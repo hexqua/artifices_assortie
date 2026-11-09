@@ -7,7 +7,7 @@ Constellation 'n Spells の運用方針を基に、Artifices Assortie 向けに�
 - `main` への取り込みは PR を使い、バージョン更新を含め merge commit のみとする。rebase merge と squash merge は使用しない。
 - `.github/workflows/pr-ci.yml` は `main` 向けの `pull_request` で `build` と `gametest` を独立実行する。`pull_request_target` は使用しない。
 - Java 21、secrets 不使用、`contents: read`、checkout 認証情報の非永続化、Gradle wrapper 検証、action の完全 SHA 固定を維持する。
-- GameTest 未実装の間は、`gametest` ジョブが存在することを機能の検証済みという意味にしない。GameTest の実装・専用 world の設定後に、その実行対象と結果を確認する。
+- CI の `gametest` ジョブは通常構成の `runGameTestServer` のみ実行する。Irons / Create の追加構成はローカル検証用とし、CI 対象には含めない。現在の検証範囲は MOD ロードと混入確認であり、ゲーム内機能の検証済みという意味にしない。Graphic は client 専用とする。
 
 ## GitHub 側で確認する設定
 
