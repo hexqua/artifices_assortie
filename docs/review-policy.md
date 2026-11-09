@@ -6,7 +6,7 @@ Constellation 'n Spells の共通レビュー方針を本リポジトリへ適�
 - コミット前の staged / unstaged / untracked 差分または指定コミットは `.codex/skills/review-local-change` でレビューする。
 - base branch に対する機能ブランチ全体、PR、CI、Codex Cloud、人間レビューを含む readiness は `.codex/skills/review-feature-branch` で確認する。
 - どちらの Skill もデフォルトではレビュー結果の報告だけを行い、明示指示なしに修正、stage、commit、push、PR コメント、merge を行わない。
-- コミットは人間確認後の明示指示が必要。リモート書き込みはこの環境では行わず、Skill 内の許可に関する記述も `AGENTS.md` の制約に従う。
+- コミットは人間確認後の明示指示が必要。リモート操作の可否と範囲は共通ルール・作業時の指示・`AGENTS.md` に従い、レビュー Skill 自体を操作の許可とみなさない。
 - コードレビューでは、実行時・ビルド時・データ上の不具合を実装 Finding として優先する。PR 説明、リリースノート、移行ガイド、コミット構成、検証未実行などの運用・文書上の不足だけを実装 Finding にせず、重大な実装不具合を省略する理由にしない。
 - ローカル変更レビューでは運用・文書上の不足をデフォルトで報告対象外とする。機能ブランチレビューで必要な場合だけ独立した Note とし、P3 相当を上限として readiness を下げない。
 

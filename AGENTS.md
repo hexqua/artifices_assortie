@@ -12,10 +12,10 @@
 
 - Artifices Assortie: Minecraft 1.21.1 / NeoForge / Java 21。バージョンの正は `gradle.properties`。
 - MOD ID は `artificesassortie`、package は `jp.aquafactory.artificesassorite`。
-- `main` が開発基準。現在 1.20.1 / Forge の保守・backport 運用は設けない。
+- `main` が開発基準。1.20.1 / Forge の保守・backport 運用は設けない。
 - Iron's Arms 'n Artifice / GeckoLib / Iron's Lib が必須依存。Create のみ任意依存。Iron's Spells 'n Spellbooks / Iron's Gems 'n Jewelry は開発用 Irons 構成へだけ追加し、本 MOD の必須・任意依存には含めない。
 - client / GameTest の共通構成は必須依存に JEI / Jade / Target Dummy と前提の MezzConfig / Moonlight Lib を加える。追加構成とバージョンは `build.gradle`、`gradle.properties`、README を確認する。開発用 MOD を配布 jar へ同梱しない。
-- サンプルコンテンツは除去済み。現在の GameTest は構成ごとのロード・混入確認のみで、独自機能と datagen Provider は未実装。機能・連携の追加時に必要な挙動テストも追加する。
+- 実行構成のロード・混入確認は `gametest.runtime` に置く。機能・連携の追加時には、対応する処理結果や状態遷移を確認する挙動テストも追加する。
 - IntelliJ IDEA では JetBrains MCP を優先してシンボル・型・依存・Inspection・実行構成を確認する。利用できない場合は代替手段で続行し報告する。
 
 ## 実行と検証
@@ -51,7 +51,7 @@
 
 - クラスは PascalCase、メソッド・変数は camelCase、定数は UPPER_SNAKE_CASE、リソース ID は snake_case。
 - Java の型参照は import と単純名を使う。名前衝突で必要な場合だけ FQCN を使う。変更した Java の未使用 import を整理し、無関係な一括整形をしない。
-- 不要な FQCN は IDEA の `UnnecessaryFullyQualifiedName` Inspection で確認する。現在、共有 Inspection 設定と Gradle による強制はない。
+- 不要な FQCN は共有 IDEA Inspection の `UnnecessaryFullyQualifiedName` で ERROR として確認する。Gradle による強制は行わない。
 - 登録は既存の DeferredRegister / EventBus と整合させる。client 専用参照は共通コードから隔離する。外部仕様依存・回避策・順序依存は理由をコメントする。
 - データ生成先は `src/generated/resources`。生成 JSON は provider を編集して再生成する。手置きとの重複と旧出力の削除を確認する。Git 管理外 `.cache` にない旧 JSON は `runData` で削除されない場合がある。
 - 標準 Provider で表現できる定型リソースは原則 datagen とし、制作物・翻訳等の手管理との判断基準は [リソース管理方針](docs/resource-generation-policy.md) に従う。生成処理は `datagen` パッケージに種類別の Provider として配置する。
@@ -68,6 +68,6 @@
 6. `main` へはブランチ + PR。バージョン更新を含め merge commit のみ使用する。rebase merge と squash merge は使わない。
 7. `PR CI / build` と `PR CI / gametest`、人間の判断を確認する。Codex Cloud は設定・実行を確認できた場合の補助であり、CI を代替しない。
 
-このローカル環境ではリモート読み取りを許可するが、push、リモートブランチ変更、PR / Issue / コメント / Release の作成・更新、CI の手動実行などのリモート書き込みは、明示依頼があっても行わない。PR・マージ・GitHub 設定の反映は人間が行う。
+リモート操作は共通ルールと作業時の指示に従う。通常は読み取りとローカル作業までとし、個別作業で許可されたリモート書き込みも、その対象・目的・範囲に限定する。個別の許可を以後の作業の恒常的な許可とみなさない。リポジトリは private を維持する。
 
-GitHub の運用方針・未確認事項は [GitHub 設定](docs/github-pr-protection.md) を確認する。workflow 未反映の段階で required check を有効化しない。実行手順変更ではこのファイル、GitHub 運用変更では設定文書も更新する。事前合意なしの大規模リファクタ、機密情報のコミットは禁止する。
+GitHub の設定とブランチ保護は [GitHub 設定](docs/github-pr-protection.md) を確認する。required check の変更時は対象 workflow と check context の整合を確認する。実行手順変更ではこのファイル、GitHub 運用変更では設定文書も更新する。事前合意なしの大規模リファクタ、機密情報のコミットは禁止する。

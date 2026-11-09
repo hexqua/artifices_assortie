@@ -1,37 +1,43 @@
 # GitHub PR・Actions 設定
 
-Constellation 'n Spells の運用方針を基に、Artifices Assortie 向けに整理する。本書の「方針」と GitHub 側の「適用済み設定」は区別する。
+対象は `hexqua/artifices_assortie`。リポジトリは private を維持する。設定は GitHub API で照合し、運用を変更した際は本書も更新する。
 
-## マージと CI の方針
+## リポジトリ設定
 
-- `main` への取り込みは PR を使い、バージョン更新を含め merge commit のみとする。rebase merge と squash merge は使用しない。
+- 開発基準・既定ブランチは `main`。
+- merge commit のみ許可する。バージョン更新を含め rebase merge と squash merge は使用しない。
+- マージ後の作業ブランチ自動削除は有効、auto merge は無効。
+
+## Actions と CI
+
+- Actions は有効。GitHub 所有 action と `gradle/actions/wrapper-validation@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e` を許可し、verified creator の一括許可は無効とする。
+- action は完全 SHA 固定を必須とする。wrapper 検証 action の SHA を更新するときは、workflow と GitHub 側の許可リストを同時に更新する。
+- 既定 workflow 権限は read。Actions による PR 作成・承認は許可しない。
 - `.github/workflows/pr-ci.yml` は `main` 向けの `pull_request` で `build` と `gametest` を独立実行する。`pull_request_target` は使用しない。
-- Java 21、secrets 不使用、`contents: read`、checkout 認証情報の非永続化、Gradle wrapper 検証、action の完全 SHA 固定を維持する。
-- CI の `gametest` ジョブは通常構成の `runGameTestServer` のみ実行する。Irons / Create の追加構成はローカル検証用とし、CI 対象には含めない。現在の検証範囲は MOD ロードと混入確認であり、ゲーム内機能の検証済みという意味にしない。Graphic は client 専用とする。
+- Java 21、secrets 不使用、`contents: read`、checkout 認証情報の非永続化、Gradle wrapper 検証を維持する。
+- `gametest` は通常構成の `runGameTestServer` のみ実行する。Irons / Create はローカル検証用、Graphic は client 専用とする。
+- `gametest.runtime` のロード・混入確認と、機能・連携の挙動テストは保証範囲を区別する。
 
-## GitHub 側で確認する設定
+## main の保護ルール
 
-以下は目標とする設定であり、今回 GitHub API で適用状況は確認していない。
+- branch ruleset `main-pr-ci-protection` を `refs/heads/main` へ適用し、enforcement を Active とする。
+- 削除・force push を禁止し、取り込みには PR を必須とする。
+- required checks は `build` / `gametest`、実行元は GitHub Actions。表示名の `PR CI /` は check context に含めない。最新 base への追従を必須とする。
+- PR の許可マージ方式は merge commit のみ。必須 approval 数は 0 とし、人間の判断は運用で確認する。
+- stale approval の破棄、code owner review、last push approval、conversation resolution は要求しない。
+- 管理者バイパスは For pull requests only に限定し、直接 push のバイパスを許可しない。通常の取り込みではバイパスを使わず、CI と人間確認を終える。
+- linear history、更新者の制限、署名・deployment・merge queue の必須化は行わない。
 
-- merge commit のみ許可、マージ後の作業ブランチ自動削除を有効、auto merge を無効。
-- Actions は必要な GitHub 所有 action と Gradle wrapper 検証 action に限定し、完全 SHA 固定を必須とする。
-- 既定 workflow 権限は read、Actions による PR 作成・承認は許可しない。
-- `main` の削除・force push を禁止し、PR と最新 base への追従を必須にする。
-- required checks は GitHub Actions の `build` / `gametest`。表示名の `PR CI /` は context に含めない。
-- 必須 approval 数は 0 を基準とし、人間の判断を運用で確認する。管理者のバイパスを設定する場合も PR 経由に限定する。
+## PR の取り込み
 
-参照元でのプラン制約・403 応答は本リポジトリの状態を示さない。実際に設定できない場合は、その制約を確認したうえで PR・CI の確認を運用で守る。リポジトリの公開範囲を変更する根拠にはしない。
+1. `main` への取り込みは PR 経由とし、直接 push・force push・削除を行わない。
+2. PR の最新コミットについて `PR CI / build` と `PR CI / gametest` の成功を確認する。過去のコミットの成功を代用しない。
+3. 最新の `main` との整合と人間の確認を終えてから merge commit で取り込む。CI の失敗・中断・待機中を成功と扱わない。
 
-## workflow 導入と保護設定
+required checks の追加・改名時は、対象 workflow が `main` に存在し、その context を実際に報告することを確認してから保護設定を変更する。
 
-設定の反映は人間が行う。このローカル環境では push、PR 作成・更新、GitHub 設定変更、CI の手動実行を行わない。
+## 設定変更とレビュー
 
-1. 人間が workflow を含む `main` 向け PR を反映し、`PR CI / build` と `PR CI / gametest` の実行結果・検証範囲を確認する。
-2. merge commit で取り込み、`main` 上に workflow が存在することを確認する。
-3. 保護機能の利用可否と check context を確認してから required checks 等を設定する。
+設定の確認には GitHub 連携または `gh api` を使う。`gh` がサンドボックス内で利用できない場合は、操作内容と目的を示して権限昇格を要求する。書き込みは共通ルールと作業時の指示で許可された対象・範囲に限定する。
 
-workflow の導入・check の報告前に required checks を有効化すると、未報告の check 待ちでマージできなくなる場合がある。
-
-## 外部レビュー
-
-Codex Cloud のアクセス・レビュー設定・実行結果は未確認。利用する場合も CI と人間の判断の補助とし、未確認を実施済みと扱わない。外部レビューの優先度はそのまま採用せず、[レビュー方針](review-policy.md) の具体的な実害に基づいて再評価する。
+Codex Cloud 等の外部レビューは、対象リポジトリへのアクセスと実行結果を確認したうえで CI と人間の判断の補助として使う。レビューの優先度はそのまま採用せず、[レビュー方針](review-policy.md) の具体的な実害に基づいて再評価する。

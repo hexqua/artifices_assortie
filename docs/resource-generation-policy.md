@@ -22,7 +22,7 @@
 ## 配置と担当
 
 - 手管理の配布リソースは `src/main/resources`、生成される配布リソースは `src/generated/resources` に置く。
-- 生成処理は `jp.aquafactory.artificesassorite.datagen` 配下に種類別の Provider として配置し、データ生成イベントへ接続する。現在は Provider 未実装であり、以下は追加時の配置方針とする。
+- 生成処理は `jp.aquafactory.artificesassorite.datagen` 配下に種類別の Provider として配置し、データ生成イベントへ接続する。
 - ブロックモデル・blockstate・対応する BlockItem モデルは `BlockModelProvider`、通常アイテムのモデルは
   `ItemModelProvider` が担当する。
 - アイテムモデルは対象ごとに平面・手持ち・既存モデル参照等の種類を明示する。全登録アイテムへ一律に平面モデルを適用せず、BlockItem
@@ -43,7 +43,7 @@
 
 ## 参照元リソースの取り込み
 
-他リポジトリから取り込む場合も Minecraft 1.21.1 / NeoForge の Provider と schema に合わせる。名前空間だけの一括置換では完了とせず、参照 ID、依存 MOD、出力パスと旧出力の残存を確認する。現在は他バージョンの保守・backport 運用を設けない。
+他リポジトリから取り込む場合も Minecraft 1.21.1 / NeoForge の Provider と schema に合わせる。名前空間だけの一括置換では完了とせず、参照 ID、依存 MOD、出力パスと旧出力の残存を確認する。他バージョンの保守・backport 運用は設けない。
 
 ## 参考
 

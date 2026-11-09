@@ -33,7 +33,7 @@ PowerShell では `JDK21_HOME` を設定するか、JDK 21 を `%USERPROFILE%\.j
 
 データ生成は `./gradlew.bat runData`、人間による client 確認は `./gradlew.bat runClient`、IDE 実行構成の同期は `./gradlew.bat neoForgeIdeSync` を使います。client の表示・操作は GameTest では検証できません。
 
-サンプルコンテンツは除去済みで、アドオン独自の機能と datagen Provider は未実装です。必須依存は Iron's Arms 'n Artifice / GeckoLib / Iron's Lib、任意依存は Create のみです。GameTest は実行構成の MOD ロードと、別構成からの MOD 混入を確認します。各 MOD のゲーム内機能や連携動作まで保証するものではありません。
+必須依存は Iron's Arms 'n Artifice / GeckoLib / Iron's Lib、任意依存は Create のみです。実行構成の MOD ロードと別構成からの混入は GameTest で確認し、機能・連携の検証は対象の挙動テストで行います。
 
 `build` では UTF-8・BOM・明らかな文字化けの検査も行います。文書・翻訳の変更時は `./gradlew.bat checkTextEncodingHygiene` で単独実行できます。
 
@@ -50,7 +50,7 @@ PowerShell では `JDK21_HOME` を設定するか、JDK 21 を `%USERPROFILE%\.j
 
 すべての client と GameTest の共通構成は、必須依存3件に JEI / Jade / MmmMmmMmmMmm（Target Dummy）と前提の MezzConfig / Moonlight Lib を加えたものです。JEI・Jade・Target Dummy は開発用であり、本 MOD の任意依存宣言には含めません。通常の `runServer` と `runData` は必須依存のみで起動します。
 
-Irons 構成の追加 MOD は導入環境の確認用で、現時点では本 MOD の必須・任意依存として対応しません。Create は任意依存ですが、固有の連携機能はまだありません。
+Irons 構成の追加 MOD は導入環境の確認用で、本 MOD の必須・任意依存には含めません。Create は任意依存として扱います。
 
 描画構成は Constellation 'n Spells と同じ Sodium 0.8.13+mc1.21.1 と補助 MOD の組み合わせを使用します。開発環境で Sodium 本体を正しく探索するため補助 jar を生成し、`neoForgeIdeSync` と起動準備から参照します。旧 Sodium Options API は追加しません。
 
@@ -68,7 +68,7 @@ GameTest は専用 world `run/artifices_gametest_clean`、`run/artifices_gametes
 
 `main` への取り込みはブランチと PR を使い、バージョン更新を含め merge commit に統一します。rebase merge と squash merge は使用しません。
 
-通常の実装・修正は自動検証とローカルレビューを終えた未コミット差分で人間へ引き渡し、人間確認後の明示指示を受けてコミットします。このローカル環境からリモートへの書き込みは行いません。
+通常の実装・修正は自動検証とローカルレビューを終えた未コミット差分で人間へ引き渡し、人間確認後の明示指示を受けてコミットします。リモート操作の可否は開発環境の共通ルールと作業時の指示に従います。
 
 CI は `PR CI / build` と `PR CI / gametest` を確認する方針です。GameTest の CI 対象は通常構成の `runGameTestServer` のみで、Irons / Create の追加構成はローカル検証用です。GitHub 側の設定・適用状況は [GitHub PR・Actions 設定](docs/github-pr-protection.md) を参照してください。
 
