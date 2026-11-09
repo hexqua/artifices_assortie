@@ -5,6 +5,8 @@ plugins {
     id 'idea'
 }
 
+apply from: 'scripts/text-encoding.gradle'
+
 tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
 }
