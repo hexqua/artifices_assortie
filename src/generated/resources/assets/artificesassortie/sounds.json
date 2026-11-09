@@ -1,0 +1,8 @@
+{
+  "precision_fire_headshot": {
+    "sounds": [
+      "random/anvil_land"
+    ],
+    "subtitle": "subtitle.artificesassortie.sound.precision_fire_headshot"
+  }
+}
