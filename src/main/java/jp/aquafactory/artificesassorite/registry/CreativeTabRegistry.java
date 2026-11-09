@@ -12,12 +12,19 @@ public final class CreativeTabRegistry {
     static {
         TABS.register("artifices_assortie", () -> CreativeModeTab.builder()
                 .title(Component.translatable("itemGroup.artificesassortie"))
-                .icon(() -> ItemRegistry.PRECISION_FIRE_MODIFIER.get().getDefaultInstance())
-                .displayItems((parameters, output) -> {
-                    output.accept(ItemRegistry.PRECISION_FIRE_MODIFIER.get());
-                    output.accept(ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER.get());
-                }).build());
+                .icon(() -> ItemRegistry.PRECISION_FIRE_MODIFIER.get().getDefaultInstance()) // todo:もうちょい顔になるアイテムを追加してアイコンを差し替える.
+                .displayItems(CreativeTabRegistry::displayItems)
+                .build());
     }
 
     private CreativeTabRegistry() {}
+
+    private static void displayItems(CreativeModeTab.ItemDisplayParameters parameters, CreativeModeTab.Output output) {
+        addModifiers(output);
+    }
+
+    private static void addModifiers(CreativeModeTab.Output output) {
+        output.accept(ItemRegistry.PRECISION_FIRE_MODIFIER.get());
+        output.accept(ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER.get());
+    }
 }
