@@ -1,0 +1,60 @@
+# idea
+
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/**/out/
+.idea/*
+!.idea/inspectionProfiles/
+.idea/inspectionProfiles/*
+!.idea/inspectionProfiles/Project_Default.xml
+
+
+# gradle
+
+build
+.gradle
+
+
+# other
+
+run-data/
+.cache/
+
+
+# Codex-Search
+
+.tmp*
+tmp
+
+
+# Files from Forge MDK
+
+forge*changelog.txt
+
+
+# Files from Neoforge ModdevGradle Gegerator
+
+.run/
+
+.apt_generated
+.classpath
+.eclipse/
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/**/bin/
+
+.vscode/
+
+.DS_Store
+
+run/
+!**/src/**/run/
+**/src/generated/**/.cache/
+repo/
+!**/src/**/repo/
