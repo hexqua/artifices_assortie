@@ -151,7 +151,7 @@ neoForge {
 
 def runtimeSourceSets = [:]
 def addRunModules = { String runName, Collection<String> modules ->
-    def profileName = runName.replaceFirst('^(client|gameTestServer)', '') ?: 'Base'
+    def profileName = runName == 'data' ? 'Data' : (runName.replaceFirst('^(client|gameTestServer)', '') ?: 'Base')
     def sourceSetName = "dev${profileName}"
     def runtimeSourceSet = runtimeSourceSets[profileName]
     if (runtimeSourceSet == null) {
@@ -182,6 +182,8 @@ runtimeProfiles.each { suffix, modules ->
     tasks.named("runGameTestServer${suffix}").configure { dependsOn cleanWorld }
 }
 addRunModules('clientGraphic', ['target_dummy', 'utility', 'graphic'])
+// 公式 Builder で連携レシピを生成するため、Create は datagen にも限定して読み込む。
+addRunModules('data', ['create'])
 // 同じ run ディレクトリのログ・設定を使うため、複数指定時も GameTest は直列にする。
 def gameTestTaskNames = runtimeProfiles.keySet().collect { "runGameTestServer${it}".toString() }
 gameTestTaskNames.eachWithIndex { name, index ->

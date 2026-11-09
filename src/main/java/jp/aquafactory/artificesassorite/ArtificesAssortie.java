@@ -2,6 +2,7 @@ package jp.aquafactory.artificesassorite;
 
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.datagen.ModItemModelProvider;
+import jp.aquafactory.artificesassorite.datagen.RecipeDataProviders;
 import jp.aquafactory.artificesassorite.datagen.SoundDataProvider;
 import jp.aquafactory.artificesassorite.network.ModifierConfigSync;
 import jp.aquafactory.artificesassorite.network.Networks;
@@ -26,5 +27,6 @@ public class ArtificesAssortie {
         bus.addListener(Networks::register);
         bus.addListener(ModItemModelProvider::gatherData);
         bus.addListener(SoundDataProvider::gatherData);
+        bus.addListener(RecipeDataProviders::gatherData);
     }
 }

@@ -48,7 +48,9 @@ PowerShell では `JDK21_HOME` を設定するか、JDK 21 を `%USERPROFILE%\.j
 | `runClientIrons` | `runGameTestServerIrons` | Iron's Spells 'n Spellbooks / Iron's Gems 'n Jewelry / Curios / playerAnimator / Atlas API |
 | `runClientCreate` | `runGameTestServerCreate` | Create（Registrate / Flywheel / Ponder は配布 jar に同梱） |
 
-すべての client と GameTest の共通構成は、必須依存3件に JEI / Jade / MmmMmmMmmMmm（Target Dummy）と前提の MezzConfig / Moonlight Lib を加えたものです。JEI・Jade・Target Dummy は開発用であり、本 MOD の任意依存宣言には含めません。通常の `runServer` と `runData` は必須依存のみで起動します。
+すべての client と GameTest の共通構成は、必須依存3件に JEI / Jade / MmmMmmMmmMmm（Target Dummy）と前提の MezzConfig / Moonlight Lib を加えたものです。JEI・Jade・Target Dummy は開発用であり、本 MOD の任意依存宣言には含めません。通常の `runServer` は必須依存のみ、`runData` は必須依存と Create を読み込んで起動します。
+
+レシピは通常用と連携用を `runData` でまとめて生成し、導入されている MOD に応じてロード条件で切り替えます。
 
 Irons 構成の追加 MOD は導入環境の確認用で、本 MOD の必須・任意依存には含めません。Create は任意依存として扱います。
 
