@@ -1,0 +1,301 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.148'
+    id 'idea'
+}
+
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
+
+version = mod_version
+group = mod_group_id
+
+sourceSets.main.resources {
+    srcDir('src/generated/resources')
+
+    exclude("**/*.bbmodel")
+    exclude('**/.cache/**')
+}
+
+repositories {
+    maven {
+        url = uri('https://maven.caffeinemc.net/releases')
+        content { includeGroup 'net.caffeinemc' }
+    }
+    maven {
+        url = uri('https://maven.sinytra.org/')
+        content { includeGroup 'org.sinytra.forgified-fabric-api' }
+    }
+    maven {
+        url = uri('https://code.redspace.io/releases')
+        content { includeGroup 'io.redspace' }
+    }
+    maven {
+        url = uri('https://maven.theillusivec4.top/')
+        content { includeGroup 'top.theillusivec4.curios' }
+    }
+    maven {
+        url = uri('https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/')
+        content { includeGroup 'software.bernie.geckolib' }
+    }
+    maven {
+        url = uri('https://api.modrinth.com/maven')
+        content { includeGroup 'maven.modrinth' }
+    }
+    maven {
+        url = uri('https://mvn.devos.one/snapshots')
+        content { includeGroup 'com.tterrag.registrate' }
+    }
+    maven {
+        // Artifice の Maven metadata が参照する同梱 Companion API の解決先。
+        url = uri('https://maven.ryanhcode.dev/releases')
+        content { includeGroup 'dev.ryanhcode.sable-companion' }
+    }
+}
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+def gameTestWorldName = 'artifices_gametest_clean'
+def gameTestNamespace = project.mod_id.toString()
+def requiredOptionalModsProperty = 'artificesassortie.requiredOptionalMods'
+Map<String, List<String>> runtimeModules = [
+        target_dummy: ['moonlight', 'dummmmmmy'],
+        utility     : ['mezz_config', 'jei', 'jade'],
+        irons       : ['irons_spellbooks', 'curios', 'playeranimator', 'atlas_api', 'irons_jewelry'],
+        create      : ['create', 'ponder'],
+        graphic     : ['sodium', 'sodiumdynamiclights', 'chloride', 'reeses_sodium_options'],
+]
+Map<String, List<String>> runtimeProfiles = [
+        ''    : ['target_dummy', 'utility'],
+        Irons : ['target_dummy', 'utility', 'irons'],
+        Create: ['target_dummy', 'utility', 'create'],
+]
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+    sodiumShell {
+        canBeConsumed = false
+        canBeResolved = true
+        transitive = false
+    }
+    runtimeModules.keySet().each { module ->
+        create("${module}RuntimeOnly") {
+            canBeConsumed = false
+            canBeResolved = true
+        }
+    }
+}
+
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    runs {
+        runtimeProfiles.each { suffix, modules ->
+            String expectedMods = modules.collectMany { String module -> runtimeModules[module] }.join(',')
+            create("client${suffix}") {
+                client()
+                systemProperty 'neoforge.enabledGameTestNamespaces', gameTestNamespace
+            }
+            create("gameTestServer${suffix}") {
+                type = 'gameTestServer'
+                systemProperty 'neoforge.enabledGameTestNamespaces', gameTestNamespace
+                systemProperty requiredOptionalModsProperty, expectedMods
+                // 別構成の MOD が標準 classpath へ漏れていないことも確認する。
+                String excludedMods = ['irons', 'create'].findAll { !modules.contains(it) }
+                        .collectMany { String module -> runtimeModules[module] }.join(',')
+                systemProperty 'artificesassortie.excludedProfileMods', excludedMods
+                programArguments.addAll '--world', "${gameTestWorldName}${suffix.toLowerCase(Locale.ROOT)}".toString()
+            }
+        }
+
+        clientGraphic {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', gameTestNamespace
+        }
+
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', gameTestNamespace
+        }
+
+        data {
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+def runtimeSourceSets = [:]
+def addRunModules = { String runName, Collection<String> modules ->
+    def profileName = runName.replaceFirst('^(client|gameTestServer)', '') ?: 'Base'
+    def sourceSetName = "dev${profileName}"
+    def runtimeSourceSet = runtimeSourceSets[profileName]
+    if (runtimeSourceSet == null) {
+        // NeoForge 1.21.1 は MOD を Java classpath から発見するため、IDE も構成別 module を使う。
+        runtimeSourceSet = sourceSets.create(sourceSetName) {
+            java.setSrcDirs([])
+            resources.setSrcDirs([])
+            runtimeClasspath += sourceSets.main.output
+        }
+        runtimeSourceSets[profileName] = runtimeSourceSet
+        def moduleConfigurations = modules.collect { configurations.named("${it}RuntimeOnly").get() }
+        configurations.named(runtimeSourceSet.runtimeClasspathConfigurationName).configure {
+            extendsFrom(configurations.runtimeClasspath)
+            extendsFrom(moduleConfigurations as Configuration[])
+        }
+    }
+    neoForge.runs.named(runName).configure {
+        sourceSet = runtimeSourceSet
+    }
+}
+runtimeProfiles.each { suffix, modules ->
+    addRunModules("client${suffix}", modules)
+    addRunModules("gameTestServer${suffix}", modules)
+    // 手動確認用 run/world は保持し、構成ごとのテスト専用 world だけを初期化する。
+    def cleanWorld = tasks.register("cleanGameTestServer${suffix}World", Delete) {
+        delete layout.projectDirectory.dir("run/${gameTestWorldName}${suffix.toLowerCase(Locale.ROOT)}")
+    }
+    tasks.named("runGameTestServer${suffix}").configure { dependsOn cleanWorld }
+}
+addRunModules('clientGraphic', ['target_dummy', 'utility', 'graphic'])
+// 同じ run ディレクトリのログ・設定を使うため、複数指定時も GameTest は直列にする。
+def gameTestTaskNames = runtimeProfiles.keySet().collect { "runGameTestServer${it}".toString() }
+gameTestTaskNames.eachWithIndex { name, index ->
+    tasks.named(name).configure { mustRunAfter gameTestTaskNames.take(index) }
+}
+
+apply from: 'scripts/text-encoding.gradle'
+
+tasks.named('jar', Jar).configure {
+    exclude('jp/aquafactory/artificesassorite/gametest/**')
+    exclude('data/artificesassortie/structure/gametest/**')
+}
+
+// 外側 jar が sodium の MOD ID を持つと、開発環境の JarJar が LIBRARY を本体として選んでしまう。
+// 本体は別 artifact から読み込み、外側の補助クラスだけを重複探索なしで保持する。
+def sodiumShellFiles = configurations.sodiumShell
+def prepareSodiumGraphicShell = tasks.register('prepareSodiumGraphicShell', Jar) {
+    archiveBaseName = 'sodium-graphic-shell-lib'
+    archiveVersion = project.sodium_version
+    destinationDirectory = layout.buildDirectory.dir('dev-libs')
+    from { sodiumShellFiles.collect { zipTree(it) } }
+    exclude 'META-INF/MANIFEST.MF'
+    exclude 'META-INF/neoforge.mods.toml'
+    exclude 'META-INF/jarjar/**'
+    exclude 'META-INF/services/net.neoforged.neoforgespi.locating.IModFileCandidateLocator'
+    manifest {
+        attributes 'FMLModType': 'LIBRARY', 'Automatic-Module-Name': 'sodium_service'
+    }
+}
+// IDE の直接起動でも補助 jar が存在するよう、実行準備・IDE 同期の段階で生成する。
+tasks.named('prepareClientGraphicRun').configure {
+    dependsOn prepareSodiumGraphicShell
+}
+
+dependencies {
+    implementation "io.redspace:irons_artifice:${irons_artifice_version}"
+    implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    implementation "io.redspace:irons_lib:${irons_lib_version}"
+
+    // Create だけを任意 API として参照し、配布 jar には同梱しない。
+    compileOnly "maven.modrinth:create:${create_modrinth_version_id}"
+    compileOnly "com.tterrag.registrate:Registrate:${registrate_version}"
+
+    target_dummyRuntimeOnly "maven.modrinth:moonlight:${moonlight_modrinth_version_id}"
+    target_dummyRuntimeOnly "maven.modrinth:Adega8YN:${target_dummy_modrinth_version_id}"
+    utilityRuntimeOnly "maven.modrinth:mezzconfig:${mezzconfig_modrinth_version_id}"
+    utilityRuntimeOnly "maven.modrinth:jei:${jei_modrinth_version_id}"
+    utilityRuntimeOnly "maven.modrinth:jade:${jade_modrinth_version_id}"
+
+    // 導入環境の確認用。Spellbooks / Jewelry の API・任意依存宣言は追加しない。
+    ironsRuntimeOnly "io.redspace:irons_spellbooks:${irons_spells_version}"
+    ironsRuntimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
+    ironsRuntimeOnly "maven.modrinth:playeranimator:${playeranimator_modrinth_version_id}"
+    ironsRuntimeOnly "io.redspace:atlas_api:${atlas_api_version}"
+    ironsRuntimeOnly "io.redspace:irons_jewelry:${irons_jewelry_version}"
+    createRuntimeOnly "maven.modrinth:create:${create_modrinth_version_id}"
+
+    // Constellation と同じ実績のある描画構成を維持する。
+    sodiumShell "net.caffeinemc:sodium-neoforge:${sodium_version}"
+    graphicRuntimeOnly "net.caffeinemc:sodium-neoforge-mod:${sodium_version}"
+    graphicRuntimeOnly files(prepareSodiumGraphicShell)
+    graphicRuntimeOnly "org.sinytra.forgified-fabric-api:fabric-api-base:${ffapi_base_version}"
+    graphicRuntimeOnly "org.sinytra.forgified-fabric-api:fabric-renderer-api-v1:${ffapi_renderer_version}"
+    graphicRuntimeOnly "org.sinytra.forgified-fabric-api:fabric-rendering-data-attachment-v1:${ffapi_rendering_data_version}"
+    graphicRuntimeOnly "org.sinytra.forgified-fabric-api:fabric-block-view-api-v2:${ffapi_block_view_version}"
+    graphicRuntimeOnly "maven.modrinth:sodium-dynamic-lights:${sodium_dynamic_lights_modrinth_version_id}"
+    graphicRuntimeOnly "maven.modrinth:chloride:${chloride_modrinth_version_id}"
+    graphicRuntimeOnly "maven.modrinth:reeses-sodium-options:${reeses_sodium_options_modrinth_version_id}"
+    // Sodium 0.8 と Reese's 2.2 は旧 Sodium Options API と非互換なので追加しない。
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            irons_lib_version      : irons_lib_version,
+            geckolib_version       : geckolib_version,
+            irons_artifice_version : irons_artifice_version,
+            create_version         : create_version,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url = "file://${project.projectDir}/repo"
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' 
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
