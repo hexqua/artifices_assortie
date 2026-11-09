@@ -1,0 +1,17 @@
+{
+  "itemGroup.artificesassortie": "Artifices Assortie",
+
+  "item.artificesassortie.precision_fire_modifier": "精密射撃モディファイア",
+  "item.artificesassortie.grip_hold_stabilization_modifier": "グリップホールド安定モディファイア",
+
+  "item.artificesassortie.precision_fire_modifier.desc_1": "%1$s%% ヘッドショットダメージ倍率(モディファイア追加分は+%2$s%%)",
+  "item.artificesassortie.precision_fire_modifier.desc_2": "%s%% 非ヘッドショットダメージ倍率",
+  "item.artificesassortie.grip_hold_stabilization_modifier.desc_1": "グリップホールド安定機能を有効化",
+  "item.artificesassortie.grip_hold_stabilization_modifier.desc_2": "[%s]を押し続けてる間安定状態となり、下記効果を受ける",
+  "item.artificesassortie.grip_hold_stabilization_modifier.desc_3": "%s%% 反動",
+  "item.artificesassortie.grip_hold_stabilization_modifier.desc_4": "%s 集弾率/拡散",
+  "item.artificesassortie.grip_hold_stabilization_modifier.desc_5": "%s%% 移動速度",
+  "item.artificesassortie.grip_hold_stabilization_modifier.desc_6": "満腹度を消費して射撃後の反動から素早く復帰できる",
+
+  "subtitle.artificesassortie.sound.precision_fire_headshot": "銃弾が鋭く当たる"
+}

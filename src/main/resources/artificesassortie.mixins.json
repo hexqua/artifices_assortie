@@ -3,6 +3,10 @@
   "package": "jp.aquafactory.artificesassorite.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
+  "client": [
+    "GripHoldRecoilMixin",
+    "GripHoldCrosshairMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },

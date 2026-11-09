@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": true,
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "irons_artifice:bullet"
+    },
+    "C": {
+      "item": "create:precision_mechanism"
+    },
+    "M": {
+      "item": "irons_artifice:mechanical_components"
+    },
+    "S": {
+      "item": "minecraft:spectral_arrow"
+    }
+  },
+  "pattern": [
+    " S ",
+    "SMS",
+    "BBB",
+    " C "
+  ],
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:precision_fire_modifier"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:mod_loaded",
+        "modid": "create"
+      }
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "H": {
+      "item": "irons_artifice:hair_trigger_modifier"
+    },
+    "I": {
+      "item": "minecraft:iron_block"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "M": {
+      "item": "irons_artifice:mechanical_components"
+    },
+    "V": {
+      "item": "irons_artifice:gas_vent_modifier"
+    }
+  },
+  "pattern": [
+    " V ",
+    "HMH",
+    "LIL"
+  ],
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:grip_hold_stabilization_modifier"
+  }
+}
