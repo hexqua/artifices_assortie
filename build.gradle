@@ -68,12 +68,14 @@ Map<String, List<String>> runtimeModules = [
         target_dummy: ['moonlight', 'dummmmmmy'],
         utility     : ['mezz_config', 'jei', 'jade'],
         irons       : ['irons_spellbooks', 'curios', 'playeranimator', 'atlas_api', 'irons_jewelry'],
+        magic       : ['malum', 'lodestone'],
         create      : ['create', 'ponder'],
         graphic     : ['sodium', 'sodiumdynamiclights', 'chloride', 'reeses_sodium_options'],
 ]
 Map<String, List<String>> runtimeProfiles = [
         ''    : ['target_dummy', 'utility'],
         Irons : ['target_dummy', 'utility', 'irons'],
+        Magic : ['target_dummy', 'utility', 'irons', 'magic'],
         Create: ['target_dummy', 'utility', 'create'],
 ]
 
@@ -112,7 +114,7 @@ neoForge {
                 systemProperty 'neoforge.enabledGameTestNamespaces', gameTestNamespace
                 systemProperty requiredOptionalModsProperty, expectedMods
                 // 別構成の MOD が標準 classpath へ漏れていないことも確認する。
-                String excludedMods = ['irons', 'create'].findAll { !modules.contains(it) }
+                String excludedMods = ['irons', 'magic', 'create'].findAll { !modules.contains(it) }
                         .collectMany { String module -> runtimeModules[module] }.join(',')
                 systemProperty 'artificesassortie.excludedProfileMods', excludedMods
                 programArguments.addAll '--world', "${gameTestWorldName}${suffix.toLowerCase(Locale.ROOT)}".toString()
@@ -239,6 +241,9 @@ dependencies {
     ironsRuntimeOnly "maven.modrinth:playeranimator:${playeranimator_modrinth_version_id}"
     ironsRuntimeOnly "io.redspace:atlas_api:${atlas_api_version}"
     ironsRuntimeOnly "io.redspace:irons_jewelry:${irons_jewelry_version}"
+    // Malum と前提 MOD は Magic の導入環境確認に限定し、API・任意依存宣言は追加しない。
+    magicRuntimeOnly "maven.modrinth:malum:${malum_modrinth_version_id}"
+    magicRuntimeOnly "maven.modrinth:lodestonelib:${lodestone_modrinth_version_id}"
     createRuntimeOnly "maven.modrinth:create:${create_modrinth_version_id}"
 
     // Constellation と同じ実績のある描画構成を維持する。

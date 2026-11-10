@@ -13,7 +13,8 @@
 - Artifices Assortie: Minecraft 1.21.1 / NeoForge / Java 21。バージョンの正は `gradle.properties`。
 - MOD ID は `artificesassortie`、package は `jp.aquafactory.artificesassorite`。
 - `main` が開発基準。1.20.1 / Forge の保守・backport 運用は設けない。
-- Iron's Arms 'n Artifice / GeckoLib / Iron's Lib が必須依存。Create のみ任意依存。Iron's Spells 'n Spellbooks / Iron's Gems 'n Jewelry は開発用 Irons 構成へだけ追加し、本 MOD の必須・任意依存には含めない。
+- Iron's Arms 'n Artifice / GeckoLib / Iron's Lib が必須依存。Create のみ任意依存。Iron's Spells 'n Spellbooks / Iron's Gems 'n Jewelry は開発用 Irons / Magic 構成へだけ追加し、本 MOD の必須・任意依存には含めない。
+- Magic 構成は Irons 構成一式に Malum / Lodestone を加える。Malum の前提 Curios は Irons 構成で導入し、本 MOD の必須・任意依存には追加しない。
 - client / GameTest の共通構成は必須依存に JEI / Jade / Target Dummy と前提の MezzConfig / Moonlight Lib を加える。追加構成とバージョンは `build.gradle`、`gradle.properties`、README を確認する。開発用 MOD を配布 jar へ同梱しない。
 - 実行構成のロード・混入確認は `gametest.runtime` に置く。機能・連携の追加時には、対応する処理結果や状態遷移を確認する挙動テストも追加する。
 - IntelliJ IDEA では JetBrains MCP を優先してシンボル・型・依存・Inspection・実行構成を確認する。利用できない場合は代替手段で続行し報告する。
@@ -26,6 +27,7 @@
 ./gradlew.bat runGameTestServer
 # 対象構成を1回ずつ直列実行
 ./gradlew.bat runGameTestServerIrons
+./gradlew.bat runGameTestServerMagic
 ./gradlew.bat runGameTestServerCreate
 # データ生成を変更したとき
 # 公式 Builder を使うため、runData は必須依存と Create を読み込む
@@ -40,9 +42,9 @@
 - 通常確認に `clean` は付けない。コード・依存・リソース・ビルド設定変更では `build`、サーバー登録・データ読込・GameTest 変更では `runGameTestServer` も実行する。文書だけならビルド省略理由を報告してよい。
 - `build` は `checkTextEncodingHygiene` を含む。同タスクは単独実行も可能。
 - テストの追加・整理では [テスト設計方針](docs/testing-policy.md) に従う。設定値の転記より、実際の処理結果・状態遷移・依存との接続を優先して検証する。
-- GameTest は専用 world `run/artifices_gametest_clean`（Irons / Create は末尾に `irons` / `create`）を毎回初期化する。手動用 `run/world` は削除しない。同じ run ディレクトリの GameTest は直列実行し、1 回の Gradle 呼び出しにつき GameTest task は 1 つとする。先行プロセスの終了を待ってから次を起動する。
-- 実行構成・共通依存変更では標準 / Irons / Create の GameTest を確認する。`runClientGraphic` は client 専用で GameTest を設けない。描画構成変更時は依存解決と IDE 同期・Sodium 補助 jar の生成を確認し、表示確認は人間へ引き継ぐ。
-- CI の GameTest は通常構成の `runGameTestServer` のみとする。Irons / Create はローカル検証用であり、実行構成の追加だけを理由に CI 対象を増やさない。
+- GameTest は専用 world `run/artifices_gametest_clean`（Irons / Magic / Create は末尾に `irons` / `magic` / `create`）を毎回初期化する。手動用 `run/world` は削除しない。同じ run ディレクトリの GameTest は直列実行し、1 回の Gradle 呼び出しにつき GameTest task は 1 つとする。先行プロセスの終了を待ってから次を起動する。
+- 実行構成・共通依存変更では標準 / Irons / Magic / Create の GameTest を確認する。`runClientGraphic` は client 専用で GameTest を設けない。描画構成変更時は依存解決と IDE 同期・Sodium 補助 jar の生成を確認し、表示確認は人間へ引き継ぐ。
+- CI の GameTest は通常構成の `runGameTestServer` のみとする。Irons / Magic / Create はローカル検証用であり、実行構成の追加だけを理由に CI 対象を増やさない。
 - 実行ツールの GameTest 強制終了 timeout は初回から最低 120 秒。yield は終了ではなく wait で追跡する。ツール timeout なら記録を保持し、前回の 2 倍以上で追加実行する。GameTest 自身の test timeout とは区別する。
 - 一度でも GameTest が失敗した場合は `report-gametest-failure` Skill で初回失敗と追加実行を最終報告する。
 - Codex の通常自動検証は build、必要な GameTest / datagen / Inspection まで。`runClient` や同等の GUI 起動・操作は通常行わない。ユーザーが明示した場合はその範囲で実施できる。起動依頼は自動操作の許可とみなさない。
