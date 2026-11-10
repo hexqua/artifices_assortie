@@ -9,27 +9,27 @@
   "accept_mirrored": true,
   "category": "misc",
   "key": {
-    "B": {
-      "item": "irons_artifice:bullet"
-    },
     "C": {
-      "item": "create:precision_mechanism"
+      "item": "irons_artifice:clockwork_components"
+    },
+    "E": {
+      "item": "minecraft:ender_pearl"
     },
     "M": {
       "item": "irons_artifice:mechanical_components"
     },
-    "S": {
-      "item": "minecraft:spectral_arrow"
+    "P": {
+      "item": "create:precision_mechanism"
     }
   },
   "pattern": [
-    " S ",
-    "SMS",
-    "BBB",
-    " C "
+    "E",
+    "M",
+    "P",
+    "C"
   ],
   "result": {
     "count": 1,
-    "id": "artificesassortie:precision_fire_modifier"
+    "id": "artificesassortie:item_transfer_modifier"
   }
 }

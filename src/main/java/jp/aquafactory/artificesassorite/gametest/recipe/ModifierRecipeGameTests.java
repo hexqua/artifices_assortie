@@ -18,6 +18,8 @@ import java.util.Arrays;
 
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
 
 @GameTestHolder(ArtificesAssortie.MODID)
 @PrefixGameTestTemplate(false)
@@ -27,11 +29,11 @@ public final class ModifierRecipeGameTests {
     @GameTest(template = "gametest/basic_floor")
     public static void precisionFireRecipeSwitchesWithCreate(GameTestHelper helper) {
         boolean createLoaded = ModList.get().isLoaded("create");
-        assertRecipeVariants(helper, "precision_fire_modifier", createLoaded);
+        assertRecipeVariants(helper, "precision_fire_modifier", "sequenced_assembly/precision_fire_modifier", createLoaded);
         var fallback = input(3, 3,
-                Items.AIR, Items.SPECTRAL_ARROW, Items.SPECTRAL_ARROW,
-                ItemRegistry.BULLET.get(), ItemRegistry.MECHANICAL_COMPONENTS.get(), Items.SPECTRAL_ARROW,
-                Items.SPYGLASS, ItemRegistry.BULLET.get(), Items.AIR);
+                Items.AIR, Items.REDSTONE, Items.SPYGLASS,
+                Items.SPECTRAL_ARROW, ItemRegistry.MECHANICAL_COMPONENTS.get(), Items.REDSTONE,
+                Items.SPECTRAL_ARROW, Items.SPECTRAL_ARROW, Items.AIR);
         if (createLoaded) {
             assertNoCraftingRecipe(helper, fallback, "Create must disable the cheap precision fire recipe");
             // Create の型は導入済みの分岐だけで読み込む。
@@ -39,10 +41,10 @@ public final class ModifierRecipeGameTests {
         } else {
             assertCrafts(helper, fallback, PRECISION_FIRE_MODIFIER.get());
             var incomplete = input(3, 3,
-                    Items.AIR, Items.SPECTRAL_ARROW, Items.SPECTRAL_ARROW,
-                    ItemRegistry.BULLET.get(), ItemRegistry.MECHANICAL_COMPONENTS.get(), Items.SPECTRAL_ARROW,
-                    Items.SPYGLASS, Items.AIR, Items.AIR);
-            assertNoCraftingRecipe(helper, incomplete, "Precision fire must require both bullets");
+                    Items.AIR, Items.REDSTONE, Items.SPYGLASS,
+                    Items.SPECTRAL_ARROW, ItemRegistry.MECHANICAL_COMPONENTS.get(), Items.REDSTONE,
+                    Items.SPECTRAL_ARROW, Items.AIR, Items.AIR);
+            assertNoCraftingRecipe(helper, incomplete, "Precision fire must require all three spectral arrows");
         }
         helper.succeed();
     }
@@ -50,7 +52,7 @@ public final class ModifierRecipeGameTests {
     @GameTest(template = "gametest/basic_floor")
     public static void gripHoldRecipeSwitchesWithCreate(GameTestHelper helper) {
         boolean createLoaded = ModList.get().isLoaded("create");
-        assertRecipeVariants(helper, "grip_hold_stabilization_modifier", createLoaded);
+        assertRecipeVariants(helper, "grip_hold_stabilization_modifier", "compat/create/grip_hold_stabilization_modifier", createLoaded);
         var fallback = gripInput(Items.LEATHER);
         if (createLoaded) {
             assertNoCraftingRecipe(helper, fallback, "Create must disable the leather grip hold recipe");
@@ -62,11 +64,51 @@ public final class ModifierRecipeGameTests {
         helper.succeed();
     }
 
-    private static void assertRecipeVariants(GameTestHelper helper, String item, boolean createLoaded) {
+    @GameTest(template = "gametest/basic_floor")
+    public static void fortuneMedalRecipeSwitchesWithCreate(GameTestHelper helper) {
+        boolean createLoaded = ModList.get().isLoaded("create");
+        assertRecipeVariants(helper, "fortune_medal_modifier", "sequenced_assembly/fortune_medal_modifier", createLoaded);
+        var fallback = fortuneInput(Items.GREEN_DYE);
+        if (createLoaded) {
+            assertNoCraftingRecipe(helper, fallback, "Create must disable the crafting table fortune medal recipe");
+            CreateModifierRecipeScenarios.fortuneMedal(helper);
+        } else {
+            assertCrafts(helper, fallback, FORTUNE_MEDAL_MODIFIER.get());
+            assertNoCraftingRecipe(helper, fortuneInput(Items.LIME_DYE), "Lime dye must not substitute for green dye");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = "gametest/basic_floor")
+    public static void itemTransferCraftingRemainsAvailableWithCreate(GameTestHelper helper) {
+        assertCrafts(helper, input(3, 3,
+                ItemRegistry.MECHANICAL_COMPONENTS.get(), Items.IRON_INGOT, Items.AIR,
+                Items.ENDER_PEARL, ItemRegistry.CLOCKWORK_COMPONENTS.get(), Items.ENDER_PEARL,
+                Items.AIR, Items.GOLD_INGOT, ItemRegistry.MECHANICAL_COMPONENTS.get()), ITEM_TRANSFER_MODIFIER.get());
+        assertNoCraftingRecipe(helper, input(3, 3,
+                ItemRegistry.MECHANICAL_COMPONENTS.get(), Items.IRON_INGOT, Items.AIR,
+                Items.ENDER_PEARL, ItemRegistry.CLOCKWORK_COMPONENTS.get(), Items.AIR,
+                Items.AIR, Items.GOLD_INGOT, ItemRegistry.MECHANICAL_COMPONENTS.get()),
+                "Crafting table item transfer recipe must require two ender pearls");
+        boolean createLoaded = ModList.get().isLoaded("create");
+        helper.assertTrue(helper.getLevel().getRecipeManager().byKey(id("compat/create/item_transfer_modifier"))
+                .isPresent() == createLoaded, "Mechanical item transfer recipe must require Create");
+        if (createLoaded) CreateModifierRecipeScenarios.itemTransfer(helper);
+        helper.succeed();
+    }
+
+    private static CraftingInput fortuneInput(ItemLike dye) {
+        return input(3, 3,
+                Items.AIR, dye, Items.AIR,
+                Items.GOLD_INGOT, ItemRegistry.MECHANICAL_COMPONENTS.get(), Items.GOLD_INGOT,
+                Items.AIR, Items.RABBIT_FOOT, Items.AIR);
+    }
+
+    private static void assertRecipeVariants(GameTestHelper helper, String item, String createPath, boolean createLoaded) {
         var recipes = helper.getLevel().getRecipeManager();
         helper.assertTrue(recipes.byKey(id("crafting/" + item)).isPresent() == !createLoaded,
                 "Fallback recipe presence must match the runtime profile: " + item);
-        helper.assertTrue(recipes.byKey(id("compat/create/" + item)).isPresent() == createLoaded,
+        helper.assertTrue(recipes.byKey(id(createPath)).isPresent() == createLoaded,
                 "Create recipe presence must match the runtime profile: " + item);
     }
 

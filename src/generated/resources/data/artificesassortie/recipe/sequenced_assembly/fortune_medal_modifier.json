@@ -1,0 +1,96 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "create:golden_sheet"
+  },
+  "results": [
+    {
+      "id": "artificesassortie:fortune_medal_modifier"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_fortune_medal_modifier"
+        },
+        {
+          "item": "irons_artifice:mechanical_components"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_fortune_medal_modifier"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_fortune_medal_modifier"
+        },
+        {
+          "item": "minecraft:rabbit_foot"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_fortune_medal_modifier"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_fortune_medal_modifier"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_fortune_medal_modifier"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_fortune_medal_modifier"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_fortune_medal_modifier"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_fortune_medal_modifier"
+        },
+        {
+          "tag": "c:dyes/green"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_fortune_medal_modifier"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "artificesassortie:incomplete_fortune_medal_modifier"
+  }
+}

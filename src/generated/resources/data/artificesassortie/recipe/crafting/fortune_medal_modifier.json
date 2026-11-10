@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:mod_loaded",
+        "modid": "create"
+      }
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "D": {
+      "tag": "c:dyes/green"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "M": {
+      "item": "irons_artifice:mechanical_components"
+    },
+    "R": {
+      "item": "minecraft:rabbit_foot"
+    }
+  },
+  "pattern": [
+    " D ",
+    "GMG",
+    " R "
+  ],
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:fortune_medal_modifier"
+  }
+}

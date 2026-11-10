@@ -6,6 +6,9 @@
   "item.artificesassortie.fortune_medal_modifier": "Fortune of Medal Modifier",
   "item.artificesassortie.item_transfer_modifier": "Item Transfer Modifier",
 
+  "item.artificesassortie.incomplete_precision_fire_modifier": "Incomplete Precision Fire Modifier",
+  "item.artificesassortie.incomplete_fortune_medal_modifier": "Incomplete Fortune Medal Modifier",
+
   "item.artificesassortie.precision_fire_modifier.desc_1": "%1$s%% headshot damage multiplier(+%2$s%% per additional modifier)",
   "item.artificesassortie.precision_fire_modifier.desc_2": "%s%% non-headshot damage multiplier",
   "item.artificesassortie.grip_hold_stabilization_modifier.desc_1": "Enables Grip-Hold stabilization",
