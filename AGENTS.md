@@ -30,7 +30,7 @@
 ./gradlew.bat runGameTestServerMagic
 ./gradlew.bat runGameTestServerCreate
 # データ生成を変更したとき
-# 公式 Builder を使うため、runData は必須依存と Create を読み込む
+# 公式 Builder を使うため、runData は必須依存と Create / Irons 構成を読み込む
 ./gradlew.bat runData
 # 人間によるクライアント確認用
 ./gradlew.bat runClient

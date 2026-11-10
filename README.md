@@ -49,7 +49,7 @@ PowerShell では `JDK21_HOME` を設定するか、JDK 21 を `%USERPROFILE%\.j
 | `runClientMagic` | `runGameTestServerMagic` | Irons 構成一式 + Malum 1.8.2 / Lodestone 1.8.2（Curios は Irons 構成で導入） |
 | `runClientCreate` | `runGameTestServerCreate` | Create（Registrate / Flywheel / Ponder は配布 jar に同梱） |
 
-すべての client と GameTest の共通構成は、必須依存3件に JEI / Jade / MmmMmmMmmMmm（Target Dummy）と前提の MezzConfig / Moonlight Lib を加えたものです。JEI・Jade・Target Dummy は開発用であり、本 MOD の任意依存宣言には含めません。通常の `runServer` は必須依存のみ、`runData` は必須依存と Create を読み込んで起動します。
+すべての client と GameTest の共通構成は、必須依存3件に JEI / Jade / MmmMmmMmmMmm（Target Dummy）と前提の MezzConfig / Moonlight Lib を加えたものです。JEI・Jade・Target Dummy は開発用であり、本 MOD の任意依存宣言には含めません。通常の `runServer` は必須依存のみ、`runData` は必須依存と Create / Irons 構成を読み込んで起動します。
 
 レシピは通常用と連携用を `runData` でまとめて生成し、導入されている MOD に応じてロード条件で切り替えます。
 

@@ -97,6 +97,7 @@ public final class VanillaRecipeProvider extends RecipeProvider {
 
         // RecipeProvider の名前は固定のため、一つの Provider から形式別の生成処理へ委譲する。
         CreateRecipes.buildRecipes(output);
+        SpellbooksRecipes.buildRecipes(output);
     }
 
     private static ResourceLocation id(String path) {

@@ -8,7 +8,7 @@ public final class RecipeDataProviders {
     public static void gatherData(GatherDataEvent event) {
         var generator = event.getGenerator();
         var output = generator.getPackOutput();
-        // Create を参照する Provider は、通常起動ではなくデータ生成イベントで初めて生成する。
+        // 任意 MOD を参照する Provider は、通常起動ではなくデータ生成イベントで初めて生成する。
         generator.addProvider(event.includeServer(), new VanillaRecipeProvider(output, event.getLookupProvider()));
     }
 }

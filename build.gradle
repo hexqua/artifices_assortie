@@ -184,8 +184,8 @@ runtimeProfiles.each { suffix, modules ->
     tasks.named("runGameTestServer${suffix}").configure { dependsOn cleanWorld }
 }
 addRunModules('clientGraphic', ['target_dummy', 'utility', 'graphic'])
-// 公式 Builder で連携レシピを生成するため、Create は datagen にも限定して読み込む。
-addRunModules('data', ['create'])
+// 連携先の登録済みアイテムを Builder から参照するため、datagen だけに追加構成を読み込む。
+addRunModules('data', ['create', 'irons'])
 // 同じ run ディレクトリのログ・設定を使うため、複数指定時も GameTest は直列にする。
 def gameTestTaskNames = runtimeProfiles.keySet().collect { "runGameTestServer${it}".toString() }
 gameTestTaskNames.eachWithIndex { name, index ->
