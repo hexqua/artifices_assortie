@@ -169,7 +169,7 @@ public final class GripHoldStabilizationGameTests {
 
     @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void saturationIsSpentBeforeFoodAndReloadedValuesApply(GameTestHelper h) throws Exception {
-        var values = new ModifierValues(ModifierValues.DEFAULTS.precisionFire(), new ModifierValues.GripHoldStabilization(0.6, 0.5, -1, 1, 4.1));
+        var values = new ModifierValues(ModifierValues.DEFAULTS.precisionFire(), new ModifierValues.GripHoldStabilization(0.6, 0.5, -1, 1, 4.1), ModifierValues.DEFAULTS.fortuneMedal());
         try (var f = new ModifierTestFixture(h); var ignored = ServerConfig.overrideForGameTest(values)) {
             f.equip("clockwork_rifle", ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER.get(), 1);
             var food = f.player.getFoodData();
@@ -239,12 +239,12 @@ public final class GripHoldStabilizationGameTests {
             f.player.setData(DataAttachmentRegistry.RECOIL, new RecoilState(3, 4, now));
             GripHoldStabilizationEvents.onTick(new PlayerTickEvent.Post(f.player));
             f.close(f.player.getData(DataAttachmentRegistry.RECOIL).pitch(), 3, "Client shot number must not bypass payment");
-            var free = new ModifierValues(ModifierValues.DEFAULTS.precisionFire(), new ModifierValues.GripHoldStabilization(0.5, 0.75, -0.5, 0.75, 0));
+            var free = new ModifierValues(ModifierValues.DEFAULTS.precisionFire(), new ModifierValues.GripHoldStabilization(0.5, 0.75, -0.5, 0.75, 0), ModifierValues.DEFAULTS.fortuneMedal());
             try (var ignoredConfig = ServerConfig.overrideForGameTest(free)) {
                 GripHoldStabilizationEvents.onTick(new PlayerTickEvent.Post(f.player));
                 f.close(f.player.getData(DataAttachmentRegistry.RECOIL).pitch(), 2.55, "Zero cost must permit recovery without food");
             }
-            var disabled = new ModifierValues(ModifierValues.DEFAULTS.precisionFire(), new ModifierValues.GripHoldStabilization(0.5, 0.75, -0.5, 0, 0.4));
+            var disabled = new ModifierValues(ModifierValues.DEFAULTS.precisionFire(), new ModifierValues.GripHoldStabilization(0.5, 0.75, -0.5, 0, 0.4), ModifierValues.DEFAULTS.fortuneMedal());
             try (var ignoredConfig = ServerConfig.overrideForGameTest(disabled)) {
                 f.player.getFoodData().setFoodLevel(20);
                 GripHoldStabilizationEvents.onTick(new PlayerTickEvent.Post(f.player));

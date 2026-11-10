@@ -26,5 +26,6 @@ public final class CreativeTabRegistry {
     private static void addModifiers(CreativeModeTab.Output output) {
         output.accept(ItemRegistry.PRECISION_FIRE_MODIFIER.get());
         output.accept(ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER.get());
+        output.accept(ItemRegistry.FORTUNE_MEDAL_MODIFIER.get());
     }
 }

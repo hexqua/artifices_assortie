@@ -129,7 +129,7 @@ public final class PrecisionFireGameTests {
             h.assertTrue(!bullets.isEmpty(), "Firing must spawn a bullet");
             var fired = bullets.getFirst().getProfile();
             fixture.equip("flintlock", ItemRegistry.PRECISION_FIRE_MODIFIER.get(), 1);
-            try (var ignoredConfig = ServerConfig.overrideForGameTest(new ModifierValues(new ModifierValues.PrecisionFire(2, 0.5, 0.75), ModifierValues.DEFAULTS.gripHoldStabilization()))) {
+            try (var ignoredConfig = ServerConfig.overrideForGameTest(new ModifierValues(new ModifierValues.PrecisionFire(2, 0.5, 0.75), ModifierValues.DEFAULTS.gripHoldStabilization(), ModifierValues.DEFAULTS.fortuneMedal()))) {
                 fixture.assertDamage(fired.copy(), true, 1.75);
                 fixture.assertDamage(fired.copy(), false, 0.25);
                 fixture.assertDamage(fixture.compose(), true, 2);
