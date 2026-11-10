@@ -33,7 +33,7 @@ PowerShell では `JDK21_HOME` を設定するか、JDK 21 を `%USERPROFILE%\.j
 
 データ生成は `./gradlew.bat runData`、人間による client 確認は `./gradlew.bat runClient`、IDE 実行構成の同期は `./gradlew.bat neoForgeIdeSync` を使います。client の表示・操作は GameTest では検証できません。
 
-必須依存は Iron's Arms 'n Artifice / GeckoLib / Iron's Lib、任意依存は Create のみです。実行構成の MOD ロードと別構成からの混入は GameTest で確認し、機能・連携の検証は対象の挙動テストで行います。
+必須依存は Iron's Arms 'n Artifice / GeckoLib / Iron's Lib、任意依存は Create / Iron's Spells 'n Spellbooks / Malum です。実行構成の MOD ロードと別構成からの混入は GameTest で確認し、機能・連携の検証は対象の挙動テストで行います。
 
 `build` では UTF-8・BOM・明らかな文字化けの検査も行います。文書・翻訳の変更時は `./gradlew.bat checkTextEncodingHygiene` で単独実行できます。
 
@@ -46,21 +46,23 @@ PowerShell では `JDK21_HOME` を設定するか、JDK 21 を `%USERPROFILE%\.j
 | `runClient` | `runGameTestServer` | 共通構成のみ |
 | `runClientGraphic` | なし | Sodium / Sodium Dynamic Lights / Chloride / Reese's Sodium Options |
 | `runClientIrons` | `runGameTestServerIrons` | Iron's Spells 'n Spellbooks / Iron's Gems 'n Jewelry / Curios / playerAnimator / Atlas API |
+| `runClientMagic` | `runGameTestServerMagic` | Irons 構成一式 + Malum 1.8.2 / Lodestone 1.8.2（Curios は Irons 構成で導入） |
 | `runClientCreate` | `runGameTestServerCreate` | Create（Registrate / Flywheel / Ponder は配布 jar に同梱） |
 
-すべての client と GameTest の共通構成は、必須依存3件に JEI / Jade / MmmMmmMmmMmm（Target Dummy）と前提の MezzConfig / Moonlight Lib を加えたものです。JEI・Jade・Target Dummy は開発用であり、本 MOD の任意依存宣言には含めません。通常の `runServer` は必須依存のみ、`runData` は必須依存と Create を読み込んで起動します。
+すべての client と GameTest の共通構成は、必須依存3件に JEI / Jade / MmmMmmMmmMmm（Target Dummy）と前提の MezzConfig / Moonlight Lib を加えたものです。JEI・Jade・Target Dummy は開発用であり、本 MOD の任意依存宣言には含めません。通常の `runServer` は必須依存のみ、`runData` は必須依存と Create / Irons 構成を読み込んで起動します。
 
 レシピは通常用と連携用を `runData` でまとめて生成し、導入されている MOD に応じてロード条件で切り替えます。
 
-Irons 構成の追加 MOD は導入環境の確認用で、本 MOD の必須・任意依存には含めません。Create は任意依存として扱います。
+Iron's Spells 'n Spellbooks は Irons / Magic、Malum は Magic 構成で任意連携を確認します。Iron's Gems 'n Jewelry と開発用の前提 MOD は本 MOD の依存宣言には含めません。Create は任意依存として扱います。
 
 描画構成は Constellation 'n Spells と同じ Sodium 0.8.13+mc1.21.1 と補助 MOD の組み合わせを使用します。開発環境で Sodium 本体を正しく探索するため補助 jar を生成し、`neoForgeIdeSync` と起動準備から参照します。旧 Sodium Options API は追加しません。
 
-GameTest は専用 world `run/artifices_gametest_clean`、`run/artifices_gametest_cleanirons`、`run/artifices_gametest_cleancreate` を各実行前に初期化します。手動確認用の `run/world` は保持します。同じ run ディレクトリを使うため、GameTest は次のように1回ずつ直列に実行してください。
+GameTest は専用 world `run/artifices_gametest_clean`、`run/artifices_gametest_cleanirons`、`run/artifices_gametest_cleanmagic`、`run/artifices_gametest_cleancreate` を各実行前に初期化します。手動確認用の `run/world` は保持します。同じ run ディレクトリを使うため、GameTest は次のように1回ずつ直列に実行してください。
 
 ```powershell
 ./gradlew.bat runGameTestServer
 ./gradlew.bat runGameTestServerIrons
+./gradlew.bat runGameTestServerMagic
 ./gradlew.bat runGameTestServerCreate
 ```
 
@@ -72,7 +74,7 @@ GameTest は専用 world `run/artifices_gametest_clean`、`run/artifices_gametes
 
 通常の実装・修正は自動検証とローカルレビューを終えた未コミット差分で人間へ引き渡し、人間確認後の明示指示を受けてコミットします。リモート操作の可否は開発環境の共通ルールと作業時の指示に従います。
 
-CI は `PR CI / build` と `PR CI / gametest` を確認する方針です。GameTest の CI 対象は通常構成の `runGameTestServer` のみで、Irons / Create の追加構成はローカル検証用です。GitHub 側の設定・適用状況は [GitHub PR・Actions 設定](docs/github-pr-protection.md) を参照してください。
+CI は `PR CI / build` と `PR CI / gametest` を確認する方針です。GameTest の CI 対象は通常構成の `runGameTestServer` のみで、Irons / Magic / Create の追加構成はローカル検証用です。GitHub 側の設定・適用状況は [GitHub PR・Actions 設定](docs/github-pr-protection.md) を参照してください。
 
 ## ライセンスや使用について
 

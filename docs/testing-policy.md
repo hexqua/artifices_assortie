@@ -4,7 +4,7 @@ Apprentice's Codex の `docs/testing-policy.md`（参照時のコミット `fa23
 
 この方針を最終形として固定しない。テストの分類、分割単位、実行方法に不都合が分かった場合は、理由を説明して関連方針も同じ変更で見直す。実行コマンド、必要な検証、失敗時の報告、client 検証の分担は [AGENTS.md](../AGENTS.md) に従う。
 
-`gametest.runtime` は標準 / Irons / Create の MOD ロードと別構成からの混入を検証する。機能・連携動作はそれぞれの機能パッケージに置く挙動テストで確認し、実行構成チェックの成功だけで検証済みとは扱わない。
+`gametest.runtime` は標準 / Irons / Magic / Create の MOD ロードと別構成からの混入を検証する。機能・連携動作はそれぞれの機能パッケージに置く挙動テストで確認し、実行構成チェックの成功だけで検証済みとは扱わない。
 
 ## 1. 検証するもの
 
@@ -92,7 +92,9 @@ GameTest は `jp.aquafactory.artificesassorite.gametest` 配下を基本とし�
 
 JUnit 等は計算部分だけを高速に繰り返す必要が明確になった時点で再検討する。その際も全件実行の入口から漏れない方法と運用負担を合わせて判断する。
 
-Iron's Arms 'n Artifice / GeckoLib / Iron's Lib を標準構成に含める。Iron's Spells 'n Spellbooks / Iron's Gems 'n Jewelry は開発用 Irons 構成のみへ追加し、本 MOD の必須・任意依存には含めない。Create は任意依存として専用構成で確認する。必須 MOD のロード確認だけの重複検証は増やさず、機能追加時は実際に利用する API・登録・データとの接続を確認する。
+Iron's Arms 'n Artifice / GeckoLib / Iron's Lib を標準構成に含める。任意依存の Iron's Spells 'n Spellbooks は Irons / Magic、Malum は Magic、Create は Create 構成で連携を確認する。Iron's Gems 'n Jewelry は開発用 Irons / Magic 構成にのみ追加し、本 MOD の依存宣言には含めない。必須 MOD のロード確認だけの重複検証は増やさず、機能追加時は実際に利用する API・登録・データとの接続を確認する。
+
+Magic 構成は Irons 構成一式に Malum / Lodestone を追加する。Malum は魂露出の任意連携、Lodestone はその前提 MOD として魔法ダメージ再計算との接続も確認する。
 
 optional MOD 構成を追加する場合は、要求 MOD が読み込まれていることを確認し、連携処理を通らず成功するのを防ぐ。対象 MOD 不在で成功として省略するテストは連携検証済みと数えない。不在時に外部型を読み込まず起動できることは別の保証として残す。
 

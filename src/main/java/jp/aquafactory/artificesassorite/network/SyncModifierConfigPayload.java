@@ -25,13 +25,19 @@ public record SyncModifierConfigPayload(ModifierValues values) implements Custom
         buffer.writeDouble(grip.recoveryDegreesPerTick());
         buffer.writeDouble(grip.exhaustionPerTick());
         buffer.writeVarInt(payload.values.fortuneMedal().maxEffectiveCount());
+        var imbuement = payload.values.spellImbuement();
+        buffer.writeDouble(imbuement.firstModifierMultiplier());
+        buffer.writeDouble(imbuement.additionalModifierMultiplier());
+        buffer.writeDouble(imbuement.normalManaCostMultiplier());
+        buffer.writeDouble(imbuement.magicManaCostMultiplier());
     }
 
     private static SyncModifierConfigPayload read(FriendlyByteBuf buffer) {
         return new SyncModifierConfigPayload(new ModifierValues(
                 new ModifierValues.PrecisionFire(buffer.readDouble(), buffer.readDouble(), buffer.readDouble()),
                 new ModifierValues.GripHoldStabilization(buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readDouble()),
-                new ModifierValues.FortuneMedal(buffer.readVarInt())));
+                new ModifierValues.FortuneMedal(buffer.readVarInt()),
+                new ModifierValues.SpellImbuement(buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readDouble())));
     }
 
     @Override

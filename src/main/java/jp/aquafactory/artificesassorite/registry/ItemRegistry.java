@@ -1,6 +1,7 @@
 package jp.aquafactory.artificesassorite.registry;
 
 import io.redspace.irons_artifice.modifier.ModifierItem;
+import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementItem;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.modifier.fortunemedal.FortuneMedalModifier;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldStabilizationModifier;
@@ -12,6 +13,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ItemRegistry {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ArtificesAssortie.MODID);
+    public static final DeferredItem<SpellImbuementItem> SPELL_IMBUEMENT_MODIFIER = ITEMS.registerItem("spell_imbuement_modifier",
+            properties -> new SpellImbuementItem(properties.stacksTo(1)));
     public static final DeferredItem<ModifierItem> PRECISION_FIRE_MODIFIER = ITEMS.registerItem("precision_fire_modifier",
             properties -> new ModifierItem(properties.stacksTo(1), new PrecisionFireModifier()));
     public static final DeferredItem<ModifierItem> GRIP_HOLD_STABILIZATION_MODIFIER = ITEMS.registerItem("grip_hold_stabilization_modifier",

@@ -26,6 +26,17 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSF
 public final class ModifierRecipeGameTests {
     private ModifierRecipeGameTests() {}
 
+    // GameTest がアノテーションから探索して呼び出す。
+    @SuppressWarnings("unused")
+    @GameTest(template = "gametest/basic_floor")
+    public static void spellImbuementCraftingRequiresSpellbooks(GameTestHelper helper) {
+        boolean spellbooksLoaded = ModList.get().isLoaded("irons_spellbooks");
+        helper.assertTrue(helper.getLevel().getRecipeManager().byKey(id("crafting/spell_imbuement_modifier"))
+                .isPresent() == spellbooksLoaded, "Spell imbuement crafting must load only with Spellbooks");
+        if (spellbooksLoaded) SpellbooksModifierRecipeScenarios.spellImbuement(helper);
+        helper.succeed();
+    }
+
     @GameTest(template = "gametest/basic_floor")
     public static void precisionFireRecipeSwitchesWithCreate(GameTestHelper helper) {
         boolean createLoaded = ModList.get().isLoaded("create");

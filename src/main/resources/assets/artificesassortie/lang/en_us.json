@@ -5,9 +5,14 @@
   "item.artificesassortie.grip_hold_stabilization_modifier": "Grip-Hold Stabilization Modifier",
   "item.artificesassortie.fortune_medal_modifier": "Fortune of Medal Modifier",
   "item.artificesassortie.item_transfer_modifier": "Item Transfer Modifier",
+  "item.artificesassortie.spell_imbuement_modifier": "Spell Imbuement Modifier",
 
   "item.artificesassortie.incomplete_precision_fire_modifier": "Incomplete Precision Fire Modifier",
   "item.artificesassortie.incomplete_fortune_medal_modifier": "Incomplete Fortune Medal Modifier",
+
+  "item.artificesassortie.common.tooltip.mana_cost": "Mana Cost: %s /shot",
+  "item.artificesassortie.common.tooltip.school": "School: %s",
+  "item.artificesassortie.common.tooltip.school.none": "None",
 
   "item.artificesassortie.precision_fire_modifier.desc_1": "%1$s%% headshot damage multiplier(+%2$s%% per additional modifier)",
   "item.artificesassortie.precision_fire_modifier.desc_2": "%s%% non-headshot damage multiplier",
@@ -22,6 +27,15 @@
   "item.artificesassortie.item_transfer_modifier.desc_1": "Teleports item drops from mobs killed by your bullets to your feet",
   "item.artificesassortie.item_transfer_modifier.desc_2": "Also teleports nearby items and experience orbs at the impact location to your feet",
   "item.artificesassortie.item_transfer_modifier.desc_3": "Each additional modifier extends the transfer range by 1 block",
+  "item.artificesassortie.spell_imbuement_modifier.tooltip": "Craft with a school rune to change its school",
+  "item.artificesassortie.spell_imbuement_modifier.desc_1": "%1$s%% Damage (+%2$s%% per additional modifier)",
+  "item.artificesassortie.spell_imbuement_modifier.desc_2": "Affected by spell resistance as the %s school",
+  "item.artificesassortie.spell_imbuement_modifier.desc_2.no_school": "Affected by general spell resistance",
+  "item.artificesassortie.spell_imbuement_modifier.desc_3": "Consumes mana per shot based on gun damage, with a smaller increase from spell power",
+  "item.artificesassortie.spell_imbuement_modifier.desc_4": "When mixing schools, the user's highest school spell power applies to all modifiers, regardless of the number of each school",
+  "item.artificesassortie.spell_imbuement_modifier.desc_5": "All Spell Imbuement Modifiers count toward the additional modifier bonus",
+
+  "ui.artificesassortie.insufficient_mana": "Not enough mana to fire!",
 
   "subtitle.artificesassortie.sound.precision_fire_headshot": "Bullet hits critically"
 }

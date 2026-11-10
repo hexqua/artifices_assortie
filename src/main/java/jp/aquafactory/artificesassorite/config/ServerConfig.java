@@ -7,6 +7,7 @@ public final class ServerConfig {
     private static final ModConfigSpec.DoubleValue HEADSHOT, ADDITIONAL_HEADSHOT, BODYSHOT;
     private static final ModConfigSpec.DoubleValue MOVEMENT, RECOIL, SPREAD, RECOVERY, EXHAUSTION;
     private static final ModConfigSpec.IntValue FORTUNE_MEDAL_LIMIT;
+    private static final ModConfigSpec.DoubleValue IMBUEMENT_FIRST, IMBUEMENT_ADDITIONAL, IMBUEMENT_NORMAL_MANA, IMBUEMENT_MAGIC_MANA;
     private static volatile ModifierValues serverValues = ModifierValues.DEFAULTS;
     private static ModifierValues clientValues = ModifierValues.DEFAULTS;
 
@@ -35,6 +36,15 @@ public final class ServerConfig {
         FORTUNE_MEDAL_LIMIT = builder.comment("Maximum number of effective fortune medals per held gun. 0 removes the limit.",
                         "This limits only the medals, not existing Looting levels or bonuses added by other mods.")
                 .defineInRange("maxEffectiveCount", 3, 0, Integer.MAX_VALUE);
+        builder.pop().push("SpellImbuementModifier");
+        IMBUEMENT_FIRST = builder.comment("Fraction of the spell power bonus applied by the first modifier.")
+                .defineInRange("firstModifierMultiplier", 0.5, 0.0, Double.MAX_VALUE);
+        IMBUEMENT_ADDITIONAL = builder.comment("Fraction of the spell power bonus applied per additional modifier.")
+                .defineInRange("additionalModifierMultiplier", 0.15, 0.0, Double.MAX_VALUE);
+        IMBUEMENT_NORMAL_MANA = builder.comment("Mana per damage before this modifier's spell power bonus, per firing.")
+                .defineInRange("normalManaCostMultiplier", 1.0, 0.0, Double.MAX_VALUE);
+        IMBUEMENT_MAGIC_MANA = builder.comment("Mana per additional damage from spell power, per firing. Set both mana coefficients to 0 to disable the cost.")
+                .defineInRange("magicManaCostMultiplier", 0.25, 0.0, Double.MAX_VALUE);
         builder.pop();
         SPEC = builder.build();
     }
@@ -44,7 +54,8 @@ public final class ServerConfig {
     public static ModifierValues snapshot() {
         return new ModifierValues(new ModifierValues.PrecisionFire(HEADSHOT.get(), ADDITIONAL_HEADSHOT.get(), BODYSHOT.get()),
                 new ModifierValues.GripHoldStabilization(MOVEMENT.get(), RECOIL.get(), SPREAD.get(), RECOVERY.get(), EXHAUSTION.get()),
-                new ModifierValues.FortuneMedal(FORTUNE_MEDAL_LIMIT.get()));
+                new ModifierValues.FortuneMedal(FORTUNE_MEDAL_LIMIT.get()),
+                new ModifierValues.SpellImbuement(IMBUEMENT_FIRST.get(), IMBUEMENT_ADDITIONAL.get(), IMBUEMENT_NORMAL_MANA.get(), IMBUEMENT_MAGIC_MANA.get()));
     }
 
     public static ModifierValues serverValues() { return serverValues; }
