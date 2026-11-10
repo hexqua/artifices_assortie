@@ -156,9 +156,11 @@ public final class ItemTransferGameTests {
         try (var s = new Scenario(h, 1)) {
             var cow = s.f.target();
             s.entities.add(cow);
-            cow.setPos(s.center.add(1, 0, 0));
+            // テンプレート内に収め、ランダム配置で隣接チャンクの entity 追跡待ちが必要になるのを防ぐ。
+            cow.setPos(h.absoluteVec(new Vec3(4, 2, 4)));
             var drops = new ArrayList<ItemEntity>();
-            Vec3 dropPosition = s.f.player.position().add(0, 0, 6);
+            // 牛と爆発中心から X 方向に 3 離し、通常収集範囲の外かつ転送先とは異なる位置を保つ。
+            Vec3 dropPosition = h.absoluteVec(new Vec3(1, 2, 4));
             Consumer<LivingDropsEvent> capture = event -> {
                 if (event.getEntity() != cow) return;
                 var extra = new ItemEntity(h.getLevel(), dropPosition.x, dropPosition.y, dropPosition.z, new ItemStack(Items.DIAMOND, 3));
