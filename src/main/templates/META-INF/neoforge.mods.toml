@@ -63,3 +63,17 @@ config="${mod_id}.mixins.json"
     versionRange="[${create_version},)"
     ordering="AFTER"
     side="BOTH"
+
+[[dependencies."${mod_id}"]]
+    modId="irons_spellbooks"
+    type="optional"
+    versionRange="[${irons_spells_version},)"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies."${mod_id}"]]
+    modId="malum"
+    type="optional"
+    versionRange="[${malum_version},)"
+    ordering="AFTER"
+    side="BOTH"

@@ -7,6 +7,7 @@ import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.fortunemedal.FortuneMedalModifier;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldStabilizationModifier;
 import jp.aquafactory.artificesassorite.item.modifier.precisionfire.PrecisionFireModifier;
+import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementModifier;
 import jp.aquafactory.artificesassorite.network.SyncModifierConfigPayload;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -31,7 +32,8 @@ public final class ModifierConfigGameTests {
         var previous = ServerConfig.clientValues();
         var buffer = new FriendlyByteBuf(Unpooled.buffer());
         try {
-            var values = new ModifierValues(new ModifierValues.PrecisionFire(1.8, 0.4, 0.6), new ModifierValues.GripHoldStabilization(0.65, 0.8, -0.75, 1.25, 0.12), new ModifierValues.FortuneMedal(7));
+            var values = new ModifierValues(new ModifierValues.PrecisionFire(1.8, 0.4, 0.6), new ModifierValues.GripHoldStabilization(0.65, 0.8, -0.75, 1.25, 0.12), new ModifierValues.FortuneMedal(7),
+                    new ModifierValues.SpellImbuement(0.7, 0.2, 0.3, 0.1));
             SyncModifierConfigPayload.STREAM_CODEC.encode(buffer, new SyncModifierConfigPayload(values));
             var decoded = SyncModifierConfigPayload.STREAM_CODEC.decode(buffer);
             h.assertTrue(decoded.values().equals(values), "Config codec must preserve all gameplay and tooltip values");
@@ -53,7 +55,12 @@ public final class ModifierConfigGameTests {
             h.assertTrue(((TranslatableContents) enchantmentName.getContents()).getKey().equals("enchantment.minecraft.looting"), "Medal tooltip must translate the Looting name without a level");
             h.assertTrue(medal.stream().allMatch(line -> Objects.equals(TextColor.fromLegacyFormat(ChatFormatting.GREEN), line.getStyle().getColor())), "Medal description lines must be green");
             buffer.clear();
-            var unlimited = new ModifierValues(values.precisionFire(), values.gripHoldStabilization(), new ModifierValues.FortuneMedal(0));
+            var imbuement = new ArrayList<Component>();
+            SpellImbuementModifier.describe(
+                    imbuement::add, 2, null, ServerConfig.clientValues().spellImbuement());
+            var imbuementArgs = ((TranslatableContents) imbuement.getFirst().getContents()).getArgs();
+            h.assertTrue(imbuementArgs[0].equals("170") && imbuementArgs[1].equals("20"), "Imbuement descriptions must use synchronized spell coefficients");
+            var unlimited = new ModifierValues(values.precisionFire(), values.gripHoldStabilization(), new ModifierValues.FortuneMedal(0), values.spellImbuement());
             SyncModifierConfigPayload.STREAM_CODEC.encode(buffer, new SyncModifierConfigPayload(unlimited));
             ServerConfig.updateClient(SyncModifierConfigPayload.STREAM_CODEC.decode(buffer).values());
             medal.clear();

@@ -225,9 +225,12 @@ dependencies {
     implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
     implementation "io.redspace:irons_lib:${irons_lib_version}"
 
-    // Create だけを任意 API として参照し、配布 jar には同梱しない。
+    // 任意連携の API はコンパイル時だけ参照し、配布 jar には同梱しない。
     compileOnly "maven.modrinth:create:${create_modrinth_version_id}"
     compileOnly "com.tterrag.registrate:Registrate:${registrate_version}"
+    compileOnly "io.redspace:irons_spellbooks:${irons_spells_version}"
+    compileOnly "maven.modrinth:malum:${malum_modrinth_version_id}"
+    compileOnly "maven.modrinth:lodestonelib:${lodestone_modrinth_version_id}"
 
     target_dummyRuntimeOnly "maven.modrinth:moonlight:${moonlight_modrinth_version_id}"
     target_dummyRuntimeOnly "maven.modrinth:Adega8YN:${target_dummy_modrinth_version_id}"
@@ -235,13 +238,13 @@ dependencies {
     utilityRuntimeOnly "maven.modrinth:jei:${jei_modrinth_version_id}"
     utilityRuntimeOnly "maven.modrinth:jade:${jade_modrinth_version_id}"
 
-    // 導入環境の確認用。Spellbooks / Jewelry の API・任意依存宣言は追加しない。
+    // Spellbooks は任意連携、Jewelry は導入環境確認用。標準 runtime へは混ぜない。
     ironsRuntimeOnly "io.redspace:irons_spellbooks:${irons_spells_version}"
     ironsRuntimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
     ironsRuntimeOnly "maven.modrinth:playeranimator:${playeranimator_modrinth_version_id}"
     ironsRuntimeOnly "io.redspace:atlas_api:${atlas_api_version}"
     ironsRuntimeOnly "io.redspace:irons_jewelry:${irons_jewelry_version}"
-    // Malum と前提 MOD は Magic の導入環境確認に限定し、API・任意依存宣言は追加しない。
+    // 魂露出と魔法耐性の連携を検証する。Malum の前提 MOD は標準 runtime へ混ぜない。
     magicRuntimeOnly "maven.modrinth:malum:${malum_modrinth_version_id}"
     magicRuntimeOnly "maven.modrinth:lodestonelib:${lodestone_modrinth_version_id}"
     createRuntimeOnly "maven.modrinth:create:${create_modrinth_version_id}"
@@ -274,6 +277,8 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             geckolib_version       : geckolib_version,
             irons_artifice_version : irons_artifice_version,
             create_version         : create_version,
+            irons_spells_version   : irons_spells_version,
+            malum_version          : malum_version,
     ]
     inputs.properties replaceProperties
     expand replaceProperties

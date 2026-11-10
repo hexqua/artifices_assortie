@@ -33,7 +33,7 @@ PowerShell では `JDK21_HOME` を設定するか、JDK 21 を `%USERPROFILE%\.j
 
 データ生成は `./gradlew.bat runData`、人間による client 確認は `./gradlew.bat runClient`、IDE 実行構成の同期は `./gradlew.bat neoForgeIdeSync` を使います。client の表示・操作は GameTest では検証できません。
 
-必須依存は Iron's Arms 'n Artifice / GeckoLib / Iron's Lib、任意依存は Create のみです。実行構成の MOD ロードと別構成からの混入は GameTest で確認し、機能・連携の検証は対象の挙動テストで行います。
+必須依存は Iron's Arms 'n Artifice / GeckoLib / Iron's Lib、任意依存は Create / Iron's Spells 'n Spellbooks / Malum です。実行構成の MOD ロードと別構成からの混入は GameTest で確認し、機能・連携の検証は対象の挙動テストで行います。
 
 `build` では UTF-8・BOM・明らかな文字化けの検査も行います。文書・翻訳の変更時は `./gradlew.bat checkTextEncodingHygiene` で単独実行できます。
 
@@ -53,7 +53,7 @@ PowerShell では `JDK21_HOME` を設定するか、JDK 21 を `%USERPROFILE%\.j
 
 レシピは通常用と連携用を `runData` でまとめて生成し、導入されている MOD に応じてロード条件で切り替えます。
 
-Irons / Magic 構成の追加 MOD は導入環境の確認用で、本 MOD の必須・任意依存には含めません。Create は任意依存として扱います。
+Iron's Spells 'n Spellbooks は Irons / Magic、Malum は Magic 構成で任意連携を確認します。Iron's Gems 'n Jewelry と開発用の前提 MOD は本 MOD の依存宣言には含めません。Create は任意依存として扱います。
 
 描画構成は Constellation 'n Spells と同じ Sodium 0.8.13+mc1.21.1 と補助 MOD の組み合わせを使用します。開発環境で Sodium 本体を正しく探索するため補助 jar を生成し、`neoForgeIdeSync` と起動準備から参照します。旧 Sodium Options API は追加しません。
 

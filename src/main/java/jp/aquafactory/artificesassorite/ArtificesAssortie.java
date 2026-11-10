@@ -1,6 +1,9 @@
 package jp.aquafactory.artificesassorite;
 
 import jp.aquafactory.artificesassorite.config.ServerConfig;
+import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementCompat;
+import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementRecipe;
+import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementStorage;
 import jp.aquafactory.artificesassorite.datagen.ModItemModelProvider;
 import jp.aquafactory.artificesassorite.datagen.RecipeDataProviders;
 import jp.aquafactory.artificesassorite.datagen.SoundDataProvider;
@@ -21,6 +24,9 @@ public class ArtificesAssortie {
     public ArtificesAssortie(IEventBus bus, ModContainer container) {
         container.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
         ItemRegistry.ITEMS.register(bus);
+        SpellImbuementStorage.COMPONENTS.register(bus);
+        SpellImbuementRecipe.SERIALIZERS.register(bus);
+        SpellImbuementCompat.register(bus);
         SoundRegistry.SOUNDS.register(bus);
         CreativeTabRegistry.TABS.register(bus);
         ModifierConfigSync.register(bus);

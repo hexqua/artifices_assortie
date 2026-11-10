@@ -92,9 +92,9 @@ GameTest は `jp.aquafactory.artificesassorite.gametest` 配下を基本とし�
 
 JUnit 等は計算部分だけを高速に繰り返す必要が明確になった時点で再検討する。その際も全件実行の入口から漏れない方法と運用負担を合わせて判断する。
 
-Iron's Arms 'n Artifice / GeckoLib / Iron's Lib を標準構成に含める。Iron's Spells 'n Spellbooks / Iron's Gems 'n Jewelry は開発用 Irons / Magic 構成のみへ追加し、本 MOD の必須・任意依存には含めない。Create は任意依存として専用構成で確認する。必須 MOD のロード確認だけの重複検証は増やさず、機能追加時は実際に利用する API・登録・データとの接続を確認する。
+Iron's Arms 'n Artifice / GeckoLib / Iron's Lib を標準構成に含める。任意依存の Iron's Spells 'n Spellbooks は Irons / Magic、Malum は Magic、Create は Create 構成で連携を確認する。Iron's Gems 'n Jewelry は開発用 Irons / Magic 構成にのみ追加し、本 MOD の依存宣言には含めない。必須 MOD のロード確認だけの重複検証は増やさず、機能追加時は実際に利用する API・登録・データとの接続を確認する。
 
-Magic 構成は Irons 構成一式に Malum / Lodestone を追加する導入環境の確認用とし、本 MOD の必須・任意依存には含めない。
+Magic 構成は Irons 構成一式に Malum / Lodestone を追加する。Malum は魂露出の任意連携、Lodestone はその前提 MOD として魔法ダメージ再計算との接続も確認する。
 
 optional MOD 構成を追加する場合は、要求 MOD が読み込まれていることを確認し、連携処理を通らず成功するのを防ぐ。対象 MOD 不在で成功として省略するテストは連携検証済みと数えない。不在時に外部型を読み込まず起動できることは別の保証として残す。
 
