@@ -195,6 +195,8 @@ gameTestTaskNames.eachWithIndex { name, index ->
 apply from: 'scripts/text-encoding.gradle'
 
 tasks.named('jar', Jar).configure {
+    // リポジトリの原本を同梱し、配布物だけでもコードと素材の利用条件を確認できるようにする。
+    from('LICENSE', 'ASSETS_LICENSE.md', 'THIRD_PARTY_NOTICES.md')
     exclude('jp/aquafactory/artificesassorite/gametest/**')
     exclude('data/artificesassortie/structure/gametest/**')
 }

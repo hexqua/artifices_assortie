@@ -1,6 +1,12 @@
 # GitHub PR・Actions 設定
 
-対象は `hexqua/artifices_assortie`。リポジトリは private を維持する。設定は GitHub API で照合し、運用を変更した際は本書も更新する。
+対象は `hexqua/artifices_assortie`。リポジトリは public として公開している。設定は GitHub API で照合し、運用を変更した際は本書も更新する。
+
+## 公開・問い合わせ方針
+
+- プレイヤー向けの機能紹介と任意 MOD 連携の説明は CurseForge の Description に集約する。README は主に開発者向けの情報を扱う。
+- CurseForge ページは未作成。作成後に MOD メタデータの `displayURL` を設定する。
+- 正規の不具合報告先は [GitHub Issues](https://github.com/hexqua/artifices_assortie/issues) に集約する。CurseForge のコメント欄は公開初期には開放する。
 
 ## リポジトリ設定
 

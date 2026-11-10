@@ -3,12 +3,12 @@
 
   "item.artificesassortie.precision_fire_modifier": "Precision Fire Modifier",
   "item.artificesassortie.grip_hold_stabilization_modifier": "Grip-Hold Stabilization Modifier",
-  "item.artificesassortie.fortune_medal_modifier": "Fortune of Medal Modifier",
+  "item.artificesassortie.fortune_medal_modifier": "Medal of Fortune Modifier",
   "item.artificesassortie.item_transfer_modifier": "Item Transfer Modifier",
   "item.artificesassortie.spell_imbuement_modifier": "Spell Imbuement Modifier",
 
   "item.artificesassortie.incomplete_precision_fire_modifier": "Incomplete Precision Fire Modifier",
-  "item.artificesassortie.incomplete_fortune_medal_modifier": "Incomplete Fortune Medal Modifier",
+  "item.artificesassortie.incomplete_fortune_medal_modifier": "Incomplete Medal of Fortune Modifier",
 
   "item.artificesassortie.common.tooltip.mana_cost": "Mana Cost: %s /shot",
   "item.artificesassortie.common.tooltip.school": "School: %s",

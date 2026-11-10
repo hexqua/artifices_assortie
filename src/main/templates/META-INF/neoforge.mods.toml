@@ -5,6 +5,8 @@ loaderVersion="${loader_version_range}"
 
 license="${mod_license}"
 
+issueTrackerURL="https://github.com/hexqua/artifices_assortie/issues"
+
 [[mods]]
 
 modId="${mod_id}"
@@ -15,8 +17,10 @@ displayName="${mod_name}"
 
 authors="Aquid"
 
+logoFile="artifices_asortie_logo.png"
+
 description='''
-Take up arms.
+A small assortment of gun-related additions for crafters.
 '''
 
 [[mixins]]
