@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "artificesassortie:item/fortune_medal_modifier"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "irons_artifice:clockwork_components"
+    },
+    "E": {
+      "item": "minecraft:ender_pearl"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "M": {
+      "item": "irons_artifice:mechanical_components"
+    }
+  },
+  "pattern": [
+    "MI ",
+    "ECE",
+    " GM"
+  ],
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:item_transfer_modifier"
+  }
+}

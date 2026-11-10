@@ -3,6 +3,11 @@
 
   "item.artificesassortie.precision_fire_modifier": "Precision Fire Modifier",
   "item.artificesassortie.grip_hold_stabilization_modifier": "Grip-Hold Stabilization Modifier",
+  "item.artificesassortie.fortune_medal_modifier": "Fortune of Medal Modifier",
+  "item.artificesassortie.item_transfer_modifier": "Item Transfer Modifier",
+
+  "item.artificesassortie.incomplete_precision_fire_modifier": "Incomplete Precision Fire Modifier",
+  "item.artificesassortie.incomplete_fortune_medal_modifier": "Incomplete Fortune Medal Modifier",
 
   "item.artificesassortie.precision_fire_modifier.desc_1": "%1$s%% headshot damage multiplier(+%2$s%% per additional modifier)",
   "item.artificesassortie.precision_fire_modifier.desc_2": "%s%% non-headshot damage multiplier",
@@ -12,6 +17,11 @@
   "item.artificesassortie.grip_hold_stabilization_modifier.desc_4": "%s accuracy/spread",
   "item.artificesassortie.grip_hold_stabilization_modifier.desc_5": "%s%% movement speed",
   "item.artificesassortie.grip_hold_stabilization_modifier.desc_6": "Consumes hunger (saturation first) to recover quickly from recoil after firing",
+  "item.artificesassortie.fortune_medal_modifier.desc_1": "%s Lv+1",
+  "item.artificesassortie.fortune_medal_modifier.desc_2": "Up to %s modifiers effective",
+  "item.artificesassortie.item_transfer_modifier.desc_1": "Teleports item drops from mobs killed by your bullets to your feet",
+  "item.artificesassortie.item_transfer_modifier.desc_2": "Also teleports nearby items and experience orbs at the impact location to your feet",
+  "item.artificesassortie.item_transfer_modifier.desc_3": "Each additional modifier extends the transfer range by 1 block",
 
   "subtitle.artificesassortie.sound.precision_fire_headshot": "Bullet hits critically"
 }

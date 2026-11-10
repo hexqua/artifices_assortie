@@ -13,11 +13,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import net.neoforged.neoforge.common.conditions.NotCondition;
+import net.neoforged.neoforge.common.Tags;
 
 import java.util.concurrent.CompletableFuture;
 
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
 
 public final class VanillaRecipeProvider extends RecipeProvider {
     public VanillaRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
@@ -30,15 +33,38 @@ public final class VanillaRecipeProvider extends RecipeProvider {
         var fallback = output.withConditions(new NotCondition(createLoaded));
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, PRECISION_FIRE_MODIFIER.get())
-                .pattern(" SS")
-                .pattern("BMS")
-                .pattern("PB ")
+                .pattern(" RG")
+                .pattern("SMR")
+                .pattern("SS ")
                 .define('S', Items.SPECTRAL_ARROW)
                 .define('M', ItemRegistry.MECHANICAL_COMPONENTS.get())
-                .define('B', ItemRegistry.BULLET.get())
-                .define('P', Items.SPYGLASS)
+                .define('R', Items.REDSTONE)
+                .define('G', Items.SPYGLASS)
                 .unlockedBy("has_mechanical_components", has(ItemRegistry.MECHANICAL_COMPONENTS.get()))
                 .save(fallback, id("crafting/precision_fire_modifier"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, FORTUNE_MEDAL_MODIFIER.get())
+                .pattern(" D ")
+                .pattern("GMG")
+                .pattern(" R ")
+                .define('D', Tags.Items.DYES_GREEN)
+                .define('G', Items.GOLD_INGOT)
+                .define('M', ItemRegistry.MECHANICAL_COMPONENTS.get())
+                .define('R', Items.RABBIT_FOOT)
+                .unlockedBy("has_mechanical_components", has(ItemRegistry.MECHANICAL_COMPONENTS.get()))
+                .save(fallback, id("crafting/fortune_medal_modifier"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ITEM_TRANSFER_MODIFIER.get())
+                .pattern("MI ")
+                .pattern("ECE")
+                .pattern(" GM")
+                .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .define('M', ItemRegistry.MECHANICAL_COMPONENTS.get())
+                .define('E', Items.ENDER_PEARL)
+                .define('I', Items.IRON_INGOT)
+                .define('G', Items.GOLD_INGOT)
+                .unlockedBy("has_clockwork_components", has(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .save(output, id("crafting/item_transfer_modifier"));
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, GRIP_HOLD_STABILIZATION_MODIFIER.get())
                 .pattern(" V ")

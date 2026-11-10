@@ -24,12 +24,14 @@ public record SyncModifierConfigPayload(ModifierValues values) implements Custom
         buffer.writeDouble(grip.adsSpreadBonus());
         buffer.writeDouble(grip.recoveryDegreesPerTick());
         buffer.writeDouble(grip.exhaustionPerTick());
+        buffer.writeVarInt(payload.values.fortuneMedal().maxEffectiveCount());
     }
 
     private static SyncModifierConfigPayload read(FriendlyByteBuf buffer) {
         return new SyncModifierConfigPayload(new ModifierValues(
                 new ModifierValues.PrecisionFire(buffer.readDouble(), buffer.readDouble(), buffer.readDouble()),
-                new ModifierValues.GripHoldStabilization(buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readDouble())));
+                new ModifierValues.GripHoldStabilization(buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readDouble()),
+                new ModifierValues.FortuneMedal(buffer.readVarInt())));
     }
 
     @Override

@@ -1,0 +1,80 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "create:precision_mechanism"
+  },
+  "results": [
+    {
+      "id": "artificesassortie:precision_fire_modifier"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_precision_fire_modifier"
+        },
+        {
+          "item": "minecraft:spyglass"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_precision_fire_modifier"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_precision_fire_modifier"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_precision_fire_modifier"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_precision_fire_modifier"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_precision_fire_modifier"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_precision_fire_modifier"
+        },
+        {
+          "item": "create:electron_tube"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_precision_fire_modifier"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "artificesassortie:incomplete_precision_fire_modifier"
+  }
+}

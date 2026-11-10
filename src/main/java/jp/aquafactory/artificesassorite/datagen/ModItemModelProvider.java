@@ -20,5 +20,9 @@ public final class ModItemModelProvider extends ItemModelProvider {
     protected void registerModels() {
         basicItem(ItemRegistry.PRECISION_FIRE_MODIFIER.get());
         basicItem(ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER.get());
+        basicItem(ItemRegistry.FORTUNE_MEDAL_MODIFIER.get());
+        basicItem(ItemRegistry.ITEM_TRANSFER_MODIFIER.get());
+        basicItem(ItemRegistry.INCOMPLETE_PRECISION_FIRE_MODIFIER.get());
+        basicItem(ItemRegistry.INCOMPLETE_FORTUNE_MEDAL_MODIFIER.get());
     }
 }

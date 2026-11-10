@@ -11,23 +11,23 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "irons_artifice:bullet"
+    "G": {
+      "item": "minecraft:spyglass"
     },
     "M": {
       "item": "irons_artifice:mechanical_components"
     },
-    "P": {
-      "item": "minecraft:spyglass"
+    "R": {
+      "item": "minecraft:redstone"
     },
     "S": {
       "item": "minecraft:spectral_arrow"
     }
   },
   "pattern": [
-    " SS",
-    "BMS",
-    "PB "
+    " RG",
+    "SMR",
+    "SS "
   ],
   "result": {
     "count": 1,

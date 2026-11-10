@@ -1,9 +1,9 @@
 package jp.aquafactory.artificesassorite.config;
 
-public record ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization) {
+public record ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization, FortuneMedal fortuneMedal) {
     public static final ModifierValues DEFAULTS = new ModifierValues(
             new PrecisionFire(1.5, 0.25, 0.5),
-            new GripHoldStabilization(0.5, 0.75, -0.5, 0.75, 0.4));
+            new GripHoldStabilization(0.5, 0.75, -0.5, 0.75, 0.4), new FortuneMedal(3));
 
     public record PrecisionFire(double initialHeadshotMultiplier, double additionalHeadshotMultiplier,
                                 double bodyshotMultiplier) {
@@ -19,4 +19,6 @@ public record ModifierValues(PrecisionFire precisionFire, GripHoldStabilization 
     public record GripHoldStabilization(double adsMovementSpeedMultiplier, double adsRecoilMultiplier,
                                         double adsSpreadBonus, double recoveryDegreesPerTick,
                                         double exhaustionPerTick) {}
+
+    public record FortuneMedal(int maxEffectiveCount) {}
 }

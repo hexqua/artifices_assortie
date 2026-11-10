@@ -3,6 +3,11 @@
 
   "item.artificesassortie.precision_fire_modifier": "精密射撃モディファイア",
   "item.artificesassortie.grip_hold_stabilization_modifier": "グリップホールド安定モディファイア",
+  "item.artificesassortie.fortune_medal_modifier": "幸運メダルモディファイア",
+  "item.artificesassortie.item_transfer_modifier": "アイテム転送モディファイア",
+
+  "item.artificesassortie.incomplete_precision_fire_modifier": "未完成の精密射撃モディファイア",
+  "item.artificesassortie.incomplete_fortune_medal_modifier": "未完成の幸運メダルモディファイア",
 
   "item.artificesassortie.precision_fire_modifier.desc_1": "%1$s%% ヘッドショットダメージ倍率(モディファイア追加分は+%2$s%%)",
   "item.artificesassortie.precision_fire_modifier.desc_2": "%s%% 非ヘッドショットダメージ倍率",
@@ -12,6 +17,11 @@
   "item.artificesassortie.grip_hold_stabilization_modifier.desc_4": "%s 集弾率/拡散",
   "item.artificesassortie.grip_hold_stabilization_modifier.desc_5": "%s%% 移動速度",
   "item.artificesassortie.grip_hold_stabilization_modifier.desc_6": "満腹度を消費して射撃後の反動から素早く復帰できる",
+  "item.artificesassortie.fortune_medal_modifier.desc_1": "%s レベル+1",
+  "item.artificesassortie.fortune_medal_modifier.desc_2": "最大%s個まで有効",
+  "item.artificesassortie.item_transfer_modifier.desc_1": "銃弾で倒したモブのドロップアイテムを足元へ転送する",
+  "item.artificesassortie.item_transfer_modifier.desc_2": "着弾地点の周囲にあるアイテムと経験値オーブも足元へ転送する",
+  "item.artificesassortie.item_transfer_modifier.desc_3": "モディファイアの追加で転送範囲が1ブロック広がる",
 
   "subtitle.artificesassortie.sound.precision_fire_headshot": "銃弾が鋭く当たる"
 }

@@ -6,6 +6,7 @@ public final class ServerConfig {
     public static final ModConfigSpec SPEC;
     private static final ModConfigSpec.DoubleValue HEADSHOT, ADDITIONAL_HEADSHOT, BODYSHOT;
     private static final ModConfigSpec.DoubleValue MOVEMENT, RECOIL, SPREAD, RECOVERY, EXHAUSTION;
+    private static final ModConfigSpec.IntValue FORTUNE_MEDAL_LIMIT;
     private static volatile ModifierValues serverValues = ModifierValues.DEFAULTS;
     private static ModifierValues clientValues = ModifierValues.DEFAULTS;
 
@@ -30,6 +31,10 @@ public final class ServerConfig {
         EXHAUSTION = builder.comment("Exhaustion per assisted tick per modifier. Saturation is consumed before food.",
                         "0.4 corresponds to one food point per 10 assisted ticks per modifier. 0 makes assistance free.")
                 .defineInRange("exhaustionPerTick", 0.4, 0, 40);
+        builder.pop().push("FortuneMedalModifier");
+        FORTUNE_MEDAL_LIMIT = builder.comment("Maximum number of effective fortune medals per held gun. 0 removes the limit.",
+                        "This limits only the medals, not existing Looting levels or bonuses added by other mods.")
+                .defineInRange("maxEffectiveCount", 3, 0, Integer.MAX_VALUE);
         builder.pop();
         SPEC = builder.build();
     }
@@ -38,7 +43,8 @@ public final class ServerConfig {
 
     public static ModifierValues snapshot() {
         return new ModifierValues(new ModifierValues.PrecisionFire(HEADSHOT.get(), ADDITIONAL_HEADSHOT.get(), BODYSHOT.get()),
-                new ModifierValues.GripHoldStabilization(MOVEMENT.get(), RECOIL.get(), SPREAD.get(), RECOVERY.get(), EXHAUSTION.get()));
+                new ModifierValues.GripHoldStabilization(MOVEMENT.get(), RECOIL.get(), SPREAD.get(), RECOVERY.get(), EXHAUSTION.get()),
+                new ModifierValues.FortuneMedal(FORTUNE_MEDAL_LIMIT.get()));
     }
 
     public static ModifierValues serverValues() { return serverValues; }
