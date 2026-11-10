@@ -4,6 +4,7 @@ import io.redspace.irons_artifice.modifier.ModifierItem;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.modifier.fortunemedal.FortuneMedalModifier;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldStabilizationModifier;
+import jp.aquafactory.artificesassorite.item.modifier.itemtransfer.ItemTransferModifier;
 import jp.aquafactory.artificesassorite.item.modifier.precisionfire.PrecisionFireModifier;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -17,6 +18,8 @@ public final class ItemRegistry {
 
     public static final DeferredItem<ModifierItem> FORTUNE_MEDAL_MODIFIER = ITEMS.registerItem("fortune_medal_modifier",
             properties -> new ModifierItem(properties.stacksTo(1), new FortuneMedalModifier()));
+    public static final DeferredItem<ModifierItem> ITEM_TRANSFER_MODIFIER = ITEMS.registerItem("item_transfer_modifier",
+            properties -> new ModifierItem(properties.stacksTo(1), new ItemTransferModifier()));
 
     private ItemRegistry() {}
 }
