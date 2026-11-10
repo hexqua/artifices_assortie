@@ -17,6 +17,11 @@ Iron's Arms 'n Artifice用の小さなアドオンMODです.
 - `mods`配下に`jar`を入れればOKです。
 - 現時点でIron's Arms 'n Artifice及びそれの前提MOD以外の前提MODはありません.
 
+## 不具合報告
+
+不具合は [GitHub Issues](https://github.com/hexqua/artifices_assortie/issues) へ報告してください。
+この README は主に開発者向けの情報を扱います。プレイヤー向けの機能紹介と任意 MOD 連携の説明は、公開時に CurseForge の Description に集約する予定です。
+
 ## 開発環境
 
 - Minecraft 1.21.1 / NeoForge 21.1.265 / Java 21
