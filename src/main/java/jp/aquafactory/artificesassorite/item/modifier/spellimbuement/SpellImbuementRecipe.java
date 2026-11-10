@@ -32,7 +32,7 @@ public final class SpellImbuementRecipe extends CustomRecipe {
         var match = find(input);
         if (match == null) return ItemStack.EMPTY;
         var result = match.modifier().copyWithCount(1);
-        SpellImbuementStorage.bind(result, match.school(), match.rune());
+        SpellImbuementStorage.bind(result, match.school(), match.rune(), registries);
         return result;
     }
 

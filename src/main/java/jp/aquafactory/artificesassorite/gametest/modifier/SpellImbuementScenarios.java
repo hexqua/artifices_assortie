@@ -58,10 +58,10 @@ import java.util.function.Consumer;
 final class SpellImbuementScenarios {
     private SpellImbuementScenarios() {}
 
-    static ItemStack module(String school) {
+    static ItemStack module(GameTestHelper h, String school) {
         var stack = new ItemStack(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get());
         if (school != null) SpellImbuementStorage.bind(stack,
-                ResourceLocation.fromNamespaceAndPath("irons_spellbooks", school), rune(school));
+                ResourceLocation.fromNamespaceAndPath("irons_spellbooks", school), rune(school), h.getLevel().registryAccess());
         return stack;
     }
 
@@ -85,7 +85,7 @@ final class SpellImbuementScenarios {
             f.close(f.compose().value(ShotComponents.DAMAGE), f.compose().gun().baseProfile().getOrDefault(ShotComponents.DAMAGE).compute() * 1.125,
                     "Unbound modifier must use general power only");
             for (int count = 1; count <= 3; count++) {
-                slots.setItem(count - 1, module(count == 1 ? "ice" : "fire"));
+                slots.setItem(count - 1, module(h, count == 1 ? "ice" : "fire"));
                 var profile = f.compose();
                 double base = profile.gun().baseProfile().getOrDefault(ShotComponents.DAMAGE).compute();
                 f.close(profile.value(ShotComponents.DAMAGE), base * (1 + 1.5 * (0.5 + (count - 1) * 0.15)),
@@ -95,25 +95,25 @@ final class SpellImbuementScenarios {
             }
             attribute(f.player, AttributeRegistry.ICE_SPELL_POWER, 1.5);
             h.assertTrue(f.compose().peek(SpellImbuementEvents.POWER).school() == SchoolRegistry.FIRE.get(), "Ties must use identifier order");
-            slots.setItem(0, module("fire"));
-            slots.setItem(1, module("ice"));
+            slots.setItem(0, module(h, "fire"));
+            slots.setItem(1, module(h, "ice"));
             h.assertTrue(f.compose().peek(SpellImbuementEvents.POWER).school() == SchoolRegistry.FIRE.get(), "Slot order must not break ties");
             attribute(f.player, AttributeRegistry.FIRE_SPELL_POWER, 0.5);
             attribute(f.player, AttributeRegistry.ICE_SPELL_POWER, 0.75);
-            slots.setItem(2, module(null));
+            slots.setItem(2, module(h, null));
             var reduced = f.compose();
             h.assertTrue(reduced.peek(SpellImbuementEvents.POWER).school() == SchoolRegistry.ICE.get(), "Bound schools below one must beat unbound candidates");
             f.close(reduced.value(ShotComponents.DAMAGE), reduced.gun().baseProfile().getOrDefault(ShotComponents.DAMAGE).compute() * 0.95,
                     "Unbound modifiers must still contribute when a school is selected");
-            var missing = module(null);
-            SpellImbuementStorage.bind(missing, ResourceLocation.fromNamespaceAndPath("removed", "school"), rune("fire"));
+            var missing = module(h, null);
+            SpellImbuementStorage.bind(missing, ResourceLocation.fromNamespaceAndPath("removed", "school"), rune("fire"), h.getLevel().registryAccess());
             for (int i = 0; i < 3; i++) slots.setItem(i, missing.copy());
             h.assertTrue(f.compose().peek(SpellImbuementEvents.POWER).school() == null, "Unknown schools must fall back to general power");
         }
     }
 
     static void craftingAndStorage(GameTestHelper h) {
-        var base = module(null);
+        var base = module(h, null);
         base.set(DataComponents.CUSTOM_NAME, Component.literal("Saved modifier"));
         var fire = rune("fire");
         fire.set(DataComponents.CUSTOM_NAME, Component.literal("Original rune"));
@@ -132,15 +132,26 @@ final class SpellImbuementScenarios {
                 && recipe.getRemainingItems(change).getFirst().getCount() == 1, "Replacement must return the original rune and its components once");
         h.assertTrue(!recipe.matches(CraftingInput.of(2, 1, List.of(saved, rune("fire"))), h.getLevel()), "Same-school rebinding must be rejected");
         h.assertTrue(!recipe.matches(CraftingInput.of(3, 1, List.of(saved, rune("ice"), rune("fire"))), h.getLevel()), "Multiple runes must be rejected");
-        h.assertTrue(!recipe.matches(CraftingInput.of(3, 1, List.of(saved, rune("ice"), module(null))), h.getLevel()), "Multiple modifiers must be rejected");
+        h.assertTrue(!recipe.matches(CraftingInput.of(3, 1, List.of(saved, rune("ice"), module(h, null))), h.getLevel()), "Multiple modifiers must be rejected");
         h.assertTrue(!recipe.matches(CraftingInput.of(2, 1, List.of(saved, new ItemStack(Items.REDSTONE))), h.getLevel()), "Non-runes must be rejected");
         h.assertTrue(SpellImbuementCompat.resolveRune(new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse("irons_spellbooks:arcane_rune")))) == null,
                 "Mana runes must not resolve to a school");
         var missing = saved.copy();
-        SpellImbuementStorage.bind(missing, ResourceLocation.parse("removed:school"), fire);
+        SpellImbuementStorage.bind(missing, ResourceLocation.parse("removed:school"), fire, h.getLevel().registryAccess());
         var repair = CraftingInput.of(2, 1, List.of(missing, rune("ice")));
         h.assertTrue(ItemStack.isSameItemSameComponents(recipe.getRemainingItems(repair).getFirst(), fire),
                 "Unresolved saved schools must retain their refundable rune");
+        var unresolved = SpellImbuementStorageGameTests.unresolvedModifier(h);
+        var replaceMissingRune = CraftingInput.of(2, 1, List.of(unresolved, rune("ice")));
+        h.assertTrue(recipe.matches(replaceMissingRune, h.getLevel()), "An unavailable refund must not prevent changing schools");
+        var replaced = recipe.assemble(replaceMissingRune, h.getLevel().registryAccess());
+        h.assertTrue(SpellImbuementEvents.school(replaced) == SchoolRegistry.ICE.get(),
+                "Changing a school with an unavailable refund must still produce the new binding");
+        h.assertTrue(recipe.getRemainingItems(replaceMissingRune).stream().allMatch(ItemStack::isEmpty),
+                "An unavailable original rune must be forfeited at refund time");
+        var replacedSaved = ItemStack.parse(h.getLevel().registryAccess(), replaced.save(h.getLevel().registryAccess())).orElseThrow();
+        h.assertTrue(ItemStack.isSameItemSameComponents(replacedSaved.get(SpellImbuementStorage.SCHOOL).returnedRune(), rune("ice")),
+                "The replacement rune must remain refundable after forfeiting the unavailable rune");
         try (var f = new ModifierTestFixture(h)) {
             var gun = f.equip("flintlock", ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get(), 0);
             new GunContainer(gun).setItem(0, rebound);
@@ -211,13 +222,13 @@ final class SpellImbuementScenarios {
     static void resistance(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var gun = f.equip("flintlock", ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get(), 0);
-            new GunContainer(gun).setItem(0, module("fire"));
+            new GunContainer(gun).setItem(0, module(h, "fire"));
             attribute(f.player, AttributeRegistry.FIRE_SPELL_POWER, 2);
             var profile = f.compose();
             double composed = profile.value(ShotComponents.DAMAGE);
             attribute(f.player, AttributeRegistry.FIRE_SPELL_POWER, 0.5);
             attribute(f.player, AttributeRegistry.ICE_SPELL_POWER, 4);
-            new GunContainer(gun).setItem(0, module("ice"));
+            new GunContainer(gun).setItem(0, module(h, "ice"));
             h.assertTrue(profile.peek(SpellImbuementEvents.POWER).school() == SchoolRegistry.FIRE.get(), "Fired school must survive equipment and attribute changes");
             var target = f.target();
             var bullet = f.bullet(profile);
@@ -248,7 +259,7 @@ final class SpellImbuementScenarios {
                     f.close(1000 - target.getHealth(), child.resolveDamage() * resist, "Child damage must receive the inherited resistance once");
                 }
                 f.close(profile.value(ShotComponents.DAMAGE), composed, "Resistance must not mutate shared damage");
-                new GunContainer(gun).setItem(0, module(null));
+                new GunContainer(gun).setItem(0, module(h, null));
                 var generalBullet = f.bullet(f.compose());
                 try {
                     target.setHealth(1000);
@@ -266,7 +277,7 @@ final class SpellImbuementScenarios {
             ServerConfig.updateClient(config(new ModifierValues.SpellImbuement(0.5, 0.15, 1, 0.25)));
             attribute(f.player, AttributeRegistry.SPELL_POWER, 1.25);
             attribute(f.player, AttributeRegistry.FIRE_SPELL_POWER, 2);
-            var module = module("fire");
+            var module = module(h, "fire");
             var lines = new ArrayList<Component>();
             module.getItem().appendHoverText(module, Item.TooltipContext.EMPTY, lines, TooltipFlag.NORMAL);
             SpellImbuementClientTooltips.onTooltip(new ItemTooltipEvent(module, f.player, lines, TooltipFlag.NORMAL, Item.TooltipContext.EMPTY));
@@ -291,8 +302,8 @@ final class SpellImbuementScenarios {
             var school = (Component) text(lines.get(2)).getArgs()[0];
             h.assertTrue(Objects.equals(school.getStyle().getColor(), SchoolRegistry.FIRE.get().getDisplayName().getStyle().getColor()), "Selected school must retain its own color");
             ServerConfig.updateClient(config(new ModifierValues.SpellImbuement(0.5, 0.15, 0, 0)));
-            var unknown = module(null);
-            SpellImbuementStorage.bind(unknown, ResourceLocation.parse("removed:school"), rune("fire"));
+            var unknown = module(h, null);
+            SpellImbuementStorage.bind(unknown, ResourceLocation.parse("removed:school"), rune("fire"), h.getLevel().registryAccess());
             slots.setItem(0, unknown);
             lines.clear();
             lines.add(Component.translatable("irons_artifice.tooltip.ammo_capacity", 5));
