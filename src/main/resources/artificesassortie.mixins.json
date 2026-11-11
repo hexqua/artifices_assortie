@@ -2,7 +2,10 @@
   "required": true,
   "package": "jp.aquafactory.artificesassorite.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "AugmentedGunContainerMixin",
+    "AugmentedGunTooltipMixin"
+  ],
   "client": [
     "GripHoldRecoilMixin",
     "GripHoldCrosshairMixin"

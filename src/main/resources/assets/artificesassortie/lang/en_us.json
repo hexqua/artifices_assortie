@@ -6,13 +6,16 @@
   "item.artificesassortie.fortune_medal_modifier": "Medal of Fortune Modifier",
   "item.artificesassortie.item_transfer_modifier": "Item Transfer Modifier",
   "item.artificesassortie.spell_imbuement_modifier": "Spell Imbuement Modifier",
+  "item.artificesassortie.modifier_augmentation_kit": "Modifier Augmentation Kit",
 
   "item.artificesassortie.incomplete_precision_fire_modifier": "Incomplete Precision Fire Modifier",
   "item.artificesassortie.incomplete_fortune_medal_modifier": "Incomplete Medal of Fortune Modifier",
+  "item.artificesassortie.incomplete_modifier_augmentation_kit": "Incomplete Modifier Augmentation Kit",
 
   "item.artificesassortie.common.tooltip.mana_cost": "Mana Cost: %s /shot",
   "item.artificesassortie.common.tooltip.school": "School: %s",
   "item.artificesassortie.common.tooltip.school.none": "None",
+  "item.artificesassortie.common.tooltip.augmented_slot": "Modifier slot augmented",
 
   "item.artificesassortie.precision_fire_modifier.desc_1": "%1$s%% headshot damage multiplier(+%2$s%% per additional modifier)",
   "item.artificesassortie.precision_fire_modifier.desc_2": "%s%% non-headshot damage multiplier",
@@ -34,6 +37,14 @@
   "item.artificesassortie.spell_imbuement_modifier.desc_3": "Consumes mana per shot based on gun damage, with a smaller increase from spell power",
   "item.artificesassortie.spell_imbuement_modifier.desc_4": "When mixing schools, the user's highest school spell power applies to all modifiers, regardless of the number of each school",
   "item.artificesassortie.spell_imbuement_modifier.desc_5": "All Spell Imbuement Modifiers count toward the additional modifier bonus",
+  "item.artificesassortie.modifier_augmentation_kit.tooltip.invalid": "Disabled because the configured item ID is invalid. (ID: \"%s\")",
+  "item.artificesassortie.modifier_augmentation_kit.tooltip.desc_1": "Combine with a compatible gun and %s at a smithing table to add one modifier slot",
+  "item.artificesassortie.modifier_augmentation_kit.tooltip.desc_2": "Can only be applied once per gun",
+  "item.artificesassortie.modifier_augmentation_kit.tooltip.desc_3": "Hold Shift to show compatible guns",
+  "item.artificesassortie.modifier_augmentation_kit.detail.header": "Compatible guns:",
+  "item.artificesassortie.modifier_augmentation_kit.detail.item": "- %s",
+  "item.artificesassortie.modifier_augmentation_kit.detail.overflow": "%s more",
+  "item.artificesassortie.modifier_augmentation_kit.detail.overflow_jei": "%s more (see JEI for recipes)",
 
   "ui.artificesassortie.insufficient_mana": "Not enough mana to fire!",
 

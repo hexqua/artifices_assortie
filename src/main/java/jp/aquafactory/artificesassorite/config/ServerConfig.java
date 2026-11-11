@@ -46,6 +46,7 @@ public final class ServerConfig {
         IMBUEMENT_MAGIC_MANA = builder.comment("Mana per additional damage from spell power, per firing. Set both mana coefficients to 0 to disable the cost.")
                 .defineInRange("magicManaCostMultiplier", 0.25, 0.0, Double.MAX_VALUE);
         builder.pop();
+        AugmentationConfig.define(builder);
         SPEC = builder.build();
     }
 

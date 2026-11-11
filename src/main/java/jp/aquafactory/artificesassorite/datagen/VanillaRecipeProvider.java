@@ -3,6 +3,7 @@ package jp.aquafactory.artificesassorite.datagen;
 import com.simibubi.create.AllItems;
 import io.redspace.irons_artifice.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
+import jp.aquafactory.artificesassorite.item.augmentation.AugmentationRecipe;
 import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementRecipe;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -23,6 +24,7 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_S
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AUGMENTATION_KIT;
 
 public final class VanillaRecipeProvider extends RecipeProvider {
     public VanillaRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
@@ -31,10 +33,22 @@ public final class VanillaRecipeProvider extends RecipeProvider {
 
     @Override
     protected void buildRecipes(RecipeOutput output) {
+        output.accept(id("smithing/modifier_augmentation"), new AugmentationRecipe(), null);
         SpecialRecipeBuilder.special(SpellImbuementRecipe::new)
                 .save(output.withConditions(new ModLoadedCondition("irons_spellbooks")), id("crafting/spell_imbuement_school"));
         var createLoaded = new ModLoadedCondition("create");
         var fallback = output.withConditions(new NotCondition(createLoaded));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MODIFIER_AUGMENTATION_KIT.get())
+                .pattern("LPL")
+                .pattern("CCC")
+                .pattern("LNL")
+                .define('P', Items.NETHERITE_PICKAXE)
+                .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .define('L', Items.LEATHER)
+                .define('N', Items.NETHERITE_INGOT)
+                .unlockedBy("has_netherite_pickaxe", has(Items.NETHERITE_PICKAXE))
+                .save(output, id("crafting/modifier_augmentation_kit"));
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, PRECISION_FIRE_MODIFIER.get())
                 .pattern(" RG")

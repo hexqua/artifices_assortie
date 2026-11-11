@@ -38,7 +38,7 @@ PowerShell では `JDK21_HOME` を設定するか、JDK 21 を `%USERPROFILE%\.j
 
 データ生成は `./gradlew.bat runData`、人間による client 確認は `./gradlew.bat runClient`、IDE 実行構成の同期は `./gradlew.bat neoForgeIdeSync` を使います。client の表示・操作は GameTest では検証できません。
 
-必須依存は Iron's Arms 'n Artifice / GeckoLib / Iron's Lib、任意依存は Create / Iron's Spells 'n Spellbooks / Malum です。実行構成の MOD ロードと別構成からの混入は GameTest で確認し、機能・連携の検証は対象の挙動テストで行います。
+必須依存は Iron's Arms 'n Artifice / GeckoLib / Iron's Lib、任意依存は Create / Iron's Spells 'n Spellbooks / Malum / JEI（client 表示連携）です。実行構成の MOD ロードと別構成からの混入は GameTest で確認し、機能・連携の検証は対象の挙動テストで行います。
 
 `build` では UTF-8・BOM・明らかな文字化けの検査も行います。文書・翻訳の変更時は `./gradlew.bat checkTextEncodingHygiene` で単独実行できます。
 
@@ -54,7 +54,7 @@ PowerShell では `JDK21_HOME` を設定するか、JDK 21 を `%USERPROFILE%\.j
 | `runClientMagic` | `runGameTestServerMagic` | Irons 構成一式 + Malum 1.8.2 / Lodestone 1.8.2（Curios は Irons 構成で導入） |
 | `runClientCreate` | `runGameTestServerCreate` | Create（Registrate / Flywheel / Ponder は配布 jar に同梱） |
 
-すべての client と GameTest の共通構成は、必須依存3件に JEI / Jade / MmmMmmMmmMmm（Target Dummy）と前提の MezzConfig / Moonlight Lib を加えたものです。JEI・Jade・Target Dummy は開発用であり、本 MOD の任意依存宣言には含めません。通常の `runServer` は必須依存のみ、`runData` は必須依存と Create / Irons 構成を読み込んで起動します。
+すべての client と GameTest の共通構成は、必須依存3件に JEI / Jade / MmmMmmMmmMmm（Target Dummy）と前提の MezzConfig / Moonlight Lib を加えたものです。JEI は任意連携も兼ね、Jade・Target Dummy は開発用で本 MOD の任意依存宣言には含めません。通常の `runServer` は必須依存のみ、`runData` は必須依存と Create / Irons 構成を読み込んで起動します。
 
 レシピは通常用と連携用を `runData` でまとめて生成し、導入されている MOD に応じてロード条件で切り替えます。
 

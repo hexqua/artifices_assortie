@@ -22,6 +22,7 @@ public final class CreativeTabRegistry {
 
     private static void displayItems(CreativeModeTab.ItemDisplayParameters parameters, CreativeModeTab.Output output) {
         addModifiers(output);
+        addSpecialItem(output);
     }
 
     private static void addModifiers(CreativeModeTab.Output output) {
@@ -33,5 +34,9 @@ public final class CreativeTabRegistry {
         if (SpellImbuementCompat.isAvailable()) {
             output.accept(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get());
         }
+    }
+
+    private static void addSpecialItem(CreativeModeTab.Output output) {
+        output.accept(ItemRegistry.MODIFIER_AUGMENTATION_KIT.get());
     }
 }

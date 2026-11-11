@@ -18,6 +18,7 @@ public final class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
+        basicItem(ItemRegistry.MODIFIER_AUGMENTATION_KIT.get());
         basicItem(ItemRegistry.PRECISION_FIRE_MODIFIER.get());
         basicItem(ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER.get());
         basicItem(ItemRegistry.FORTUNE_MEDAL_MODIFIER.get());
@@ -25,5 +26,6 @@ public final class ModItemModelProvider extends ItemModelProvider {
         basicItem(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_PRECISION_FIRE_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_FORTUNE_MEDAL_MODIFIER.get());
+        basicItem(ItemRegistry.INCOMPLETE_MODIFIER_AUGMENTATION_KIT.get());
     }
 }
