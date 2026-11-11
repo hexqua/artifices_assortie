@@ -27,6 +27,7 @@ public final class ItemRegistry {
             properties -> new ModifierItem(properties.stacksTo(1), new ItemTransferModifier()));
     public static final DeferredItem<Item> INCOMPLETE_PRECISION_FIRE_MODIFIER = ITEMS.registerSimpleItem("incomplete_precision_fire_modifier");
     public static final DeferredItem<Item> INCOMPLETE_FORTUNE_MEDAL_MODIFIER = ITEMS.registerSimpleItem("incomplete_fortune_medal_modifier");
+    public static final DeferredItem<Item> INCOMPLETE_MODIFIER_AUGMENTATION_KIT = ITEMS.registerSimpleItem("incomplete_modifier_augmentation_kit");
 
     private ItemRegistry() {}
 }

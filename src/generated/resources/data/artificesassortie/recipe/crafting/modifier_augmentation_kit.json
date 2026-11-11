@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "irons_artifice:clockwork_components"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "N": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "P": {
+      "item": "minecraft:netherite_pickaxe"
+    }
+  },
+  "pattern": [
+    "LPL",
+    "CCC",
+    "LNL"
+  ],
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:modifier_augmentation_kit"
+  }
+}

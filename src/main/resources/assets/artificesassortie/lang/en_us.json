@@ -10,6 +10,7 @@
 
   "item.artificesassortie.incomplete_precision_fire_modifier": "Incomplete Precision Fire Modifier",
   "item.artificesassortie.incomplete_fortune_medal_modifier": "Incomplete Medal of Fortune Modifier",
+  "item.artificesassortie.incomplete_modifier_augmentation_kit": "Incomplete Modifier Augmentation Kit",
 
   "item.artificesassortie.common.tooltip.mana_cost": "Mana Cost: %s /shot",
   "item.artificesassortie.common.tooltip.school": "School: %s",

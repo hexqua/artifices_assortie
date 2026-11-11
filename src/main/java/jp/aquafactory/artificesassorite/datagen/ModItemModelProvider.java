@@ -26,5 +26,6 @@ public final class ModItemModelProvider extends ItemModelProvider {
         basicItem(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_PRECISION_FIRE_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_FORTUNE_MEDAL_MODIFIER.get());
+        basicItem(ItemRegistry.INCOMPLETE_MODIFIER_AUGMENTATION_KIT.get());
     }
 }

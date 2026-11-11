@@ -27,9 +27,27 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MED
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_PRECISION_FIRE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_FORTUNE_MEDAL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AUGMENTATION_KIT;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_MODIFIER_AUGMENTATION_KIT;
 
 final class CreateModifierRecipeScenarios {
     private CreateModifierRecipeScenarios() {}
+
+    static void augmentationKit(GameTestHelper helper) {
+        var incomplete = INCOMPLETE_MODIFIER_AUGMENTATION_KIT.get();
+        var current = deploy(helper, new ItemStack(AllItems.PRECISION_MECHANISM.get()), Items.NETHERITE_INGOT);
+        assertIntermediate(helper, current, incomplete, 1);
+        current = deploy(helper, current, AllItems.STURDY_SHEET.get());
+        assertIntermediate(helper, current, incomplete, 2);
+        current = press(helper, current);
+        assertIntermediate(helper, current, incomplete, 3);
+        current = deploy(helper, current, ItemRegistry.CLOCKWORK_COMPONENTS.get());
+        assertIntermediate(helper, current, incomplete, 4);
+        current = deploy(helper, current, ItemRegistry.CLOCKWORK_COMPONENTS.get());
+        assertIntermediate(helper, current, incomplete, 5);
+        current = deploy(helper, current, AllItems.EXTENDO_GRIP.get());
+        ModifierRecipeGameTests.assertResult(helper, current, MODIFIER_AUGMENTATION_KIT.get(), "Sequenced assembly");
+    }
 
     static void precisionFire(GameTestHelper helper) {
         var current = deploy(helper, new ItemStack(AllItems.PRECISION_MECHANISM.get()), Items.SPYGLASS);

@@ -24,6 +24,7 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_S
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AUGMENTATION_KIT;
 
 public final class VanillaRecipeProvider extends RecipeProvider {
     public VanillaRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
@@ -37,6 +38,17 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .save(output.withConditions(new ModLoadedCondition("irons_spellbooks")), id("crafting/spell_imbuement_school"));
         var createLoaded = new ModLoadedCondition("create");
         var fallback = output.withConditions(new NotCondition(createLoaded));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MODIFIER_AUGMENTATION_KIT.get())
+                .pattern("LPL")
+                .pattern("CCC")
+                .pattern("LNL")
+                .define('P', Items.NETHERITE_PICKAXE)
+                .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .define('L', Items.LEATHER)
+                .define('N', Items.NETHERITE_INGOT)
+                .unlockedBy("has_netherite_pickaxe", has(Items.NETHERITE_PICKAXE))
+                .save(output, id("crafting/modifier_augmentation_kit"));
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, PRECISION_FIRE_MODIFIER.get())
                 .pattern(" RG")

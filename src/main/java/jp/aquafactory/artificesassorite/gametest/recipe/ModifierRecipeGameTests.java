@@ -20,11 +20,34 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_S
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AUGMENTATION_KIT;
 
 @GameTestHolder(ArtificesAssortie.MODID)
 @PrefixGameTestTemplate(false)
 public final class ModifierRecipeGameTests {
     private ModifierRecipeGameTests() {}
+
+    // GameTest がアノテーションから探索して呼び出す。
+    @SuppressWarnings("unused")
+    @GameTest(template = "gametest/basic_floor")
+    public static void augmentationKitCraftingRemainsAvailableWithCreate(GameTestHelper helper) {
+        assertCrafts(helper, augmentationKitInput(Items.NETHERITE_PICKAXE), MODIFIER_AUGMENTATION_KIT.get());
+        assertNoCraftingRecipe(helper, augmentationKitInput(Items.DIAMOND_PICKAXE),
+                "Augmentation kit crafting must require a netherite pickaxe");
+        boolean createLoaded = ModList.get().isLoaded("create");
+        helper.assertTrue(helper.getLevel().getRecipeManager().byKey(id("sequenced_assembly/modifier_augmentation_kit"))
+                .isPresent() == createLoaded, "Augmentation kit assembly must require Create");
+        if (createLoaded) CreateModifierRecipeScenarios.augmentationKit(helper);
+        helper.succeed();
+    }
+
+    private static CraftingInput augmentationKitInput(ItemLike pickaxe) {
+        var components = ItemRegistry.CLOCKWORK_COMPONENTS.get();
+        return input(3, 3,
+                Items.LEATHER, pickaxe, Items.LEATHER,
+                components, components, components,
+                Items.LEATHER, Items.NETHERITE_INGOT, Items.LEATHER);
+    }
 
     // GameTest がアノテーションから探索して呼び出す。
     @SuppressWarnings("unused")

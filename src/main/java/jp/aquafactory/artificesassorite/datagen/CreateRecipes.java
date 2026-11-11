@@ -18,12 +18,27 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MED
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_PRECISION_FIRE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_FORTUNE_MEDAL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AUGMENTATION_KIT;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_MODIFIER_AUGMENTATION_KIT;
 
 final class CreateRecipes {
     private CreateRecipes() {}
 
     static void buildRecipes(RecipeOutput output) {
         var createOutput = output.withConditions(new ModLoadedCondition("create"));
+        new SequencedAssemblyRecipeBuilder(id("modifier_augmentation_kit"))
+                .require(AllItems.PRECISION_MECHANISM.get())
+                .transitionTo(INCOMPLETE_MODIFIER_AUGMENTATION_KIT.get())
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(Items.NETHERITE_INGOT))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(AllItems.STURDY_SHEET.get()))
+                .addStep(PressingRecipe::new, step -> step)
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(AllItems.EXTENDO_GRIP.get()))
+                .loops(1)
+                .addOutput(MODIFIER_AUGMENTATION_KIT.get(), 1)
+                .build(createOutput);
+
         new SequencedAssemblyRecipeBuilder(id("precision_fire_modifier"))
                 .require(AllItems.PRECISION_MECHANISM.get())
                 .transitionTo(INCOMPLETE_PRECISION_FIRE_MODIFIER.get())
