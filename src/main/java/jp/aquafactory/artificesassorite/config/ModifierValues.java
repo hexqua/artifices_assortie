@@ -1,11 +1,16 @@
 package jp.aquafactory.artificesassorite.config;
 
 public record ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization, FortuneMedal fortuneMedal,
-                             SpellImbuement spellImbuement) {
+                             SpellImbuement spellImbuement, Excavation excavation) {
     public static final ModifierValues DEFAULTS = new ModifierValues(
             new PrecisionFire(1.5, 0.25, 0.5),
             new GripHoldStabilization(0.5, 0.75, -0.5, 0.75, 0.4), new FortuneMedal(3),
-            new SpellImbuement(0.5, 0.15, 1.0, 0.25));
+            new SpellImbuement(0.5, 0.15, 1.0, 0.25), new Excavation(6, 3));
+
+    public ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization,
+                          FortuneMedal fortuneMedal, SpellImbuement spellImbuement) {
+        this(precisionFire, gripHoldStabilization, fortuneMedal, spellImbuement, DEFAULTS.excavation());
+    }
 
     public ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization, FortuneMedal fortuneMedal) {
         this(precisionFire, gripHoldStabilization, fortuneMedal, DEFAULTS.spellImbuement());
@@ -34,4 +39,6 @@ public record ModifierValues(PrecisionFire precisionFire, GripHoldStabilization 
                                         double exhaustionPerTick) {}
 
     public record FortuneMedal(int maxEffectiveCount) {}
+
+    public record Excavation(double explosionResistanceCap, int maxFortuneCount) {}
 }

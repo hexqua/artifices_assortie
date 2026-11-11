@@ -30,6 +30,8 @@ public record SyncModifierConfigPayload(ModifierValues values) implements Custom
         buffer.writeDouble(imbuement.additionalModifierMultiplier());
         buffer.writeDouble(imbuement.normalManaCostMultiplier());
         buffer.writeDouble(imbuement.magicManaCostMultiplier());
+        buffer.writeDouble(payload.values.excavation().explosionResistanceCap());
+        buffer.writeVarInt(payload.values.excavation().maxFortuneCount());
     }
 
     private static SyncModifierConfigPayload read(FriendlyByteBuf buffer) {
@@ -37,7 +39,8 @@ public record SyncModifierConfigPayload(ModifierValues values) implements Custom
                 new ModifierValues.PrecisionFire(buffer.readDouble(), buffer.readDouble(), buffer.readDouble()),
                 new ModifierValues.GripHoldStabilization(buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readDouble()),
                 new ModifierValues.FortuneMedal(buffer.readVarInt()),
-                new ModifierValues.SpellImbuement(buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readDouble())));
+                new ModifierValues.SpellImbuement(buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readDouble()),
+                new ModifierValues.Excavation(buffer.readDouble(), buffer.readVarInt())));
     }
 
     @Override

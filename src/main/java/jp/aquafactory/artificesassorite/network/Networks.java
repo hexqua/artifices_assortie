@@ -11,7 +11,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 public final class Networks {
     // 互換性のない通信仕様変更時に手動で更新し、異なる形式の payload の送受信を防ぐ。
-    private static final int PROTOCOL_VERSION = 4;
+    private static final int PROTOCOL_VERSION = 5;
 
     private Networks() {}
 

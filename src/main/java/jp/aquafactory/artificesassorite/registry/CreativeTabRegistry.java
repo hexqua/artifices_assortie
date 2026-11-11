@@ -30,6 +30,7 @@ public final class CreativeTabRegistry {
         output.accept(ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER.get());
         output.accept(ItemRegistry.FORTUNE_MEDAL_MODIFIER.get());
         output.accept(ItemRegistry.ITEM_TRANSFER_MODIFIER.get());
+        output.accept(ItemRegistry.EXCAVATION_MODIFIER.get());
 
         if (SpellImbuementCompat.isAvailable()) {
             output.accept(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get());
