@@ -19,6 +19,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -38,6 +39,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.NeoForge;
@@ -337,6 +339,58 @@ public final class ExcavationGameTests {
 
     private static String key(Component component) {
         return ((TranslatableContents) component.getContents()).getKey();
+    }
+
+    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
+    public static void experiencePositionPreservesAmountRulesAndExistingOrbMerging(GameTestHelper h) throws Exception {
+        try (var s = new Scenario(h); var ignored = config(6, 3)) {
+            Consumer<BlockDropsEvent> fixedExperience = event -> {
+                if (event.getLevel() == h.getLevel() && event.getPos().equals(s.pos)) event.setDroppedExperience(7);
+            };
+            var rule = h.getLevel().getGameRules().getRule(GameRules.RULE_DOBLOCKDROPS);
+            boolean previous = rule.get();
+            NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, fixedExperience);
+            try {
+                rule.set(true, h.getLevel().getServer());
+                var transfer = s.power(s.profile(MINING, TRANSFER), 1000);
+                var pool = new ArrayList<ExperienceOrb>();
+                Vec3 feet = s.f.player.position();
+                // 合流先 ID の剰余を全て用意し、乱数の出目に関係なく既存オーブへ合流させる。
+                for (int i = 0; i < 40; i++) {
+                    var orb = new ExperienceOrb(h.getLevel(), feet.x, feet.y, feet.z, 7);
+                    pool.add(orb);
+                    s.entities.add(orb);
+                }
+                h.assertTrue(pool.stream().map(orb -> Math.floorMod(orb.getId(), 40)).distinct().count() == 40,
+                        "Orb fixture must cover every merge selector");
+                for (var orb : pool) h.assertTrue(h.getLevel().addFreshEntity(orb), "Merge destination must exist before excavation");
+                s.assertHits(Blocks.DIAMOND_ORE, transfer, 1);
+                int count = pool.stream().mapToInt(orb -> orb.saveWithoutId(new CompoundTag()).getInt("Count")).sum();
+                h.assertTrue(count == 41 && s.entities.stream().filter(ExperienceOrb.class::isInstance).count() == 40,
+                        "Modified experience must merge at the destination without spawning replacement orbs");
+                s.clearEntities();
+                s.assertHits(Blocks.DIAMOND_ORE, s.power(s.profile(MINING), 1000), 1);
+                var localOrbs = s.entities.stream().filter(ExperienceOrb.class::isInstance).map(ExperienceOrb.class::cast).toList();
+                h.assertTrue(localOrbs.size() == 1 && localOrbs.getFirst().getValue() == 7
+                                && localOrbs.getFirst().position().equals(Vec3.atCenterOf(s.pos)),
+                        "Excavation without transfer must preserve modified experience at the original position");
+                s.clearEntities();
+                Blocks.STONE.popExperience(h.getLevel(), s.pos, 7);
+                var ordinaryOrbs = h.getLevel().getEntitiesOfClass(ExperienceOrb.class, AABB.ofSize(Vec3.atCenterOf(s.pos), 1, 1, 1));
+                s.entities.addAll(ordinaryOrbs);
+                h.assertTrue(ordinaryOrbs.size() == 1 && ordinaryOrbs.getFirst().position().equals(Vec3.atCenterOf(s.pos)),
+                        "Experience outside excavation must retain the original spawn position");
+                s.clearEntities();
+                rule.set(false, h.getLevel().getServer());
+                s.assertHits(Blocks.DIAMOND_ORE, transfer, 1);
+                h.assertTrue(s.entities.stream().noneMatch(ExperienceOrb.class::isInstance),
+                        "Transfer must not bypass the doTileDrops experience rule");
+            } finally {
+                rule.set(previous, h.getLevel().getServer());
+                NeoForge.EVENT_BUS.unregister(fixedExperience);
+            }
+        }
+        h.succeed();
     }
 
     @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")

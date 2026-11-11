@@ -5,11 +5,8 @@ import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.modifier.itemtransfer.ItemTransferModifier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -68,14 +65,9 @@ public final class ExcavationDrops {
         item.setNoPickUpDelay();
     }
 
-    public static void experience(Block block, ServerLevel level, BlockPos pos, int amount) {
+    public static Vec3 experiencePosition(ServerLevel level, BlockPos pos, Vec3 original) {
         LivingEntity owner = recipient(level, pos);
-        if (owner == null) {
-            block.popExperience(level, pos, amount);
-        } else if (level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS) && !level.restoringBlockSnapshots) {
-            // BlockDropsEvent の取消・数量変更を処理した後の生成位置だけを差し替える。
-            ExperienceOrb.award(level, owner.position(), amount);
-        }
+        return owner == null ? original : owner.position();
     }
 
     record Context(ServerLevel level, BlockPos pos, @Nullable LivingEntity recipient) {}
