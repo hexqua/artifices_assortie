@@ -2,6 +2,7 @@ package jp.aquafactory.artificesassorite.network;
 
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.config.AugmentationConfig;
+import jp.aquafactory.artificesassorite.item.modifier.excavation.ExcavationClientBridge;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldClientBridge;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldStabilizationEvents;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -11,7 +12,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 public final class Networks {
     // 互換性のない通信仕様変更時に手動で更新し、異なる形式の payload の送受信を防ぐ。
-    private static final int PROTOCOL_VERSION = 5;
+    private static final int PROTOCOL_VERSION = 6;
 
     private Networks() {}
 
@@ -29,6 +30,8 @@ public final class Networks {
                 (payload, context) -> ServerConfig.updateClient(payload.values()));
         registrar.playToClient(SyncAugmentationMaterialPayload.TYPE, SyncAugmentationMaterialPayload.STREAM_CODEC,
                 (payload, context) -> AugmentationConfig.updateClient(payload.material()));
+        registrar.playToClient(ExcavationEffectsPayload.TYPE, ExcavationEffectsPayload.STREAM_CODEC,
+                (payload, context) -> ExcavationClientBridge.effects.accept(payload));
     }
 
     public static void sendToPlayer(ServerPlayer player, CustomPacketPayload payload) {

@@ -1,5 +1,6 @@
 package jp.aquafactory.artificesassorite.gametest.modifier;
 
+import io.netty.buffer.Unpooled;
 import io.redspace.irons_artifice.data.ShotComponents;
 import io.redspace.irons_artifice.data.Value;
 import io.redspace.irons_artifice.gun.ShotProfile;
@@ -8,6 +9,9 @@ import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.excavation.ExcavationModifier;
+import jp.aquafactory.artificesassorite.item.modifier.excavation.ExcavationEffectBatch;
+import jp.aquafactory.artificesassorite.network.ExcavationEffectsPayload;
+import jp.aquafactory.artificesassorite.network.ExcavationEffectsPayload.DestroyedBlock;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -22,6 +26,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import org.jetbrains.annotations.NotNull;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -35,6 +50,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.GameRules;
@@ -56,6 +72,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 
 @GameTestHolder(ArtificesAssortie.MODID)
@@ -440,6 +457,130 @@ public final class ExcavationGameTests {
             h.assertTrue(s.state().isAir() && !s.items().isEmpty(), "Removing the harvest restriction must allow mining");
         }
         h.succeed();
+    }
+
+    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
+    public static void impactNotifiesShooterAndObserversWithoutVanillaDuplicates(GameTestHelper h) throws ReflectiveOperationException {
+        try (var s = new Scenario(h); var shooter = new EffectPackets(s.f.player); var observerFixture = new ModifierTestFixture(h);
+             var observer = new EffectPackets(observerFixture.player)) {
+            var positions = new LinkedHashSet<BlockPos>();
+            for (int x = -1; x <= 2; x++) for (int z = -1; z <= 2; z++) for (int y = 0; y <= 2; y++) {
+                var pos = s.pos.offset(x, y, z);
+                h.getLevel().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
+                positions.add(pos);
+            }
+            var denied = s.pos.offset(1, 0, 0);
+            Consumer<BlockEvent.BreakEvent> cancel = event -> {
+                if (event.getLevel() == h.getLevel() && event.getPos().equals(denied)) event.setCanceled(true);
+            };
+            NeoForge.EVENT_BUS.addListener(cancel);
+            try { s.hit(s.power(s.profile(MINING, POWDER, POWDER, POWDER), 10000)); }
+            finally { NeoForge.EVENT_BUS.unregister(cancel); }
+            var effects = shooter.effects();
+            var blocks = effects.stream().flatMap(packet -> packet.blocks().stream()).toList();
+            h.assertTrue(blocks.size() > 32, "Server must notify more than the default particle budget");
+            h.assertTrue(effects.equals(observer.effects()), "Shooter and nearby observer must receive the same complete effects");
+            h.assertTrue(blocks.stream().map(DestroyedBlock::pos).distinct().count() == blocks.size(), "Direct and area mining must share one deduplicated batch");
+            h.assertTrue(blocks.stream().noneMatch(block -> block.pos().equals(denied)) && h.getLevel().getBlockState(denied).is(Blocks.DIRT),
+                    "Canceled blocks must survive and must not produce effects");
+            for (var pos : positions) if (!pos.equals(denied)) {
+                h.assertTrue(h.getLevel().getBlockState(pos).isAir() && blocks.stream().anyMatch(block -> block.pos().equals(pos)
+                        && block.stateId() == Block.getId(Blocks.DIRT.defaultBlockState())), "Successful mining must notify the original state: " + pos);
+            }
+            var impact = Vec3.atCenterOf(s.pos);
+            for (int i = 1; i < blocks.size(); i++) h.assertTrue(Vec3.atCenterOf(blocks.get(i - 1).pos()).distanceToSqr(impact)
+                    <= Vec3.atCenterOf(blocks.get(i).pos()).distanceToSqr(impact), "Effects must be ordered by actual impact distance");
+            h.assertTrue(effects.stream().mapToInt(packet -> packet.selected(32).size()).sum() == 32
+                    && effects.stream().mapToInt(packet -> packet.selected(4).size()).sum() == 4,
+                    "Particle and sound budgets must select independent nearest subsets");
+            h.assertTrue(shooter.vanillaBreaks() == 0 && observer.vanillaBreaks() == 0, "Excavation must suppress vanilla break effects for every recipient");
+
+            shooter.packets.clear(); observer.packets.clear();
+            s.place(Blocks.DIRT);
+            s.hit(s.power(s.profile(MINING), 10000));
+            h.assertTrue(shooter.effects().size() == 1 && shooter.effects().getFirst().offset() == 0
+                    && shooter.effects().getFirst().blocks().size() == 1, "Next impact must start a fresh budget");
+            shooter.packets.clear(); observer.packets.clear();
+            s.place(Blocks.DIRT);
+            s.hit(s.power(s.profile(BREACH), 10000));
+            h.assertTrue(s.state().isAir() && shooter.effects().isEmpty() && observer.effects().isEmpty()
+                    && shooter.vanillaBreaks() > 0 && observer.vanillaBreaks() > 0,
+                    "Ordinary breaching must retain upstream effects after excavation scopes close");
+            shooter.packets.clear(); observer.packets.clear();
+            s.place(Blocks.TORCH);
+            s.hit(s.power(s.profile(MINING), 10000));
+            h.assertTrue(s.state().isAir() && shooter.effects().stream().flatMap(packet -> packet.blocks().stream())
+                    .anyMatch(block -> block.pos().equals(s.pos)), "Zero-health mining must also notify the shooter");
+        }
+        h.succeed();
+    }
+
+    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
+    public static void splitEffectPacketsPreserveAllBlocksAndGlobalClientBudgets(GameTestHelper h) throws ReflectiveOperationException {
+        try (var s = new Scenario(h); var captured = new EffectPackets(s.f.player)) {
+            var bullet = s.f.bullet(s.profile(MINING));
+            try (var ignored = ExcavationEffectBatch.begin(h.getLevel(), bullet, Vec3.atCenterOf(s.pos))) {
+                for (int i = 599; i >= 0; i--) ExcavationEffectBatch.record(h.getLevel(), bullet,
+                        s.pos.offset(i % 10, i / 100, (i / 10) % 10), Blocks.DIRT.defaultBlockState());
+            } finally { bullet.discard(); }
+            var received = new ArrayList<ExcavationEffectsPayload>();
+            for (var payload : captured.effects()) {
+                var buffer = new FriendlyByteBuf(Unpooled.buffer());
+                try {
+                    ExcavationEffectsPayload.STREAM_CODEC.encode(buffer, payload);
+                    received.add(ExcavationEffectsPayload.STREAM_CODEC.decode(buffer));
+                    h.assertTrue(!buffer.isReadable(), "Effect packet codec must consume the complete batch");
+                } finally { buffer.release(); }
+            }
+            h.assertTrue(received.size() > 1 && received.stream().mapToInt(packet -> packet.blocks().size()).sum() == 600,
+                    "Large impacts must split packets without losing candidates");
+            for (int limit : new int[]{0, 4, 32, 400, -1}) {
+                int expected = limit < 0 ? 600 : limit;
+                h.assertTrue(received.stream().mapToInt(packet -> packet.selected(limit).size()).sum() == expected,
+                        "Global client budget must survive packet splitting: " + limit);
+            }
+        }
+        h.succeed();
+    }
+
+    private static final class EffectPackets implements AutoCloseable {
+        final ServerPlayer player;
+        final ServerGamePacketListenerImpl previous;
+        final List<Packet<?>> packets = new ArrayList<>();
+        final List<ServerPlayer> recipients;
+
+        @SuppressWarnings("unchecked")
+        EffectPackets(ServerPlayer player) throws ReflectiveOperationException {
+            this.player = player;
+            previous = player.connection;
+            // 公開 getter は読み取り専用。実際の配信先を一時追加し、close で必ず元へ戻す。
+            var field = PlayerList.class.getDeclaredField("players");
+            field.setAccessible(true);
+            recipients = (List<ServerPlayer>) field.get(player.server.getPlayerList());
+            new ServerGamePacketListenerImpl(player.server, new Connection(PacketFlow.SERVERBOUND), player,
+                    CommonListenerCookie.createInitial(player.getGameProfile(), false)) {
+                @Override
+                public void send(@NotNull Packet<?> packet) { packets.add(packet); }
+            };
+            // 通常の levelEvent の配信経路も観測するため、fixture の間だけ配信先へ登録する。
+            recipients.add(player);
+        }
+
+        List<ExcavationEffectsPayload> effects() {
+            return packets.stream().filter(ClientboundCustomPayloadPacket.class::isInstance).map(ClientboundCustomPayloadPacket.class::cast)
+                    .map(ClientboundCustomPayloadPacket::payload).filter(ExcavationEffectsPayload.class::isInstance).map(ExcavationEffectsPayload.class::cast).toList();
+        }
+
+        long vanillaBreaks() {
+            return packets.stream().filter(ClientboundLevelEventPacket.class::isInstance).map(ClientboundLevelEventPacket.class::cast)
+                    .filter(packet -> packet.getType() == LevelEvent.PARTICLES_DESTROY_BLOCK).count();
+        }
+
+        @Override
+        public void close() {
+            recipients.remove(player);
+            player.connection = previous;
+        }
     }
 
     private static AutoCloseable config(double cap, int fortune) {

@@ -9,7 +9,9 @@
     "ExcavationDamageManagerAccessor",
     "ExcavationBlockHealthAccessor",
     "ExcavationBlockChangeMixin",
-    "ExcavationExperienceMixin"
+    "ExcavationExperienceMixin",
+    "ExcavationImpactMixin",
+    "ExcavationEffectMixin"
   ],
   "client": [
     "GripHoldRecoilMixin",

@@ -90,7 +90,7 @@ public final class ExcavationMining {
         if (fortune > 0) tool.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.FORTUNE), fortune);
         BlockEntity blockEntity = level.getBlockEntity(pos);
         var previous = ExcavationDrops.begin(level, pos, bullet);
-        try {
+        try (var ignored = ExcavationEffectBatch.harvesting(level, pos, state)) {
             Block block = state.getBlock();
             if (bullet.getOwner() instanceof Player player) {
                 BlockState destroyedState = block.playerWillDestroy(level, pos, state, player);
@@ -103,6 +103,7 @@ public final class ExcavationMining {
                 if (!level.destroyBlock(pos, false, bullet.getOwner())) return false;
                 Block.dropResources(state, level, pos, blockEntity, bullet.getOwner(), tool);
             }
+            ExcavationEffectBatch.record(level, bullet, pos, state);
             return true;
         } finally {
             ExcavationDrops.end(previous);
