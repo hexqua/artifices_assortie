@@ -13,6 +13,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ItemRegistry {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ArtificesAssortie.MODID);
+    public static final DeferredItem<Item> MODIFIER_AUGMENTATION_KIT = ITEMS.registerSimpleItem("modifier_augmentation_kit");
     public static final DeferredItem<SpellImbuementItem> SPELL_IMBUEMENT_MODIFIER = ITEMS.registerItem("spell_imbuement_modifier",
             properties -> new SpellImbuementItem(properties.stacksTo(1)));
     public static final DeferredItem<ModifierItem> PRECISION_FIRE_MODIFIER = ITEMS.registerItem("precision_fire_modifier",

@@ -6,6 +6,7 @@
   "item.artificesassortie.fortune_medal_modifier": "幸運メダルモディファイア",
   "item.artificesassortie.item_transfer_modifier": "アイテム転送モディファイア",
   "item.artificesassortie.spell_imbuement_modifier": "術式注入モディファイア",
+  "item.artificesassortie.modifier_augmentation_kit": "モディファイア拡張キット",
 
   "item.artificesassortie.incomplete_precision_fire_modifier": "未完成の精密射撃モディファイア",
   "item.artificesassortie.incomplete_fortune_medal_modifier": "未完成の幸運メダルモディファイア",
@@ -13,6 +14,7 @@
   "item.artificesassortie.common.tooltip.mana_cost": "消費マナ: %s /shot",
   "item.artificesassortie.common.tooltip.school": "系統: %s",
   "item.artificesassortie.common.tooltip.school.none": "無し",
+  "item.artificesassortie.common.tooltip.augmented_slot": "モディファイアスロット拡張済み",
 
   "item.artificesassortie.precision_fire_modifier.desc_1": "%1$s%% ヘッドショットダメージ倍率(モディファイア追加分は+%2$s%%)",
   "item.artificesassortie.precision_fire_modifier.desc_2": "%s%% 非ヘッドショットダメージ倍率",
@@ -34,6 +36,14 @@
   "item.artificesassortie.spell_imbuement_modifier.desc_3": "射撃時に銃の威力に応じてマナを消費するが、魔法威力による増加は控えめ",
   "item.artificesassortie.spell_imbuement_modifier.desc_4": "異なる系統を併用した場合、装着数にかかわらず使用者の魔法威力が最も高い系統を全体に適用する",
   "item.artificesassortie.spell_imbuement_modifier.desc_5": "全てのモディファイアが追加装着による強化にカウントされる",
+  "item.artificesassortie.modifier_augmentation_kit.tooltip.invalid": "指定されたアイテムIDが正しくないため機能しない。(ID: \"%s\")",
+  "item.artificesassortie.modifier_augmentation_kit.tooltip.desc_1": "鍛冶台で対応の銃と%sを組み合わせることでモディファイアスロットを+1する",
+  "item.artificesassortie.modifier_augmentation_kit.tooltip.desc_2": "各銃につき一度だけ使用可能",
+  "item.artificesassortie.modifier_augmentation_kit.tooltip.desc_3": "Shift長押しで対応する銃を表示",
+  "item.artificesassortie.modifier_augmentation_kit.detail.header": "対応する銃:",
+  "item.artificesassortie.modifier_augmentation_kit.detail.item": "- %s",
+  "item.artificesassortie.modifier_augmentation_kit.detail.overflow": "他%s種",
+  "item.artificesassortie.modifier_augmentation_kit.detail.overflow_jei": "他%s種(レシピはJEIで確認可能)",
 
   "ui.artificesassortie.insufficient_mana": "発射するのに十分なマナが足りない！",
 

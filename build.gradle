@@ -233,6 +233,7 @@ dependencies {
     compileOnly "io.redspace:irons_spellbooks:${irons_spells_version}"
     compileOnly "maven.modrinth:malum:${malum_modrinth_version_id}"
     compileOnly "maven.modrinth:lodestonelib:${lodestone_modrinth_version_id}"
+    compileOnly "maven.modrinth:jei:${jei_modrinth_version_id}"
 
     target_dummyRuntimeOnly "maven.modrinth:moonlight:${moonlight_modrinth_version_id}"
     target_dummyRuntimeOnly "maven.modrinth:Adega8YN:${target_dummy_modrinth_version_id}"
@@ -281,6 +282,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             create_version         : create_version,
             irons_spells_version   : irons_spells_version,
             malum_version          : malum_version,
+            jei_version            : jei_version,
     ]
     inputs.properties replaceProperties
     expand replaceProperties
