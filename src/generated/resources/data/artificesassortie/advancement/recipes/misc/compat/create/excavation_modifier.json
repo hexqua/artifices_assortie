@@ -1,0 +1,38 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_clockwork_components": {
+      "conditions": {
+        "items": [
+          {
+            "items": "irons_artifice:clockwork_components"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "artificesassortie:compat/create/excavation_modifier"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_clockwork_components"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "artificesassortie:compat/create/excavation_modifier"
+    ]
+  }
+}

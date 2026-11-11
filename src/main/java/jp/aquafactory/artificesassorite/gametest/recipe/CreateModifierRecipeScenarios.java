@@ -1,5 +1,6 @@
 package jp.aquafactory.artificesassorite.gametest.recipe;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.AllDataComponents;
@@ -22,6 +23,7 @@ import net.neoforged.neoforge.items.wrapper.RecipeWrapper;
 import java.util.ArrayList;
 
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.EXCAVATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
@@ -32,6 +34,18 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_
 
 final class CreateModifierRecipeScenarios {
     private CreateModifierRecipeScenarios() {}
+
+    static void excavation(GameTestHelper helper) {
+        var drill = AllBlocks.MECHANICAL_DRILL.get();
+        ModifierRecipeGameTests.assertCrafts(helper, ModifierRecipeGameTests.excavationInput(drill, drill, Items.FLINT),
+                EXCAVATION_MODIFIER.get());
+        ModifierRecipeGameTests.assertNoCraftingRecipe(helper,
+                ModifierRecipeGameTests.excavationInput(Items.DIAMOND_PICKAXE, drill, Items.FLINT),
+                "Create excavation crafting must require a third mechanical drill instead of a pickaxe");
+        ModifierRecipeGameTests.assertNoCraftingRecipe(helper,
+                ModifierRecipeGameTests.excavationInput(drill, drill, Items.AIR),
+                "Create excavation crafting must require flint");
+    }
 
     static void augmentationKit(GameTestHelper helper) {
         var incomplete = INCOMPLETE_MODIFIER_AUGMENTATION_KIT.get();

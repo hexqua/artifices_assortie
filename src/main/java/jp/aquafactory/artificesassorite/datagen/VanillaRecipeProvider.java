@@ -1,5 +1,6 @@
 package jp.aquafactory.artificesassorite.datagen;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import io.redspace.irons_artifice.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
@@ -21,6 +22,7 @@ import net.neoforged.neoforge.common.Tags;
 import java.util.concurrent.CompletableFuture;
 
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.EXCAVATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
@@ -38,6 +40,29 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .save(output.withConditions(new ModLoadedCondition("irons_spellbooks")), id("crafting/spell_imbuement_school"));
         var createLoaded = new ModLoadedCondition("create");
         var fallback = output.withConditions(new NotCondition(createLoaded));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, EXCAVATION_MODIFIER.get())
+                .pattern(" P ")
+                .pattern("DMD")
+                .pattern("FCF")
+                .define('P', Items.DIAMOND_PICKAXE)
+                .define('D', Items.DIAMOND)
+                .define('M', ItemRegistry.BREACHING_SHELL.get())
+                .define('F', Items.FLINT)
+                .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .unlockedBy("has_clockwork_components", has(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .save(fallback, id("crafting/excavation_modifier"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, EXCAVATION_MODIFIER.get())
+                .pattern(" D ")
+                .pattern("DMD")
+                .pattern("FCF")
+                .define('D', AllBlocks.MECHANICAL_DRILL.get())
+                .define('M', ItemRegistry.BREACHING_SHELL.get())
+                .define('F', Items.FLINT)
+                .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .unlockedBy("has_clockwork_components", has(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .save(output.withConditions(createLoaded), id("compat/create/excavation_modifier"));
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MODIFIER_AUGMENTATION_KIT.get())
                 .pattern("LPL")

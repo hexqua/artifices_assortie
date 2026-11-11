@@ -9,6 +9,7 @@ import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.excavation.ExcavationModifier;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,6 +19,7 @@ import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -245,16 +247,20 @@ public final class ExcavationGameTests {
     }
 
     @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
-    public static void detailTooltipRetainsCombosAndUsesIndependentLimit(GameTestHelper h) {
+    public static void detailTooltipReplacesAllDescriptionsAndUsesIndependentLimit(GameTestHelper h) {
         var normal = new ArrayList<Component>();
         var detail = new ArrayList<Component>();
         ExcavationModifier.describe(normal::add, false, 2);
-        ExcavationModifier.describe(detail::add, true, 0);
         h.assertTrue(normal.stream().anyMatch(c -> key(c).endsWith(".desc_8")), "Normal tooltip must advertise Shift details");
-        h.assertTrue(detail.stream().noneMatch(c -> key(c).endsWith(".desc_8")) && key(detail.getFirst()).contains(".detail."),
-                "Detailed tooltip must replace normal mining explanations");
-        h.assertTrue(detail.stream().anyMatch(c -> key(c).endsWith(".desc_6.no_limit"))
-                && detail.stream().anyMatch(c -> key(c).endsWith(".desc_7")), "Details must retain Fortune and transfer combinations");
+        h.assertTrue(normal.stream().anyMatch(c -> key(c).endsWith(".desc_7")),
+                "Normal tooltip must retain the transfer combination");
+        for (int fortuneLimit : new int[]{0, 2}) {
+            detail.clear();
+            ExcavationModifier.describe(detail::add, true, fortuneLimit);
+            h.assertTrue(!detail.isEmpty() && detail.stream().allMatch(c -> key(c).startsWith(ExcavationModifier.KEY + ".detail.")
+                            && Objects.equals(TextColor.fromLegacyFormat(ChatFormatting.GRAY), c.getStyle().getColor())),
+                    "Shift details must replace every normal description with gray details regardless of Fortune cap");
+        }
         var fortune = normal.stream().filter(c -> key(c).endsWith(".desc_6")).findFirst().orElseThrow();
         h.assertTrue(((TranslatableContents) fortune.getContents()).getArgs()[2].equals(2), "Excavation tooltip must use its own Fortune cap");
         try (var s = new Scenario(h)) {

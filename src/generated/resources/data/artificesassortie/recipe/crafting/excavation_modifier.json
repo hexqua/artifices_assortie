@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:mod_loaded",
+        "modid": "create"
+      }
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "irons_artifice:clockwork_components"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "F": {
+      "item": "minecraft:flint"
+    },
+    "M": {
+      "item": "irons_artifice:breaching_shell_modifier"
+    },
+    "P": {
+      "item": "minecraft:diamond_pickaxe"
+    }
+  },
+  "pattern": [
+    " P ",
+    "DMD",
+    "FCF"
+  ],
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:excavation_modifier"
+  }
+}

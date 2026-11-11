@@ -35,19 +35,19 @@ public final class ExcavationModifier implements GunModifier {
     public static void describe(Consumer<Component> builder, boolean details, int fortuneLimit) {
         if (details) {
             for (int line = 1; line <= 4; line++) add(builder, ChatFormatting.GRAY, KEY + ".detail.desc_" + line);
-        } else {
-            add(builder, ChatFormatting.AQUA, KEY + ".desc_1");
-            add(builder, ChatFormatting.AQUA, KEY + ".desc_2");
-            add(builder, ChatFormatting.GREEN, KEY + ".desc_3");
-            add(builder, ChatFormatting.YELLOW, KEY + ".desc_4");
-            add(builder, ChatFormatting.GREEN, KEY + ".desc_5");
+            return;
         }
+        add(builder, ChatFormatting.AQUA, KEY + ".desc_1");
+        add(builder, ChatFormatting.AQUA, KEY + ".desc_2");
+        add(builder, ChatFormatting.GREEN, KEY + ".desc_3");
+        add(builder, ChatFormatting.YELLOW, KEY + ".desc_4");
+        add(builder, ChatFormatting.GREEN, KEY + ".desc_5");
         Component medal = ItemRegistry.FORTUNE_MEDAL_MODIFIER.get().getDescription();
         Component fortune = Component.translatable("enchantment.minecraft.fortune");
         if (fortuneLimit == 0) add(builder, ChatFormatting.GREEN, KEY + ".desc_6.no_limit", medal, fortune);
         else add(builder, ChatFormatting.GREEN, KEY + ".desc_6", medal, fortune, fortuneLimit);
         add(builder, ChatFormatting.AQUA, KEY + ".desc_7", ItemRegistry.ITEM_TRANSFER_MODIFIER.get().getDescription());
-        if (!details) add(builder, ChatFormatting.DARK_GRAY, KEY + ".desc_8");
+        add(builder, ChatFormatting.DARK_GRAY, KEY + ".desc_8");
     }
 
     private static void add(Consumer<Component> builder, ChatFormatting color, String key, Object... args) {
