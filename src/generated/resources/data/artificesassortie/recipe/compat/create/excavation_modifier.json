@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "irons_artifice:clockwork_components"
+    },
+    "D": {
+      "item": "create:mechanical_drill"
+    },
+    "F": {
+      "item": "minecraft:flint"
+    },
+    "M": {
+      "item": "irons_artifice:breaching_shell_modifier"
+    }
+  },
+  "pattern": [
+    " D ",
+    "DMD",
+    "FCF"
+  ],
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:excavation_modifier"
+  }
+}

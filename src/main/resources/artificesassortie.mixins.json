@@ -4,7 +4,14 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "AugmentedGunContainerMixin",
-    "AugmentedGunTooltipMixin"
+    "AugmentedGunTooltipMixin",
+    "ExcavationBlockDamageMixin",
+    "ExcavationDamageManagerAccessor",
+    "ExcavationBlockHealthAccessor",
+    "ExcavationBlockChangeMixin",
+    "ExcavationExperienceMixin",
+    "ExcavationImpactMixin",
+    "ExcavationEffectMixin"
   ],
   "client": [
     "GripHoldRecoilMixin",

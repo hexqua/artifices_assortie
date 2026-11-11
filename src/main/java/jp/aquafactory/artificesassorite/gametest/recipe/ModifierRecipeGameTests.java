@@ -17,6 +17,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import java.util.Arrays;
 
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.EXCAVATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
@@ -26,6 +27,31 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AU
 @PrefixGameTestTemplate(false)
 public final class ModifierRecipeGameTests {
     private ModifierRecipeGameTests() {}
+
+    @GameTest(template = "gametest/basic_floor")
+    public static void excavationRecipeSwitchesWithCreate(GameTestHelper helper) {
+        boolean createLoaded = ModList.get().isLoaded("create");
+        assertRecipeVariants(helper, "excavation_modifier", "compat/create/excavation_modifier", createLoaded);
+        var fallback = excavationInput(Items.DIAMOND_PICKAXE, Items.DIAMOND, Items.FLINT);
+        if (createLoaded) {
+            assertNoCraftingRecipe(helper, fallback, "Create must disable the diamond excavation recipe");
+            CreateModifierRecipeScenarios.excavation(helper);
+        } else {
+            assertCrafts(helper, fallback, EXCAVATION_MODIFIER.get());
+            assertNoCraftingRecipe(helper, excavationInput(Items.IRON_PICKAXE, Items.DIAMOND, Items.FLINT),
+                    "Excavation crafting must require a diamond pickaxe");
+            assertNoCraftingRecipe(helper, excavationInput(Items.DIAMOND_PICKAXE, Items.DIAMOND, Items.AIR),
+                    "Excavation crafting must require flint");
+        }
+        helper.succeed();
+    }
+
+    static CraftingInput excavationInput(ItemLike top, ItemLike side, ItemLike flint) {
+        return input(3, 3,
+                Items.AIR, top, Items.AIR,
+                side, ItemRegistry.BREACHING_SHELL.get(), side,
+                flint, ItemRegistry.CLOCKWORK_COMPONENTS.get(), flint);
+    }
 
     // GameTest がアノテーションから探索して呼び出す。
     @SuppressWarnings("unused")

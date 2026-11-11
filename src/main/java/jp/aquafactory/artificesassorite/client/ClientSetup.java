@@ -1,6 +1,7 @@
 package jp.aquafactory.artificesassorite.client;
 
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
+import jp.aquafactory.artificesassorite.item.modifier.excavation.ExcavationClientBridge;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -13,5 +14,6 @@ public final class ClientSetup {
     @SubscribeEvent
     public static void setup(FMLClientSetupEvent event) {
         event.enqueueWork(GripHoldStabilizationClientEvents::register);
+        event.enqueueWork(() -> ExcavationClientBridge.effects = ExcavationEffects::play);
     }
 }

@@ -5,6 +5,7 @@ import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.fortunemedal.FortuneMedalModifier;
+import jp.aquafactory.artificesassorite.item.modifier.excavation.ExcavationModifier;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldStabilizationModifier;
 import jp.aquafactory.artificesassorite.item.modifier.precisionfire.PrecisionFireModifier;
 import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementModifier;
@@ -33,11 +34,17 @@ public final class ModifierConfigGameTests {
         var buffer = new FriendlyByteBuf(Unpooled.buffer());
         try {
             var values = new ModifierValues(new ModifierValues.PrecisionFire(1.8, 0.4, 0.6), new ModifierValues.GripHoldStabilization(0.65, 0.8, -0.75, 1.25, 0.12), new ModifierValues.FortuneMedal(7),
-                    new ModifierValues.SpellImbuement(0.7, 0.2, 0.3, 0.1));
+                    new ModifierValues.SpellImbuement(0.7, 0.2, 0.3, 0.1), new ModifierValues.Excavation(0, 2));
             SyncModifierConfigPayload.STREAM_CODEC.encode(buffer, new SyncModifierConfigPayload(values));
             var decoded = SyncModifierConfigPayload.STREAM_CODEC.decode(buffer);
             h.assertTrue(decoded.values().equals(values), "Config codec must preserve all gameplay and tooltip values");
             ServerConfig.updateClient(decoded.values());
+            var excavation = new ArrayList<Component>();
+            new ExcavationModifier().getDescriptionText(excavation::add);
+            var excavationFortune = excavation.stream().filter(c -> ((TranslatableContents) c.getContents()).getKey()
+                    .equals(ExcavationModifier.KEY + ".desc_6")).findFirst().orElseThrow();
+            h.assertTrue(((TranslatableContents) excavationFortune.getContents()).getArgs()[2].equals(2),
+                    "Excavation tooltip must use its synchronized Fortune cap independently of Looting");
             var precision = new ArrayList<Component>();
             new PrecisionFireModifier().getDescriptionText(precision::add);
             var head = (TranslatableContents) precision.getFirst().getContents();
