@@ -10,6 +10,7 @@ import io.redspace.irons_artifice.modifier.OnHitEffect;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.registry.SoundRegistry;
+import jp.aquafactory.artificesassorite.item.modifier.potionoil.OilEffects;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -51,7 +52,8 @@ public final class PrecisionFireEvents {
         if (bullet.level().isClientSide) return;
         // 貫通・跳弾・キャンセル時も前の対象の判定を持ち越さない。
         bullet.getProfile().components().remove(IMPACT);
-        if (event.isCanceled() || bullet.getProfile().peek(PrecisionFireModifier.COUNT) == 0) return;
+        if (event.isCanceled() || bullet.getProfile().peek(PrecisionFireModifier.COUNT) == 0
+                || OilEffects.enabled(bullet.getProfile())) return;
         if (event.getRayTraceResult() instanceof EntityHitResult hit && hit.getEntity() instanceof LivingEntity target) {
             bullet.getProfile().components().set(IMPACT, new Impact(target, hit.getLocation(), isHeadshot(target, hit.getLocation()), false));
         }

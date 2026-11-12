@@ -6,6 +6,8 @@
   "item.artificesassortie.fortune_medal_modifier": "Medal of Fortune Modifier",
   "item.artificesassortie.item_transfer_modifier": "Item Transfer Modifier",
   "item.artificesassortie.excavation_modifier": "Excavation Modifier",
+  "item.artificesassortie.healing_oil_modifier": "Healing Oil Modifier",
+  "item.artificesassortie.harming_oil_modifier": "Harming Oil Modifier",
   "item.artificesassortie.spell_imbuement_modifier": "Spell Imbuement Modifier",
   "item.artificesassortie.modifier_augmentation_kit": "Modifier Augmentation Kit",
 
@@ -48,6 +50,19 @@
   "item.artificesassortie.excavation_modifier.detail.desc_2": "Additional modifiers only raise the tool tier; mining speed depends on bullet damage",
   "item.artificesassortie.excavation_modifier.detail.desc_3": "Mines blocks requiring no tool, or a suitable pickaxe, axe, shovel, or hoe",
   "item.artificesassortie.excavation_modifier.detail.desc_4": "This bullet deals no terrain damage if its tool type or tier is insufficient",
+  "item.artificesassortie.healing_oil_modifier.desc_1": "%s%% Damage",
+  "item.artificesassortie.healing_oil_modifier.desc_2": "Direct bullet hits and blasts heal their targets instead of dealing damage",
+  "item.artificesassortie.healing_oil_modifier.desc_3": "Undead take damage that bypasses armor and shields instead of being healed",
+  "item.artificesassortie.healing_oil_modifier.desc_4": "Direct hits and blasts can also hit you, allies, and pets",
+  "item.artificesassortie.healing_oil_modifier.desc_5": "Installing %s in the same gun restores normal targeting and turns healing into damage",
+  "item.artificesassortie.healing_oil_modifier.desc_6": "Precision Fire's headshot and non-headshot multipliers do not apply",
+  "item.artificesassortie.healing_oil_modifier.desc_7": "Additional effects such as burning, chain lightning, and soulfire are not converted to healing",
+  "item.artificesassortie.harming_oil_modifier.desc_1": "%s%% Damage",
+  "item.artificesassortie.harming_oil_modifier.desc_2": "Direct bullet hits and blasts bypass armor and shields",
+  "item.artificesassortie.harming_oil_modifier.desc_3": "Undead are healed instead of taking damage",
+  "item.artificesassortie.harming_oil_modifier.desc_4": "Witches' magic resistance greatly reduces the damage",
+  "item.artificesassortie.harming_oil_modifier.desc_5": "Installing %s in the same gun also makes undead take damage instead of being healed",
+  "item.artificesassortie.harming_oil_modifier.desc_6": "Precision Fire's headshot and non-headshot multipliers do not apply",
   "item.artificesassortie.spell_imbuement_modifier.tooltip": "Craft with a school rune to change its school",
   "item.artificesassortie.spell_imbuement_modifier.desc_1": "%1$s%% Damage (+%2$s%% per additional modifier)",
   "item.artificesassortie.spell_imbuement_modifier.desc_2": "Affected by spell resistance as the %s school",
@@ -66,5 +81,11 @@
 
   "ui.artificesassortie.insufficient_mana": "Not enough mana to fire!",
 
-  "subtitle.artificesassortie.sound.precision_fire_headshot": "Bullet hits critically"
+  "subtitle.artificesassortie.sound.precision_fire_headshot": "Bullet hits critically",
+  "death.attack.artificesassortie.oil_bullet": "%1$s was shot with potion oil",
+  "death.attack.artificesassortie.oil_bullet.player": "%1$s was shot with potion oil by %2$s",
+  "death.attack.artificesassortie.oil_bullet.item": "%1$s was shot with potion oil by %2$s using %3$s",
+  "death.attack.artificesassortie.oil_blast": "%1$s was caught in a potion oil blast",
+  "death.attack.artificesassortie.oil_blast.player": "%1$s was caught in %2$s's potion oil blast",
+  "death.attack.artificesassortie.oil_blast.item": "%1$s was caught in %2$s's potion oil blast from %3$s"
 }

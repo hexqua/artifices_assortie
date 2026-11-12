@@ -6,6 +6,8 @@
   "item.artificesassortie.fortune_medal_modifier": "幸運メダルモディファイア",
   "item.artificesassortie.item_transfer_modifier": "アイテム転送モディファイア",
   "item.artificesassortie.excavation_modifier": "採掘モディファイア",
+  "item.artificesassortie.healing_oil_modifier": "治癒オイルモディファイア",
+  "item.artificesassortie.harming_oil_modifier": "負傷オイルモディファイア",
   "item.artificesassortie.spell_imbuement_modifier": "術式注入モディファイア",
   "item.artificesassortie.modifier_augmentation_kit": "モディファイア拡張キット",
 
@@ -48,6 +50,19 @@
   "item.artificesassortie.excavation_modifier.detail.desc_2": "追加装着はツールレベルのみ上昇し、採掘速度は弾の威力に依存する",
   "item.artificesassortie.excavation_modifier.detail.desc_3": "適正ツール不要、または対応するツルハシ・斧・シャベル・クワで採掘可能なブロックが対象",
   "item.artificesassortie.excavation_modifier.detail.desc_4": "ツールの種類・レベルが条件を満たさない場合、この弾の地形ダメージは無効",
+  "item.artificesassortie.healing_oil_modifier.desc_1": "%s%% ダメージ",
+  "item.artificesassortie.healing_oil_modifier.desc_2": "銃弾の直撃・爆風が、ダメージの代わりに命中した対象を回復する",
+  "item.artificesassortie.healing_oil_modifier.desc_3": "アンデッドには回復の代わりに、防御力と盾を無視するダメージを与える",
+  "item.artificesassortie.healing_oil_modifier.desc_4": "直撃・爆風が自分や味方、ペットにも当たるようになる",
+  "item.artificesassortie.healing_oil_modifier.desc_5": "%sを同じ銃に装着すると、通常の命中対象に戻り、回復効果はダメージに変わる",
+  "item.artificesassortie.healing_oil_modifier.desc_6": "精密射撃のヘッドショット・非ヘッドショット倍率は適用されない",
+  "item.artificesassortie.healing_oil_modifier.desc_7": "炎上・連鎖雷・ソウルファイアなどの追加効果は回復に変換されない",
+  "item.artificesassortie.harming_oil_modifier.desc_1": "%s%% ダメージ",
+  "item.artificesassortie.harming_oil_modifier.desc_2": "銃弾の直撃・爆風が防御力と盾を無視する",
+  "item.artificesassortie.harming_oil_modifier.desc_3": "アンデッドにはダメージの代わりに回復を与える",
+  "item.artificesassortie.harming_oil_modifier.desc_4": "ウィッチの魔法耐性によってダメージが大幅に軽減される",
+  "item.artificesassortie.harming_oil_modifier.desc_5": "%sを同じ銃に装着すると、アンデッドにも回復の代わりにダメージを与える",
+  "item.artificesassortie.harming_oil_modifier.desc_6": "精密射撃のヘッドショット・非ヘッドショット倍率は適用されない",
   "item.artificesassortie.spell_imbuement_modifier.tooltip": "系統のルーンとクラフトすることで系統を変更できる",
   "item.artificesassortie.spell_imbuement_modifier.desc_1": "%1$s%% ダメージ(モディファイア追加分は+%2$s%%)",
   "item.artificesassortie.spell_imbuement_modifier.desc_2": "%s系統として呪文耐性の影響を受ける",
@@ -66,5 +81,11 @@
 
   "ui.artificesassortie.insufficient_mana": "発射するのに十分なマナが足りない！",
 
-  "subtitle.artificesassortie.sound.precision_fire_headshot": "銃弾が鋭く当たる"
+  "subtitle.artificesassortie.sound.precision_fire_headshot": "銃弾が鋭く当たる",
+  "death.attack.artificesassortie.oil_bullet": "%1$sはポーションオイルを塗った銃弾に撃たれた",
+  "death.attack.artificesassortie.oil_bullet.player": "%1$sは%2$sのポーションオイルを塗った銃弾に撃たれた",
+  "death.attack.artificesassortie.oil_bullet.item": "%1$sは%2$sの%3$sから放たれたポーションオイルを塗った銃弾に撃たれた",
+  "death.attack.artificesassortie.oil_blast": "%1$sはポーションオイルの爆風に巻き込まれた",
+  "death.attack.artificesassortie.oil_blast.player": "%1$sは%2$sのポーションオイルの爆風に巻き込まれた",
+  "death.attack.artificesassortie.oil_blast.item": "%1$sは%2$sの%3$sによるポーションオイルの爆風に巻き込まれた"
 }

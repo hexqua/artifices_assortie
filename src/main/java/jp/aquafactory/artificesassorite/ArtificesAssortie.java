@@ -11,6 +11,7 @@ import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuem
 import jp.aquafactory.artificesassorite.datagen.ModItemModelProvider;
 import jp.aquafactory.artificesassorite.datagen.RecipeDataProviders;
 import jp.aquafactory.artificesassorite.datagen.SoundDataProvider;
+import jp.aquafactory.artificesassorite.datagen.OilDamageProvider;
 import jp.aquafactory.artificesassorite.network.ModifierConfigSync;
 import jp.aquafactory.artificesassorite.network.Networks;
 import jp.aquafactory.artificesassorite.registry.CreativeTabRegistry;
@@ -41,6 +42,7 @@ public class ArtificesAssortie {
         bus.addListener(ModItemModelProvider::gatherData);
         bus.addListener(ModItemTagsProvider::gatherData);
         bus.addListener(SoundDataProvider::gatherData);
+        bus.addListener(OilDamageProvider::gatherData);
         bus.addListener(RecipeDataProviders::gatherData);
     }
 }

@@ -8,6 +8,7 @@ public final class ServerConfig {
     private static final ModConfigSpec.DoubleValue MOVEMENT, RECOIL, SPREAD, RECOVERY, EXHAUSTION;
     private static final ModConfigSpec.IntValue FORTUNE_MEDAL_LIMIT;
     private static final ModConfigSpec.DoubleValue EXCAVATION_RESISTANCE_CAP;
+    private static final ModConfigSpec.DoubleValue HEALING_OIL_DAMAGE, HARMING_OIL_DAMAGE;
     private static final ModConfigSpec.IntValue EXCAVATION_FORTUNE_LIMIT;
     private static final ModConfigSpec.DoubleValue IMBUEMENT_FIRST, IMBUEMENT_ADDITIONAL, IMBUEMENT_NORMAL_MANA, IMBUEMENT_MAGIC_MANA;
     private static volatile ModifierValues serverValues = ModifierValues.DEFAULTS;
@@ -54,6 +55,12 @@ public final class ServerConfig {
                 .defineInRange("normalManaCostMultiplier", 1.0, 0.0, Double.MAX_VALUE);
         IMBUEMENT_MAGIC_MANA = builder.comment("Mana per additional damage from spell power, per firing. Set both mana coefficients to 0 to disable the cost.")
                 .defineInRange("magicManaCostMultiplier", 0.25, 0.0, Double.MAX_VALUE);
+        builder.pop().push("HealingOilModifier");
+        HEALING_OIL_DAMAGE = builder.comment("Damage and healing multiplier per installed modifier. 0.9 means 90%.")
+                .defineInRange("damageMultiplier", 0.9, 0.0, 1000.0);
+        builder.pop().push("HarmingOilModifier");
+        HARMING_OIL_DAMAGE = builder.comment("Damage and healing multiplier per installed modifier. 0.9 means 90%.")
+                .defineInRange("damageMultiplier", 0.9, 0.0, 1000.0);
         builder.pop();
         AugmentationConfig.define(builder);
         SPEC = builder.build();
@@ -66,7 +73,8 @@ public final class ServerConfig {
                 new ModifierValues.GripHoldStabilization(MOVEMENT.get(), RECOIL.get(), SPREAD.get(), RECOVERY.get(), EXHAUSTION.get()),
                 new ModifierValues.FortuneMedal(FORTUNE_MEDAL_LIMIT.get()),
                 new ModifierValues.SpellImbuement(IMBUEMENT_FIRST.get(), IMBUEMENT_ADDITIONAL.get(), IMBUEMENT_NORMAL_MANA.get(), IMBUEMENT_MAGIC_MANA.get()),
-                new ModifierValues.Excavation(EXCAVATION_RESISTANCE_CAP.get(), EXCAVATION_FORTUNE_LIMIT.get()));
+                new ModifierValues.Excavation(EXCAVATION_RESISTANCE_CAP.get(), EXCAVATION_FORTUNE_LIMIT.get()),
+                new ModifierValues.Oil(HEALING_OIL_DAMAGE.get()), new ModifierValues.Oil(HARMING_OIL_DAMAGE.get()));
     }
 
     public static ModifierValues serverValues() { return serverValues; }

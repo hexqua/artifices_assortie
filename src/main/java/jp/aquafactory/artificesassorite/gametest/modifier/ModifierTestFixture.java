@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.item.Item;
@@ -109,5 +110,6 @@ final class ModifierTestFixture implements AutoCloseable {
         }
 
         void hit(HitResult result) { super.onHit(result); }
+        boolean canTarget(Entity target) { return super.canHitEntity(target); }
     }
 }
