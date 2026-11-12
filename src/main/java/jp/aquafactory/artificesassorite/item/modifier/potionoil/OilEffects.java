@@ -51,6 +51,7 @@ public final class OilEffects {
             double soul = bullet.getProfile().value(ShotComponents.SOUL_DAMAGE);
             if (soul > 0) living.hurt(DamageSources.soul(bullet.level(), bullet, bullet.getOwner()), (float) (amount * soul));
             living.heal(amount);
+            if (amount > 0 && living.isAlive()) OilHealingParticles.emit(living);
             return true;
         }
         var holder = bullet.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(blast ? BLAST : BULLET);
