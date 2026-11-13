@@ -3,7 +3,10 @@ package jp.aquafactory.artificesassorite.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import io.redspace.irons_artifice.entity.Bullet;
+import io.redspace.irons_artifice.entity.SoulfireCoin;
 import jp.aquafactory.artificesassorite.item.modifier.potionoil.OilEffects;
+import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementEffects;
+import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementModifier;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -32,7 +35,8 @@ public abstract class OilBulletMixin extends Projectile {
     private boolean allowHealingTargets(Entity attacker, Entity target, Operation<Boolean> original) {
         var bullet = (Bullet) (Object) this;
         // 味方除外だけを外す。射手と乗り物から一度離れるまでの保護は Projectile に委ねる。
-        return OilEffects.unrestricted(bullet.getProfile()) ? super.canHitEntity(target) : original.call(attacker, target);
+        return OilEffects.unrestricted(bullet.getProfile()) || bullet.getProfile().peek(PotionImbuementModifier.INSTALLED)
+                ? super.canHitEntity(target) : original.call(attacker, target);
     }
 
     @Inject(method = "canHitEntity", at = @At("RETURN"), cancellable = true)
@@ -44,6 +48,11 @@ public abstract class OilBulletMixin extends Projectile {
             target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
     private boolean convertOilImpact(Entity target, DamageSource source, float amount, Operation<Boolean> original) {
         var bullet = (Bullet) (Object) this;
+        // コインの hurt は生物への damage ではなく、跳弾イベント後のコイン消費を担う。
+        if (PotionImbuementEffects.regular(bullet) && !(target instanceof SoulfireCoin)) {
+            if (target instanceof EnderDragonPart part && !artificesassortie$hitDragons.add(part.parentMob.getId())) return false;
+            return PotionImbuementEffects.applyRegular(bullet, target);
+        }
         if (!OilEffects.enabled(bullet.getProfile())) return original.call(target, source, amount);
         if (target instanceof EnderDragonPart part && !artificesassortie$hitDragons.add(part.parentMob.getId())) return false;
         return OilEffects.affect(bullet, target, amount, false);
@@ -52,7 +61,8 @@ public abstract class OilBulletMixin extends Projectile {
     @WrapOperation(method = "onHitEntity", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/LivingEntity;knockback(DDD)V"))
     private void suppressHealingKnockback(LivingEntity target, double strength, double x, double z, Operation<Void> original) {
-        if (!OilEffects.heals((Bullet) (Object) this, target)) original.call(target, strength, x, z);
+        var bullet = (Bullet) (Object) this;
+        if (!PotionImbuementEffects.regular(bullet) && !OilEffects.heals(bullet, target)) original.call(target, strength, x, z);
     }
 
     @Inject(method = {"clearPierced", "reflectMotion"}, at = @At("HEAD"))

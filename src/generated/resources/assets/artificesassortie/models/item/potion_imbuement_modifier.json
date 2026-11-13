@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "artificesassortie:item/potion_imbuement_modifier"
+  }
+}

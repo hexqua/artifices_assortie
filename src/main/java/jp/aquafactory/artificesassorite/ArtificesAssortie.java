@@ -8,6 +8,10 @@ import jp.aquafactory.artificesassorite.datagen.ModItemTagsProvider;
 import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementCompat;
 import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementRecipe;
 import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementStorage;
+import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementStorage;
+import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementCreate;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import jp.aquafactory.artificesassorite.datagen.ModItemModelProvider;
 import jp.aquafactory.artificesassorite.datagen.RecipeDataProviders;
 import jp.aquafactory.artificesassorite.datagen.SoundDataProvider;
@@ -33,6 +37,11 @@ public class ArtificesAssortie {
         GunAugmentation.COMPONENTS.register(bus);
         AugmentationRecipe.SERIALIZERS.register(bus);
         SpellImbuementStorage.COMPONENTS.register(bus);
+        PotionImbuementStorage.COMPONENTS.register(bus);
+        // Create 固有型を持つ handler は、導入済みの環境だけでロードする。
+        bus.addListener((RegisterCapabilitiesEvent event) -> {
+            if (ModList.get().isLoaded("create")) PotionImbuementCreate.register(event);
+        });
         SpellImbuementRecipe.SERIALIZERS.register(bus);
         SpellImbuementCompat.register(bus);
         SoundRegistry.SOUNDS.register(bus);
