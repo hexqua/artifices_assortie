@@ -109,6 +109,8 @@ public final class PotionImbuementGameTests {
             PotionImbuementStorage.fill(customModifier, Bottle.REGULAR, PotionContents.EMPTY.withEffectAdded(originalEffect), 1, false);
             h.assertTrue(PotionImbuementStorage.fill(customModifier, Bottle.REGULAR, PotionContents.EMPTY.withEffectAdded(changedCures), 1, false) == 0,
                     "Matching visible effects must not hide differences in stored curing conditions");
+            h.assertTrue(!contents(customModifier).samePotionAs(new Contents(Bottle.REGULAR, PotionContents.EMPTY.withEffectAdded(changedCures), 8)),
+                    "Consecutive-dose aggregation must also distinguish curing conditions");
         } catch (RuntimeException failure) {
             LogUtils.getLogger().error("Potion storage scenario failed", failure);
             throw failure;
@@ -136,7 +138,8 @@ public final class PotionImbuementGameTests {
             var slots = new GunContainer(gun);
             int left = contents(slots.getItem(0)).doses();
             int right = contents(slots.getItem(1)).doses();
-            h.assertTrue(left + right == 3 && (left == 1) == (payload.contents().bottle() == Bottle.SPLASH), "Only the selected modifier must lose one dose");
+            h.assertTrue(left == 1 && right == 2 && payload.contents().bottle() == Bottle.SPLASH,
+                    "Only the leftmost filled modifier must lose one dose");
             Consumer<GunAboutToShootEvent> cancel = event -> { if (event.getEntity() == f.player) event.setCanceled(true); };
             NeoForge.EVENT_BUS.addListener(cancel);
             try { GunplayManager.tryFire(f.player, new Vec3(0, 0, 1)); }
@@ -166,6 +169,9 @@ public final class PotionImbuementGameTests {
                     bullet.hit(new EntityHitResult(target, target.position()));
                     f.close(target.getHealth(), 1000, "Regular potion must replace oil damage");
                     h.assertTrue(target.hasEffect(MobEffects.MOVEMENT_SPEED), "Every pierced target must receive the potion");
+                    PotionImbuementDisplayGameTests.assertDisplayedDuration(h,
+                            new Contents(Bottle.REGULAR, new PotionContents(Potions.SWIFTNESS), 1),
+                            Objects.requireNonNull(target.getEffect(MobEffects.MOVEMENT_SPEED)));
                     f.close(target.getDeltaMovement().length(), 0, "Regular potion must suppress direct knockback");
                     h.assertTrue(!bullet.canTarget(target), "Pierced targets must still be recorded by the bullet");
                 }
@@ -230,6 +236,9 @@ public final class PotionImbuementGameTests {
             try {
                 first.hit(new EntityHitResult(target, target.position()));
                 h.assertTrue(target.getHealth() < 1000 && target.hasEffect(MobEffects.MOVEMENT_SPEED), "Splash must preserve bullet damage and apply the potion");
+                PotionImbuementDisplayGameTests.assertDisplayedDuration(h,
+                        new Contents(Bottle.SPLASH, new PotionContents(Potions.SWIFTNESS), 1),
+                        Objects.requireNonNull(target.getEffect(MobEffects.MOVEMENT_SPEED)));
                 h.assertTrue(first.getProfile().peek(PotionImbuementModifier.PAYLOAD) == null, "First pellet must lose its payload after bursting");
                 h.assertTrue(second.getProfile().peek(PotionImbuementModifier.PAYLOAD) != null, "Other pellets must retain their payload");
                 target.removeAllEffects();
@@ -252,8 +261,10 @@ public final class PotionImbuementGameTests {
             try {
                 for (int pellets : new int[]{1, 4, 36}) {
                     var profile = base.copy();
+                    var stored = new Contents(Bottle.LINGERING, new PotionContents(Potions.SWIFTNESS)
+                            .withEffectAdded(new MobEffectInstance(MobEffects.REGENERATION, 200)), 1);
                     profile.components().set(PotionImbuementModifier.PAYLOAD, new PotionImbuementModifier.Payload(
-                            new Contents(Bottle.LINGERING, new PotionContents(Potions.SWIFTNESS), 1), pellets));
+                            stored, pellets));
                     var bullet = f.bullet(profile);
                     try { bullet.hit(new BlockHitResult(center, Direction.UP, target.blockPosition().below(), false)); }
                     finally { bullet.discard(); }
@@ -268,6 +279,8 @@ public final class PotionImbuementGameTests {
                         else {
                             h.assertTrue(target.hasEffect(MobEffects.MOVEMENT_SPEED), "A viable cloud must apply its potion");
                             h.assertTrue(Objects.requireNonNull(target.getEffect(MobEffects.MOVEMENT_SPEED)).getDuration() == 900, "Scatter must not reduce the applied effect duration");
+                            PotionImbuementDisplayGameTests.assertDisplayedDuration(h, stored, Objects.requireNonNull(target.getEffect(MobEffects.MOVEMENT_SPEED)));
+                            PotionImbuementDisplayGameTests.assertDisplayedDuration(h, stored, Objects.requireNonNull(target.getEffect(MobEffects.REGENERATION)));
                             h.assertTrue(cloud.getDuration() == 600 / pellets, "Scatter must shorten cloud lifetime");
                             for (int tick = 0; tick < 610 && !cloud.isRemoved(); tick++) cloud.tick();
                             h.assertTrue(cloud.isRemoved(), "Lingering clouds must naturally terminate");

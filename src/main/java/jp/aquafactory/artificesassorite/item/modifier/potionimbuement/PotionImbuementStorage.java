@@ -52,6 +52,10 @@ public final class PotionImbuementStorage {
         ).apply(instance, Contents::new));
 
         public ItemStack potionStack() { return bottle.stack(potion); }
+
+        public boolean samePotionAs(Contents other) {
+            return bottle == other.bottle && samePotion(potion, other.potion);
+        }
     }
 
     public static int space(ItemStack modifier, Bottle bottle, PotionContents potion) {

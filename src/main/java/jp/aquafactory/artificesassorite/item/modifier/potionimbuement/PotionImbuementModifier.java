@@ -32,6 +32,6 @@ public final class PotionImbuementModifier implements GunModifier {
         int count = details ? 6 : 4;
         String prefix = details ? ".detail.desc_" : ".desc_";
         for (int line = 1; line <= count; line++) builder.accept(Component.translatable(KEY + prefix + line)
-                .withStyle(!details && line == 3 ? ChatFormatting.YELLOW : !details && line == 4 ? ChatFormatting.DARK_GRAY : ChatFormatting.AQUA));
+                .withStyle(!details && line == 3 ? ChatFormatting.YELLOW : !details && line == 4 ? ChatFormatting.DARK_GRAY : ChatFormatting.GRAY));
     }
 }

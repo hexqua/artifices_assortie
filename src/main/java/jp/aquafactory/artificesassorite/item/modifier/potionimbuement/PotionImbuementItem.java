@@ -1,7 +1,6 @@
 package jp.aquafactory.artificesassorite.item.modifier.potionimbuement;
 
 import io.redspace.irons_artifice.modifier.ModifierItem;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.SlotAccess;
@@ -34,19 +33,9 @@ public final class PotionImbuementItem extends ModifierItem {
         return true;
     }
 
-    @Override public @NotNull Component getName(@NotNull ItemStack stack) {
-        var contents = stack.get(PotionImbuementStorage.CONTENTS);
-        return contents == null ? super.getName(stack) : Component.translatable(PotionImbuementModifier.KEY + ".potion",
-                super.getName(stack), contents.potionStack().getHoverName(), contents.doses());
-    }
-
     @Override public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context,
                                         @NotNull List<Component> lines, @NotNull TooltipFlag flag) {
-        var contents = stack.get(PotionImbuementStorage.CONTENTS);
-        lines.add(Component.translatable(PotionImbuementModifier.KEY + ".tooltip_1").withStyle(ChatFormatting.AQUA));
-        Component current = contents == null ? Component.translatable(PotionImbuementModifier.KEY + ".tooltip.empty")
-                : Component.translatable(PotionImbuementModifier.KEY + ".tooltip.potion", contents.potionStack().getHoverName(), contents.doses(), PotionImbuementStorage.CAPACITY);
-        lines.add(Component.translatable(PotionImbuementModifier.KEY + ".tooltip_2", current).withStyle(ChatFormatting.AQUA));
+        PotionImbuementTooltips.stored(stack, lines, context.tickRate());
         super.appendHoverText(stack, context, lines, flag);
     }
 }

@@ -7,16 +7,12 @@ import io.redspace.irons_artifice.gun.ShotProfile;
 import io.redspace.irons_artifice.menu.GunContainer;
 import io.redspace.irons_artifice.modifier.OnHitEffect;
 import io.redspace.irons_artifice.modifier.OnShotEffect;
-import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.EnderDragonPart;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.HitResult;
-
-import java.util.ArrayList;
 
 public final class PotionImbuementEffects {
     private PotionImbuementEffects() {}
@@ -44,11 +40,10 @@ public final class PotionImbuementEffects {
         @Override public void onShot(ServerLevel level, LivingEntity shooter, ShotProfile profile) {
             profile.remove(PotionImbuementModifier.PAYLOAD);
             var slots = new GunContainer(profile.itemStack());
-            var candidates = new ArrayList<ItemStack>();
-            for (var stack : slots.getItems()) if (stack.is(ItemRegistry.POTION_IMBUEMENT_MODIFIER) && stack.has(PotionImbuementStorage.CONTENTS)) candidates.add(stack);
-            if (candidates.isEmpty()) return;
-            var selected = candidates.get(level.random.nextInt(candidates.size()));
-            var contents = selected.get(PotionImbuementStorage.CONTENTS);
+            var selection = PotionImbuementSelection.next(slots);
+            if (selection == null) return;
+            var selected = slots.getItem(selection.slot());
+            var contents = selection.contents();
             int count = Math.max(1, (int) Math.round(profile.value(ShotComponents.PROJECTILE_COUNT)));
             profile.components().set(PotionImbuementModifier.PAYLOAD, new PotionImbuementModifier.Payload(contents, count));
             PotionImbuementStorage.consume(selected);
