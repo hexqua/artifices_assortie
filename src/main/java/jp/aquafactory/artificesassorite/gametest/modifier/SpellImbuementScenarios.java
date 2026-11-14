@@ -319,6 +319,28 @@ final class SpellImbuementScenarios {
         return (TranslatableContents) component.getSiblings().getFirst().getContents();
     }
 
+    static void oilHealing(GameTestHelper h) throws Exception {
+        try (var f = new ModifierTestFixture(h); var ignored = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS)) {
+            attribute(f.player, AttributeRegistry.SPELL_POWER, 3);
+            var target = f.target();
+            try {
+                attribute(target, AttributeRegistry.SPELL_RESIST, 2);
+                var gun = f.equip("flintlock", ItemRegistry.HEALING_OIL_MODIFIER.get(), 1);
+                double normal = f.compose().value(ShotComponents.DAMAGE);
+                new GunContainer(gun).setItem(1, module(h, null));
+                var profile = f.compose();
+                f.close(profile.value(ShotComponents.DAMAGE), normal * 2, "Spell power must amplify oil healing before impact");
+                h.assertTrue(SpellImbuementEvents.cost(profile, false) > 0, "Healing shots must retain the spell mana cost");
+                var bullet = f.bullet(profile);
+                try {
+                    target.setHealth(100);
+                    bullet.hit(new EntityHitResult(target, target.getEyePosition()));
+                    f.close(target.getHealth(), 100 + bullet.resolveDamage(), "Magic resistance must not reduce spell-powered healing");
+                } finally { bullet.discard(); }
+            } finally { target.discard(); }
+        }
+    }
+
     private static ModifierValues config(ModifierValues.SpellImbuement values) {
         return new ModifierValues(ModifierValues.DEFAULTS.precisionFire(), ModifierValues.DEFAULTS.gripHoldStabilization(),
                 ModifierValues.DEFAULTS.fortuneMedal(), values);

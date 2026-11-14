@@ -11,7 +11,11 @@
     "ExcavationBlockChangeMixin",
     "ExcavationExperienceMixin",
     "ExcavationImpactMixin",
-    "ExcavationEffectMixin"
+    "ExcavationEffectMixin",
+    "OilBulletMixin",
+    "PotionImbuementCloudMixin",
+    "OilBlastMixin",
+    "OilCowboyHatMixin"
   ],
   "client": [
     "GripHoldRecoilMixin",

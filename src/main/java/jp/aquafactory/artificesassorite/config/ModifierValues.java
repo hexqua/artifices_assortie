@@ -1,11 +1,17 @@
 package jp.aquafactory.artificesassorite.config;
 
 public record ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization, FortuneMedal fortuneMedal,
-                             SpellImbuement spellImbuement, Excavation excavation) {
+                             SpellImbuement spellImbuement, Excavation excavation, Oil healingOil, Oil harmingOil) {
     public static final ModifierValues DEFAULTS = new ModifierValues(
             new PrecisionFire(1.5, 0.25, 0.5),
             new GripHoldStabilization(0.5, 0.75, -0.5, 0.75, 0.4), new FortuneMedal(3),
-            new SpellImbuement(0.5, 0.15, 1.0, 0.25), new Excavation(6, 3));
+            new SpellImbuement(0.5, 0.15, 1.0, 0.25), new Excavation(6, 3), new Oil(0.9), new Oil(0.9));
+
+    public ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization,
+                          FortuneMedal fortuneMedal, SpellImbuement spellImbuement, Excavation excavation) {
+        this(precisionFire, gripHoldStabilization, fortuneMedal, spellImbuement, excavation,
+                DEFAULTS.healingOil(), DEFAULTS.harmingOil());
+    }
 
     public ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization,
                           FortuneMedal fortuneMedal, SpellImbuement spellImbuement) {
@@ -41,4 +47,6 @@ public record ModifierValues(PrecisionFire precisionFire, GripHoldStabilization 
     public record FortuneMedal(int maxEffectiveCount) {}
 
     public record Excavation(double explosionResistanceCap, int maxFortuneCount) {}
+
+    public record Oil(double damageMultiplier) {}
 }

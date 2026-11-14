@@ -8,6 +8,8 @@ import jp.aquafactory.artificesassorite.item.modifier.fortunemedal.FortuneMedalM
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldStabilizationModifier;
 import jp.aquafactory.artificesassorite.item.modifier.itemtransfer.ItemTransferModifier;
 import jp.aquafactory.artificesassorite.item.modifier.precisionfire.PrecisionFireModifier;
+import jp.aquafactory.artificesassorite.item.modifier.potionoil.OilModifier;
+import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementItem;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -28,9 +30,18 @@ public final class ItemRegistry {
             properties -> new ModifierItem(properties.stacksTo(1), new ItemTransferModifier()));
     public static final DeferredItem<ModifierItem> EXCAVATION_MODIFIER = ITEMS.registerItem("excavation_modifier",
             properties -> new ModifierItem(properties.stacksTo(1), new ExcavationModifier()));
+    public static final DeferredItem<ModifierItem> HEALING_OIL_MODIFIER = ITEMS.registerItem("healing_oil_modifier",
+            properties -> new ModifierItem(properties.stacksTo(1), new OilModifier(true)));
+    public static final DeferredItem<ModifierItem> HARMING_OIL_MODIFIER = ITEMS.registerItem("harming_oil_modifier",
+            properties -> new ModifierItem(properties.stacksTo(1), new OilModifier(false)));
     public static final DeferredItem<Item> INCOMPLETE_PRECISION_FIRE_MODIFIER = ITEMS.registerSimpleItem("incomplete_precision_fire_modifier");
+    public static final DeferredItem<PotionImbuementItem> POTION_IMBUEMENT_MODIFIER = ITEMS.registerItem("potion_imbuement_modifier",
+            properties -> new PotionImbuementItem(properties.stacksTo(1)));
     public static final DeferredItem<Item> INCOMPLETE_FORTUNE_MEDAL_MODIFIER = ITEMS.registerSimpleItem("incomplete_fortune_medal_modifier");
     public static final DeferredItem<Item> INCOMPLETE_MODIFIER_AUGMENTATION_KIT = ITEMS.registerSimpleItem("incomplete_modifier_augmentation_kit");
+    public static final DeferredItem<Item> INCOMPLETE_HEALING_OIL_MODIFIER = ITEMS.registerSimpleItem("incomplete_healing_oil_modifier");
+    public static final DeferredItem<Item> INCOMPLETE_HARMING_OIL_MODIFIER = ITEMS.registerSimpleItem("incomplete_harming_oil_modifier");
+    public static final DeferredItem<Item> INCOMPLETE_POTION_IMBUEMENT_MODIFIER = ITEMS.registerSimpleItem("incomplete_potion_imbuement_modifier");
 
     private ItemRegistry() {}
 }

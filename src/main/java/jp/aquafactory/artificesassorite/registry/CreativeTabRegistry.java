@@ -31,6 +31,9 @@ public final class CreativeTabRegistry {
         output.accept(ItemRegistry.FORTUNE_MEDAL_MODIFIER.get());
         output.accept(ItemRegistry.ITEM_TRANSFER_MODIFIER.get());
         output.accept(ItemRegistry.EXCAVATION_MODIFIER.get());
+        output.accept(ItemRegistry.HEALING_OIL_MODIFIER.get());
+        output.accept(ItemRegistry.HARMING_OIL_MODIFIER.get());
+        output.accept(ItemRegistry.POTION_IMBUEMENT_MODIFIER.get());
 
         if (SpellImbuementCompat.isAvailable()) {
             output.accept(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get());

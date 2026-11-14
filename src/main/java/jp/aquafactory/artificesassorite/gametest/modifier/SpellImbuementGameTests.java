@@ -58,6 +58,12 @@ public final class SpellImbuementGameTests {
     }
 
     @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.spell_imbuement")
+    public static void oilHealingUsesSpellPowerWithoutResistance(GameTestHelper h) throws Exception {
+        if (SpellImbuementCompat.isAvailable()) SpellImbuementScenarios.oilHealing(h);
+        h.succeed();
+    }
+
+    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.spell_imbuement")
     public static void dynamicTooltipsAndColors(GameTestHelper h) throws Exception {
         if (SpellImbuementCompat.isAvailable()) SpellImbuementScenarios.tooltips(h);
         h.succeed();
