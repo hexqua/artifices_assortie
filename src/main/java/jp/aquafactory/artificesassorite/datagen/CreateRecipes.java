@@ -4,12 +4,15 @@ import com.simibubi.create.AllItems;
 import com.simibubi.create.api.data.recipe.MechanicalCraftingRecipeBuilder;
 import com.simibubi.create.content.kinetics.deployer.DeployerApplicationRecipe;
 import com.simibubi.create.content.kinetics.press.PressingRecipe;
+import com.simibubi.create.content.fluids.potion.PotionFluidHandler;
+import com.simibubi.create.content.fluids.transfer.FillingRecipe;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipeBuilder;
 import io.redspace.irons_artifice.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potions;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 
@@ -20,12 +23,47 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AUGMENTATION_KIT;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_MODIFIER_AUGMENTATION_KIT;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.HEALING_OIL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.HARMING_OIL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.POTION_IMBUEMENT_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_HEALING_OIL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_HARMING_OIL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_POTION_IMBUEMENT_MODIFIER;
 
 final class CreateRecipes {
     private CreateRecipes() {}
 
     static void buildRecipes(RecipeOutput output) {
         var createOutput = output.withConditions(new ModLoadedCondition("create"));
+        new SequencedAssemblyRecipeBuilder(id("healing_oil_modifier"))
+                .require(ItemRegistry.GUN_OIL.get())
+                .transitionTo(INCOMPLETE_HEALING_OIL_MODIFIER.get())
+                .addStep(FillingRecipe::new, step -> step.require(PotionFluidHandler.potionIngredient(Potions.STRONG_HEALING, 250)))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .loops(1)
+                .addOutput(HEALING_OIL_MODIFIER.get(), 1)
+                .build(createOutput);
+
+        new SequencedAssemblyRecipeBuilder(id("harming_oil_modifier"))
+                .require(ItemRegistry.GUN_OIL.get())
+                .transitionTo(INCOMPLETE_HARMING_OIL_MODIFIER.get())
+                .addStep(FillingRecipe::new, step -> step.require(PotionFluidHandler.potionIngredient(Potions.STRONG_HARMING, 250)))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .loops(1)
+                .addOutput(HARMING_OIL_MODIFIER.get(), 1)
+                .build(createOutput);
+
+        new SequencedAssemblyRecipeBuilder(id("potion_imbuement_modifier"))
+                .require(ItemRegistry.VENOM_CAPSULE.get())
+                .transitionTo(INCOMPLETE_POTION_IMBUEMENT_MODIFIER.get())
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .addStep(FillingRecipe::new, step -> step.require(PotionFluidHandler.potionIngredient(Potions.STRONG_HARMING, 250)))
+                .addStep(FillingRecipe::new, step -> step.require(PotionFluidHandler.potionIngredient(Potions.STRONG_HEALING, 250)))
+                .addStep(PressingRecipe::new, step -> step)
+                .loops(1)
+                .addOutput(POTION_IMBUEMENT_MODIFIER.get(), 1)
+                .build(createOutput);
+
         new SequencedAssemblyRecipeBuilder(id("modifier_augmentation_kit"))
                 .require(AllItems.PRECISION_MECHANISM.get())
                 .transitionTo(INCOMPLETE_MODIFIER_AUGMENTATION_KIT.get())

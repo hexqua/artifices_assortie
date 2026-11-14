@@ -31,5 +31,8 @@ public final class ModItemModelProvider extends ItemModelProvider {
         basicItem(ItemRegistry.INCOMPLETE_PRECISION_FIRE_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_FORTUNE_MEDAL_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_MODIFIER_AUGMENTATION_KIT.get());
+        basicItem(ItemRegistry.INCOMPLETE_HEALING_OIL_MODIFIER.get());
+        basicItem(ItemRegistry.INCOMPLETE_HARMING_OIL_MODIFIER.get());
+        basicItem(ItemRegistry.INCOMPLETE_POTION_IMBUEMENT_MODIFIER.get());
     }
 }

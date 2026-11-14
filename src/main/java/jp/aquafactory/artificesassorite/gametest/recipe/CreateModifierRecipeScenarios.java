@@ -4,16 +4,22 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.AllDataComponents;
+import com.simibubi.create.content.fluids.potion.PotionFluidHandler;
+import com.simibubi.create.content.fluids.spout.FillingBySpout;
 import com.simibubi.create.content.kinetics.deployer.DeployerApplicationRecipe;
 import com.simibubi.create.content.kinetics.press.PressingRecipe;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import com.simibubi.create.content.kinetics.crafter.RecipeGridHandler;
 import io.redspace.irons_artifice.registry.ItemRegistry;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.ItemLike;
@@ -31,9 +37,74 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AUGMENTATION_KIT;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_MODIFIER_AUGMENTATION_KIT;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.HEALING_OIL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.HARMING_OIL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.POTION_IMBUEMENT_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_HEALING_OIL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_HARMING_OIL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_POTION_IMBUEMENT_MODIFIER;
 
 final class CreateModifierRecipeScenarios {
     private CreateModifierRecipeScenarios() {}
+
+    static void potionOil(GameTestHelper helper, boolean healing) {
+        var strong = healing ? Potions.STRONG_HEALING : Potions.STRONG_HARMING;
+        var current = fill(helper, new ItemStack(ItemRegistry.GUN_OIL.get()), strong,
+                healing ? Potions.HEALING : Potions.HARMING);
+        assertIntermediate(helper, current,
+                healing ? INCOMPLETE_HEALING_OIL_MODIFIER.get() : INCOMPLETE_HARMING_OIL_MODIFIER.get(), 1);
+        // 最初の注入で選ばれた系統を、別のポーションで変更できないことも確認する。
+        assertFillingRejected(helper, current, healing ? Potions.STRONG_HARMING : Potions.STRONG_HEALING, 250);
+        current = deploy(helper, current, ItemRegistry.CLOCKWORK_COMPONENTS.get());
+        ModifierRecipeGameTests.assertResult(helper, current,
+                healing ? HEALING_OIL_MODIFIER.get() : HARMING_OIL_MODIFIER.get(), "Oil assembly");
+    }
+
+    static void potionImbuement(GameTestHelper helper) {
+        var incomplete = INCOMPLETE_POTION_IMBUEMENT_MODIFIER.get();
+        var current = deploy(helper, new ItemStack(ItemRegistry.VENOM_CAPSULE.get()), ItemRegistry.CLOCKWORK_COMPONENTS.get());
+        assertIntermediate(helper, current, incomplete, 1);
+        current = fill(helper, current, Potions.STRONG_HARMING, Potions.HARMING);
+        assertIntermediate(helper, current, incomplete, 2);
+        current = fill(helper, current, Potions.STRONG_HEALING, Potions.HEALING);
+        assertIntermediate(helper, current, incomplete, 3);
+        current = press(helper, current);
+        ModifierRecipeGameTests.assertResult(helper, current, POTION_IMBUEMENT_MODIFIER.get(), "Potion imbuement assembly");
+    }
+
+    private static ItemStack fill(GameTestHelper helper, ItemStack current, Holder<Potion> potion, Holder<Potion> weak) {
+        assertFillingRejected(helper, current, weak, 250);
+        assertFillingRejected(helper, current, Potions.STRONG_POISON, 250);
+        assertFillingRejected(helper, current, potion, 249);
+        // ガンオイルの初回だけは治癒・負傷の両方が正しい入口となる。
+        if (!current.is(ItemRegistry.GUN_OIL.get())) {
+            assertFillingRejected(helper, current,
+                    potion.equals(Potions.STRONG_HEALING) ? Potions.STRONG_HARMING : Potions.STRONG_HEALING, 250);
+        }
+        var level = helper.getLevel();
+        var fluid = PotionFluidHandler.getFluidFromPotionItem(PotionContents.createItemStack(Items.POTION, potion));
+        helper.assertTrue(FillingBySpout.canItemBeFilled(level, current), "Assembly item must accept spout filling: " + current);
+        int required = FillingBySpout.getRequiredAmountForItem(level, current, fluid);
+        helper.assertTrue(required == 250, "Assembly must require 250 mB for " + potion + ", got " + required);
+        var input = current.copy();
+        var result = FillingBySpout.fillItem(level, required, input, fluid);
+        helper.assertTrue(input.isEmpty() && fluid.isEmpty(), "Spout must consume one input and exactly 250 mB");
+        var surplus = PotionFluidHandler.getFluidFromPotionItem(PotionContents.createItemStack(Items.POTION, potion));
+        surplus.setAmount(500);
+        var surplusInput = current.copy();
+        var surplusResult = FillingBySpout.fillItem(level, required, surplusInput, surplus);
+        helper.assertTrue(surplusInput.isEmpty() && surplus.getAmount() == 250
+                        && ItemStack.isSameItemSameComponents(result, surplusResult),
+                "Spout must preserve surplus fluid and produce the same assembly progress");
+        return result;
+    }
+
+    private static void assertFillingRejected(GameTestHelper helper, ItemStack current, Holder<Potion> potion, int amount) {
+        var fluid = PotionFluidHandler.getFluidFromPotionItem(PotionContents.createItemStack(Items.POTION, potion));
+        fluid.setAmount(amount);
+        helper.assertTrue(FillingBySpout.getRequiredAmountForItem(helper.getLevel(), current, fluid) == -1,
+                "Spout must reject " + potion + " / " + amount + " mB for " + current);
+    }
 
     static void excavation(GameTestHelper helper) {
         var drill = AllBlocks.MECHANICAL_DRILL.get();

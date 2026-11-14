@@ -1,0 +1,42 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:mod_loaded",
+        "modid": "create"
+      }
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "irons_artifice:clockwork_components"
+    },
+    "F": {
+      "item": "minecraft:fermented_spider_eye"
+    },
+    "G": {
+      "item": "irons_artifice:gun_oil_modifier"
+    },
+    "P": {
+      "type": "neoforge:components",
+      "components": {
+        "minecraft:potion_contents": {
+          "potion": "minecraft:strong_harming"
+        }
+      },
+      "items": "minecraft:potion"
+    }
+  },
+  "pattern": [
+    " F ",
+    "FPF",
+    "CG "
+  ],
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:harming_oil_modifier"
+  }
+}

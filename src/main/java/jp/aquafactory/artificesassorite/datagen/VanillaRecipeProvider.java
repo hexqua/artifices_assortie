@@ -7,6 +7,7 @@ import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.augmentation.AugmentationRecipe;
 import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementRecipe;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -15,6 +16,9 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.SpecialRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
+import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import net.neoforged.neoforge.common.conditions.NotCondition;
 import net.neoforged.neoforge.common.Tags;
@@ -27,6 +31,9 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_F
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AUGMENTATION_KIT;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.HEALING_OIL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.HARMING_OIL_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.POTION_IMBUEMENT_MODIFIER;
 
 public final class VanillaRecipeProvider extends RecipeProvider {
     public VanillaRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
@@ -40,6 +47,43 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .save(output.withConditions(new ModLoadedCondition("irons_spellbooks")), id("crafting/spell_imbuement_school"));
         var createLoaded = new ModLoadedCondition("create");
         var fallback = output.withConditions(new NotCondition(createLoaded));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, HEALING_OIL_MODIFIER.get())
+                .pattern(" M ")
+                .pattern("MPM")
+                .pattern("CG ")
+                .define('M', Items.GLISTERING_MELON_SLICE)
+                .define('P', DataComponentIngredient.of(false, DataComponents.POTION_CONTENTS,
+                        new PotionContents(Potions.STRONG_HEALING), Items.POTION))
+                .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .define('G', ItemRegistry.GUN_OIL.get())
+                .unlockedBy("has_gun_oil", has(ItemRegistry.GUN_OIL.get()))
+                .save(fallback, id("crafting/healing_oil_modifier"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, HARMING_OIL_MODIFIER.get())
+                .pattern(" F ")
+                .pattern("FPF")
+                .pattern("CG ")
+                .define('F', Items.FERMENTED_SPIDER_EYE)
+                .define('P', DataComponentIngredient.of(false, DataComponents.POTION_CONTENTS,
+                        new PotionContents(Potions.STRONG_HARMING), Items.POTION))
+                .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .define('G', ItemRegistry.GUN_OIL.get())
+                .unlockedBy("has_gun_oil", has(ItemRegistry.GUN_OIL.get()))
+                .save(fallback, id("crafting/harming_oil_modifier"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, POTION_IMBUEMENT_MODIFIER.get())
+                .pattern(" W ")
+                .pattern("HPD")
+                .pattern("CG ")
+                .define('W', Items.NETHER_WART)
+                .define('H', HEALING_OIL_MODIFIER.get())
+                .define('P', ItemRegistry.VENOM_CAPSULE.get())
+                .define('D', HARMING_OIL_MODIFIER.get())
+                .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .define('G', Items.GLASS_BOTTLE)
+                .unlockedBy("has_venom_capsule", has(ItemRegistry.VENOM_CAPSULE.get()))
+                .save(fallback, id("crafting/potion_imbuement_modifier"));
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, EXCAVATION_MODIFIER.get())
                 .pattern(" P ")

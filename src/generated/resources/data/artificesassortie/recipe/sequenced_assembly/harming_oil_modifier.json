@@ -1,0 +1,62 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "irons_artifice:gun_oil_modifier"
+  },
+  "results": [
+    {
+      "id": "artificesassortie:harming_oil_modifier"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:filling",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_harming_oil_modifier"
+        },
+        {
+          "type": "neoforge:components",
+          "amount": 250,
+          "components": {
+            "create:potion_fluid_bottle_type": "regular",
+            "minecraft:potion_contents": {
+              "potion": "minecraft:strong_harming"
+            }
+          },
+          "fluids": "create:potion"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_harming_oil_modifier"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_harming_oil_modifier"
+        },
+        {
+          "item": "irons_artifice:clockwork_components"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_harming_oil_modifier"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "artificesassortie:incomplete_harming_oil_modifier"
+  }
+}

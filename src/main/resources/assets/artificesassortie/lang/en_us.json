@@ -15,6 +15,9 @@
   "item.artificesassortie.incomplete_precision_fire_modifier": "Incomplete Precision Fire Modifier",
   "item.artificesassortie.incomplete_fortune_medal_modifier": "Incomplete Medal of Fortune Modifier",
   "item.artificesassortie.incomplete_modifier_augmentation_kit": "Incomplete Modifier Augmentation Kit",
+  "item.artificesassortie.incomplete_healing_oil_modifier": "Incomplete Healing Oil Modifier",
+  "item.artificesassortie.incomplete_harming_oil_modifier": "Incomplete Harming Oil Modifier",
+  "item.artificesassortie.incomplete_potion_imbuement_modifier": "Incomplete Potion Imbuement Modifier",
 
   "item.artificesassortie.common.tooltip.tool_tier": "Tool Tier: %s",
   "item.artificesassortie.common.tooltip.tool_tier.tier1": "Iron",

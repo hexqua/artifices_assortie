@@ -39,6 +39,9 @@ public final class ItemRegistry {
             properties -> new PotionImbuementItem(properties.stacksTo(1)));
     public static final DeferredItem<Item> INCOMPLETE_FORTUNE_MEDAL_MODIFIER = ITEMS.registerSimpleItem("incomplete_fortune_medal_modifier");
     public static final DeferredItem<Item> INCOMPLETE_MODIFIER_AUGMENTATION_KIT = ITEMS.registerSimpleItem("incomplete_modifier_augmentation_kit");
+    public static final DeferredItem<Item> INCOMPLETE_HEALING_OIL_MODIFIER = ITEMS.registerSimpleItem("incomplete_healing_oil_modifier");
+    public static final DeferredItem<Item> INCOMPLETE_HARMING_OIL_MODIFIER = ITEMS.registerSimpleItem("incomplete_harming_oil_modifier");
+    public static final DeferredItem<Item> INCOMPLETE_POTION_IMBUEMENT_MODIFIER = ITEMS.registerSimpleItem("incomplete_potion_imbuement_modifier");
 
     private ItemRegistry() {}
 }
