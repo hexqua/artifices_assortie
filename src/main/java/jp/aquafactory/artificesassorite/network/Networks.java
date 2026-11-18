@@ -5,6 +5,7 @@ import jp.aquafactory.artificesassorite.config.AugmentationConfig;
 import jp.aquafactory.artificesassorite.item.modifier.excavation.ExcavationClientBridge;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldClientBridge;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldStabilizationEvents;
+import jp.aquafactory.artificesassorite.item.modifier.movementfire.StandingSnipeClientBridge;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -12,7 +13,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 public final class Networks {
     // 互換性のない通信仕様変更時に手動で更新し、異なる形式の payload の送受信を防ぐ。
-    private static final int PROTOCOL_VERSION = 6;
+    private static final int PROTOCOL_VERSION = 8;
 
     private Networks() {}
 
@@ -28,6 +29,8 @@ public final class Networks {
                 (payload, context) -> GripHoldClientBridge.correction.accept(payload));
         registrar.playToClient(SyncModifierConfigPayload.TYPE, SyncModifierConfigPayload.STREAM_CODEC,
                 (payload, context) -> ServerConfig.updateClient(payload.values()));
+        registrar.playToClient(SyncStandingSnipePayload.TYPE, SyncStandingSnipePayload.STREAM_CODEC,
+                (payload, context) -> StandingSnipeClientBridge.progress.accept(payload.filledRows()));
         registrar.playToClient(SyncAugmentationMaterialPayload.TYPE, SyncAugmentationMaterialPayload.STREAM_CODEC,
                 (payload, context) -> AugmentationConfig.updateClient(payload.material()));
         registrar.playToClient(ExcavationEffectsPayload.TYPE, ExcavationEffectsPayload.STREAM_CODEC,

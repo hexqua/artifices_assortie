@@ -1,11 +1,21 @@
 package jp.aquafactory.artificesassorite.config;
 
 public record ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization, FortuneMedal fortuneMedal,
-                             SpellImbuement spellImbuement, Excavation excavation, Oil healingOil, Oil harmingOil) {
+                             SpellImbuement spellImbuement, Excavation excavation, Oil healingOil, Oil harmingOil,
+                             MovementFire movementFire) {
+    public static final MovementFire DEFAULT_MOVEMENT_FIRE = new MovementFire(20, 1.2, 5, 1.1);
     public static final ModifierValues DEFAULTS = new ModifierValues(
             new PrecisionFire(1.5, 0.25, 0.5),
             new GripHoldStabilization(0.5, 0.75, -0.5, 0.75, 0.4), new FortuneMedal(3),
-            new SpellImbuement(0.5, 0.15, 1.0, 0.25), new Excavation(6, 3), new Oil(0.9), new Oil(0.9));
+            new SpellImbuement(0.5, 0.15, 1.0, 0.25), new Excavation(6, 3), new Oil(0.9), new Oil(0.9),
+            DEFAULT_MOVEMENT_FIRE);
+
+    public ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization,
+                          FortuneMedal fortuneMedal, SpellImbuement spellImbuement, Excavation excavation,
+                          Oil healingOil, Oil harmingOil) {
+        this(precisionFire, gripHoldStabilization, fortuneMedal, spellImbuement, excavation,
+                healingOil, harmingOil, DEFAULT_MOVEMENT_FIRE);
+    }
 
     public ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization,
                           FortuneMedal fortuneMedal, SpellImbuement spellImbuement, Excavation excavation) {
@@ -49,4 +59,11 @@ public record ModifierValues(PrecisionFire precisionFire, GripHoldStabilization 
     public record Excavation(double explosionResistanceCap, int maxFortuneCount) {}
 
     public record Oil(double damageMultiplier) {}
+
+    public record MovementFire(int standingTicks, double standingMultiplier, int movingTicks, double movingMultiplier) {
+        public MovementFire {
+            // 設定を変えても、同じ射撃に両方の条件が成立しないようにする。
+            movingTicks = Math.min(movingTicks, standingTicks);
+        }
+    }
 }

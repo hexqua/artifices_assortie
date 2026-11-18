@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "C": {
+      "item": "irons_artifice:clockwork_components"
+    },
+    "D": {
+      "item": "minecraft:polished_deepslate"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "pattern": [
+    " A ",
+    "RCR",
+    "ADA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:standing_snipe_modifier"
+  }
+}

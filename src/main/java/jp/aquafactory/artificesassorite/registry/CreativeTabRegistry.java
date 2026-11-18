@@ -34,6 +34,8 @@ public final class CreativeTabRegistry {
         output.accept(ItemRegistry.HEALING_OIL_MODIFIER.get());
         output.accept(ItemRegistry.HARMING_OIL_MODIFIER.get());
         output.accept(ItemRegistry.POTION_IMBUEMENT_MODIFIER.get());
+        output.accept(ItemRegistry.STANDING_SNIPE_MODIFIER.get());
+        output.accept(ItemRegistry.MOVING_FIRE_MODIFIER.get());
 
         if (SpellImbuementCompat.isAvailable()) {
             output.accept(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get());
