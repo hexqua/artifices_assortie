@@ -7,6 +7,7 @@ import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.modifier.fortunemedal.FortuneMedalModifier;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldStabilizationModifier;
 import jp.aquafactory.artificesassorite.item.modifier.itemtransfer.ItemTransferModifier;
+import jp.aquafactory.artificesassorite.item.modifier.movementfire.MovementFireModifier;
 import jp.aquafactory.artificesassorite.item.modifier.precisionfire.PrecisionFireModifier;
 import jp.aquafactory.artificesassorite.item.modifier.potionoil.OilModifier;
 import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementItem;
@@ -37,6 +38,10 @@ public final class ItemRegistry {
     public static final DeferredItem<Item> INCOMPLETE_PRECISION_FIRE_MODIFIER = ITEMS.registerSimpleItem("incomplete_precision_fire_modifier");
     public static final DeferredItem<PotionImbuementItem> POTION_IMBUEMENT_MODIFIER = ITEMS.registerItem("potion_imbuement_modifier",
             properties -> new PotionImbuementItem(properties.stacksTo(1)));
+    public static final DeferredItem<ModifierItem> STANDING_SNIPE_MODIFIER = ITEMS.registerItem("standing_snipe_modifier",
+            properties -> new ModifierItem(properties.stacksTo(1), MovementFireModifier.STANDING_SNIPE));
+    public static final DeferredItem<ModifierItem> MOVING_FIRE_MODIFIER = ITEMS.registerItem("moving_fire_modifier",
+            properties -> new ModifierItem(properties.stacksTo(1), MovementFireModifier.MOVING_FIRE));
     public static final DeferredItem<Item> INCOMPLETE_FORTUNE_MEDAL_MODIFIER = ITEMS.registerSimpleItem("incomplete_fortune_medal_modifier");
     public static final DeferredItem<Item> INCOMPLETE_MODIFIER_AUGMENTATION_KIT = ITEMS.registerSimpleItem("incomplete_modifier_augmentation_kit");
     public static final DeferredItem<Item> INCOMPLETE_HEALING_OIL_MODIFIER = ITEMS.registerSimpleItem("incomplete_healing_oil_modifier");

@@ -9,6 +9,8 @@ public final class ServerConfig {
     private static final ModConfigSpec.IntValue FORTUNE_MEDAL_LIMIT;
     private static final ModConfigSpec.DoubleValue EXCAVATION_RESISTANCE_CAP;
     private static final ModConfigSpec.DoubleValue HEALING_OIL_DAMAGE, HARMING_OIL_DAMAGE;
+    private static final ModConfigSpec.DoubleValue STANDING_SNIPE_DAMAGE, MOVING_FIRE_DAMAGE;
+    private static final ModConfigSpec.IntValue STANDING_SNIPE_TICKS, MOVING_FIRE_TICKS;
     private static final ModConfigSpec.IntValue EXCAVATION_FORTUNE_LIMIT;
     private static final ModConfigSpec.DoubleValue IMBUEMENT_FIRST, IMBUEMENT_ADDITIONAL, IMBUEMENT_NORMAL_MANA, IMBUEMENT_MAGIC_MANA;
     private static volatile ModifierValues serverValues = ModifierValues.DEFAULTS;
@@ -61,6 +63,18 @@ public final class ServerConfig {
         builder.pop().push("HarmingOilModifier");
         HARMING_OIL_DAMAGE = builder.comment("Damage and healing multiplier per installed modifier. 0.9 means 90%.")
                 .defineInRange("damageMultiplier", 0.9, 0.0, 1000.0);
+        var movementFire = ModifierValues.DEFAULT_MOVEMENT_FIRE;
+        builder.pop().push("StandingSnipeModifier");
+        STANDING_SNIPE_TICKS = builder.comment("Ticks without position changes required to activate the bonus.")
+                .defineInRange("stationaryTicks", movementFire.standingTicks(), 1, Integer.MAX_VALUE);
+        STANDING_SNIPE_DAMAGE = builder.comment("Damage multiplier per installed modifier while stationary. 1.2 means 120%.")
+                .defineInRange("damageMultiplier", movementFire.standingMultiplier(), 0.0, 1000.0);
+        builder.pop().push("MovingFireModifier");
+        MOVING_FIRE_TICKS = builder.comment("The bonus applies before this many ticks have elapsed since movement.",
+                        "The effective value cannot exceed StandingSnipeModifier.stationaryTicks.")
+                .defineInRange("recentMovementTicks", movementFire.movingTicks(), 1, Integer.MAX_VALUE);
+        MOVING_FIRE_DAMAGE = builder.comment("Damage multiplier per installed modifier after movement. 1.1 means 110%.")
+                .defineInRange("damageMultiplier", movementFire.movingMultiplier(), 0.0, 1000.0);
         builder.pop();
         AugmentationConfig.define(builder);
         SPEC = builder.build();
@@ -74,7 +88,9 @@ public final class ServerConfig {
                 new ModifierValues.FortuneMedal(FORTUNE_MEDAL_LIMIT.get()),
                 new ModifierValues.SpellImbuement(IMBUEMENT_FIRST.get(), IMBUEMENT_ADDITIONAL.get(), IMBUEMENT_NORMAL_MANA.get(), IMBUEMENT_MAGIC_MANA.get()),
                 new ModifierValues.Excavation(EXCAVATION_RESISTANCE_CAP.get(), EXCAVATION_FORTUNE_LIMIT.get()),
-                new ModifierValues.Oil(HEALING_OIL_DAMAGE.get()), new ModifierValues.Oil(HARMING_OIL_DAMAGE.get()));
+                new ModifierValues.Oil(HEALING_OIL_DAMAGE.get()), new ModifierValues.Oil(HARMING_OIL_DAMAGE.get()),
+                new ModifierValues.MovementFire(STANDING_SNIPE_TICKS.get(), STANDING_SNIPE_DAMAGE.get(),
+                        MOVING_FIRE_TICKS.get(), MOVING_FIRE_DAMAGE.get()));
     }
 
     public static ModifierValues serverValues() { return serverValues; }
