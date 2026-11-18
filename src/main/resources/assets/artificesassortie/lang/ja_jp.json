@@ -100,7 +100,6 @@
   "item.artificesassortie.moving_fire_modifier.desc_1": "移動中、止まるまで下記効果を得る",
   "item.artificesassortie.moving_fire_modifier.desc_2": "%s%% ダメージ",
   "item.artificesassortie.moving_fire_modifier.desc_3": "ノックバックなどの外的要因でも効果を得る",
-  "hud.artificesassortie.standing_snipe.ready": "静止狙撃 準備完了",
   "item.artificesassortie.spell_imbuement_modifier.tooltip": "系統のルーンとクラフトすることで系統を変更できる",
   "item.artificesassortie.spell_imbuement_modifier.desc_1": "%1$s%% ダメージ(モディファイア追加分は+%2$s%%)",
   "item.artificesassortie.spell_imbuement_modifier.desc_2": "%s系統として呪文耐性の影響を受ける",

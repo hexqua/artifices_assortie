@@ -100,7 +100,6 @@
   "item.artificesassortie.moving_fire_modifier.desc_1": "While moving, gain the following effect until you stop",
   "item.artificesassortie.moving_fire_modifier.desc_2": "%s%% Damage",
   "item.artificesassortie.moving_fire_modifier.desc_3": "Knockback and other forced movement also activate the effect",
-  "hud.artificesassortie.standing_snipe.ready": "Standing Snipe Ready",
   "item.artificesassortie.spell_imbuement_modifier.tooltip": "Craft with a school rune to change its school",
   "item.artificesassortie.spell_imbuement_modifier.desc_1": "%1$s%% Damage (+%2$s%% per additional modifier)",
   "item.artificesassortie.spell_imbuement_modifier.desc_2": "Affected by spell resistance as the %s school",

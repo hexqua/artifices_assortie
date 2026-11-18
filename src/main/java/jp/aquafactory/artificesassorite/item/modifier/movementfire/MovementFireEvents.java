@@ -32,7 +32,7 @@ public final class MovementFireEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             long now = gameTime(player);
             State state = observe(player, now);
-            updateHud(player, state, state.isStationary(now, ServerConfig.serverValues().movementFire().standingTicks()));
+            updateHud(player, state, now, ServerConfig.serverValues().movementFire().standingTicks());
         }
     }
 
@@ -46,7 +46,7 @@ public final class MovementFireEvents {
         State state = observe(player, now);
         var values = ServerConfig.serverValues().movementFire();
         boolean stationary = state.isStationary(now, values.standingTicks());
-        updateHud(player, state, stationary);
+        updateHud(player, state, now, values.standingTicks());
         if (stationary) {
             applyDamage(event.getShotProfile(), MovementFireModifier.STANDING_SNIPE, values.standingMultiplier());
         } else if (state.recentlyMoved(now, values.movingTicks())) {
@@ -102,22 +102,25 @@ public final class MovementFireEvents {
         }
     }
 
-    private static void updateHud(ServerPlayer player, State state, boolean stationary) {
+    private static void updateHud(ServerPlayer player, State state, long now, int requiredTicks) {
         if (player instanceof FakePlayer) {
             return;
         }
-        boolean ready = stationary && player.isAlive() && !player.isSpectator()
-                && MovementFireModifier.hasStandingSnipe(player.getMainHandItem());
-        if (ready != state.hudReady) {
-            state.hudReady = ready;
-            Networks.sendToPlayer(player, new SyncStandingSnipePayload(ready));
+        int filledRows = SyncStandingSnipePayload.HIDDEN;
+        if (player.isAlive() && !player.isSpectator()
+                && MovementFireModifier.hasStandingSnipe(player.getMainHandItem())) {
+            filledRows = state.hudProgress(now, requiredTicks);
+        }
+        if (filledRows != state.lastHudProgress) {
+            state.lastHudProgress = filledRows;
+            Networks.sendToPlayer(player, new SyncStandingSnipePayload(filledRows));
         }
     }
 
     private static void reset(ServerPlayer player) {
         STATES.remove(player);
         if (!(player instanceof FakePlayer)) {
-            Networks.sendToPlayer(player, new SyncStandingSnipePayload(false));
+            Networks.sendToPlayer(player, new SyncStandingSnipePayload(SyncStandingSnipePayload.HIDDEN));
         }
     }
 
@@ -125,7 +128,7 @@ public final class MovementFireEvents {
         private Vec3 anchor;
         private long stationarySince;
         private boolean hasMoved;
-        private boolean hudReady;
+        private int lastHudProgress = SyncStandingSnipePayload.HIDDEN;
 
         private State(Vec3 anchor, long now) {
             this.anchor = anchor;
@@ -134,6 +137,14 @@ public final class MovementFireEvents {
 
         private boolean isStationary(long now, int requiredTicks) {
             return now - stationarySince >= requiredTicks;
+        }
+
+        private int hudProgress(long now, int requiredTicks) {
+            // 時間を2倍してから引くと、奇数設定でも半分の時点を丸めずに済む。
+            long elapsed = Math.min(now - stationarySince, requiredTicks);
+            long progress = 2 * elapsed - requiredTicks;
+            return progress < 0 ? SyncStandingSnipePayload.HIDDEN
+                    : (int) (progress * SyncStandingSnipePayload.FULL / requiredTicks);
         }
 
         private boolean recentlyMoved(long now, int windowTicks) {
