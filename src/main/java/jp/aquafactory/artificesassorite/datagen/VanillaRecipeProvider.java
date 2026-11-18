@@ -25,15 +25,7 @@ import net.neoforged.neoforge.common.Tags;
 
 import java.util.concurrent.CompletableFuture;
 
-import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER;
-import static jp.aquafactory.artificesassorite.registry.ItemRegistry.EXCAVATION_MODIFIER;
-import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
-import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
-import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
-import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AUGMENTATION_KIT;
-import static jp.aquafactory.artificesassorite.registry.ItemRegistry.HEALING_OIL_MODIFIER;
-import static jp.aquafactory.artificesassorite.registry.ItemRegistry.HARMING_OIL_MODIFIER;
-import static jp.aquafactory.artificesassorite.registry.ItemRegistry.POTION_IMBUEMENT_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.*;
 
 public final class VanillaRecipeProvider extends RecipeProvider {
     public VanillaRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
@@ -177,6 +169,30 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('I', Items.IRON_BLOCK)
                 .unlockedBy("has_mechanical_components", has(ItemRegistry.MECHANICAL_COMPONENTS.get()))
                 .save(output.withConditions(createLoaded), id("compat/create/grip_hold_stabilization_modifier"));
+
+        // 入手時期がMODに左右されないようにCreate 導入時でもレシピを変更しない.
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, STANDING_SNIPE_MODIFIER.get())
+                .pattern(" A ")
+                .pattern("RCR")
+                .pattern("ADA")
+                .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .define('A', Items.AMETHYST_SHARD)
+                .define('R', Items.REDSTONE)
+                .define('D', Items.POLISHED_DEEPSLATE)
+                .unlockedBy("has_mechanical_components", has(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .save(output);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MOVING_FIRE_MODIFIER.get())
+                .pattern(" A ")
+                .pattern("RCR")
+                .pattern("ASA")
+                .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .define('A', Items.AMETHYST_SHARD)
+                .define('R', Items.REDSTONE)
+                .define('S', Items.SUGAR)
+                .unlockedBy("has_mechanical_components", has(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .save(output);
+
 
         // RecipeProvider の名前は固定のため、一つの Provider から形式別の生成処理へ委譲する。
         CreateRecipes.buildRecipes(output);

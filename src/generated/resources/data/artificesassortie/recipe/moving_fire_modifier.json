@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "C": {
+      "item": "irons_artifice:clockwork_components"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "minecraft:sugar"
+    }
+  },
+  "pattern": [
+    " A ",
+    "RCR",
+    "ASA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:moving_fire_modifier"
+  }
+}
