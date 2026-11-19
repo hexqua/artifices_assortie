@@ -29,8 +29,12 @@ public final class ModItemModelProvider extends ItemModelProvider {
         basicItem(ItemRegistry.POTION_IMBUEMENT_MODIFIER.get());
         basicItem(ItemRegistry.STANDING_SNIPE_MODIFIER.get());
         basicItem(ItemRegistry.MOVING_FIRE_MODIFIER.get());
+        basicItem(ItemRegistry.GYROSCOPE_CALIBRATION_MODIFIER.get());
+        basicItem(ItemRegistry.SHOCK_ABSORBER_MODIFIER.get());
         basicItem(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_PRECISION_FIRE_MODIFIER.get());
+        basicItem(ItemRegistry.INCOMPLETE_GYROSCOPE_CALIBRATION_MODIFIER.get());
+        basicItem(ItemRegistry.INCOMPLETE_SHOCK_ABSORBER_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_FORTUNE_MEDAL_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_MODIFIER_AUGMENTATION_KIT.get());
         basicItem(ItemRegistry.INCOMPLETE_HEALING_OIL_MODIFIER.get());

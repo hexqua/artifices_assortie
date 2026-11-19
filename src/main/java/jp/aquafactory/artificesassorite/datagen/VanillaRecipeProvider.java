@@ -122,6 +122,28 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_mechanical_components", has(ItemRegistry.MECHANICAL_COMPONENTS.get()))
                 .save(fallback, id("crafting/precision_fire_modifier"));
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, GYROSCOPE_CALIBRATION_MODIFIER.get())
+                .pattern(" Q ")
+                .pattern("CPC")
+                .pattern(" M ")
+                .define('Q', Items.QUARTZ)
+                .define('C', Tags.Items.INGOTS_COPPER)
+                .define('P', Items.COMPASS)
+                .define('M', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .unlockedBy("has_quartz", has(Items.QUARTZ))
+                .save(fallback, id("crafting/gyroscope_calibration_modifier"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SHOCK_ABSORBER_MODIFIER.get())
+                .pattern(" N ")
+                .pattern("SB ")
+                .pattern(" M ")
+                .define('N', Items.NETHERITE_SCRAP)
+                .define('S', Items.SLIME_BALL)
+                .define('B', ItemRegistry.BUFFER_SPRING.get())
+                .define('M', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .unlockedBy("has_netherite_scrap", has(Items.NETHERITE_SCRAP))
+                .save(fallback, id("crafting/shock_absorber_modifier"));
+
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, FORTUNE_MEDAL_MODIFIER.get())
                 .pattern(" D ")
                 .pattern("GMG")

@@ -7,6 +7,7 @@ import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.fortunemedal.FortuneMedalModifier;
 import jp.aquafactory.artificesassorite.item.modifier.excavation.ExcavationModifier;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldStabilizationModifier;
+import jp.aquafactory.artificesassorite.item.modifier.gyroscope.GyroscopeCalibrationModifier;
 import jp.aquafactory.artificesassorite.item.modifier.movementfire.MovementFireModifier;
 import jp.aquafactory.artificesassorite.item.modifier.precisionfire.PrecisionFireModifier;
 import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementModifier;
@@ -37,11 +38,18 @@ public final class ModifierConfigGameTests {
             var values = new ModifierValues(new ModifierValues.PrecisionFire(1.8, 0.4, 0.6), new ModifierValues.GripHoldStabilization(0.65, 0.8, -0.75, 1.25, 0.12), new ModifierValues.FortuneMedal(7),
                     new ModifierValues.SpellImbuement(0.7, 0.2, 0.3, 0.1), new ModifierValues.Excavation(0, 2),
                     new ModifierValues.Oil(0.8), new ModifierValues.Oil(1.2),
-                    new ModifierValues.MovementFire(15, 1.35, 25, 1.15));
+                    new ModifierValues.MovementFire(15, 1.35, 25, 1.15),
+                    new ModifierValues.GyroscopeCalibration(0.75, 2.5, 8),
+                    new ModifierValues.ShockAbsorber(0.125, 4.0));
             SyncModifierConfigPayload.STREAM_CODEC.encode(buffer, new SyncModifierConfigPayload(values));
             var decoded = SyncModifierConfigPayload.STREAM_CODEC.decode(buffer);
             h.assertTrue(decoded.values().equals(values), "Config codec must preserve all gameplay and tooltip values");
             ServerConfig.updateClient(decoded.values());
+            var gyroscope = new ArrayList<Component>();
+            new GyroscopeCalibrationModifier().getDescriptionText(gyroscope::add);
+            h.assertTrue(gyroscope.size() == 4 && gyroscope.stream().allMatch(line -> Objects.equals(
+                            line.getStyle().getColor(), TextColor.fromLegacyFormat(ChatFormatting.AQUA))),
+                    "All four gyroscope benefits must appear in aqua");
             var movement = new ArrayList<Component>();
             MovementFireModifier.STANDING_SNIPE.getDescriptionText(movement::add);
             h.assertTrue(((TranslatableContents) movement.getFirst().getContents()).getArgs()[0].equals("0.75"),
@@ -98,6 +106,31 @@ public final class ModifierConfigGameTests {
             new FortuneMedalModifier().getDescriptionText(medal::add);
             h.assertTrue(medal.size() == 2 && ((TranslatableContents) medal.get(1).getContents()).getArgs()[0].equals(3), "Client reset must restore the default medal limit line");
         } finally { buffer.release(); ServerConfig.updateClient(previous); }
+        h.succeed();
+    }
+
+    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
+    public static void gyroscopeTooltipOmitsDisabledEffects(GameTestHelper h) {
+        var previous = ServerConfig.clientValues();
+        var defaults = ModifierValues.DEFAULTS;
+        try {
+            var disabled = new ModifierValues.GyroscopeCalibration[]{
+                    new ModifierValues.GyroscopeCalibration(0, 3, 5),
+                    new ModifierValues.GyroscopeCalibration(0.5, 0, 5)
+            };
+            for (var gyroscope : disabled) {
+                ServerConfig.updateClient(new ModifierValues(defaults.precisionFire(), defaults.gripHoldStabilization(),
+                        defaults.fortuneMedal(), defaults.spellImbuement(), defaults.excavation(), defaults.healingOil(),
+                        defaults.harmingOil(), defaults.movementFire(), gyroscope));
+                var tooltip = new ArrayList<Component>();
+                new GyroscopeCalibrationModifier().getDescriptionText(tooltip::add);
+                h.assertTrue(tooltip.size() == 3 && tooltip.stream().noneMatch(line -> ((TranslatableContents) line.getContents())
+                                .getKey().equals("item.artificesassortie.gyroscope_calibration_modifier.desc_4")),
+                        "Gyroscope tooltip must keep the three penalty cancellations when stacking is disabled");
+            }
+        } finally {
+            ServerConfig.updateClient(previous);
+        }
         h.succeed();
     }
 }

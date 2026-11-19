@@ -34,6 +34,10 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_F
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_PRECISION_FIRE_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GYROSCOPE_CALIBRATION_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.SHOCK_ABSORBER_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_GYROSCOPE_CALIBRATION_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_SHOCK_ABSORBER_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AUGMENTATION_KIT;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_MODIFIER_AUGMENTATION_KIT;
@@ -143,6 +147,29 @@ final class CreateModifierRecipeScenarios {
         assertIntermediate(helper, current, INCOMPLETE_PRECISION_FIRE_MODIFIER.get(), 3);
         current = deploy(helper, current, AllItems.ELECTRON_TUBE.get());
         ModifierRecipeGameTests.assertResult(helper, current, PRECISION_FIRE_MODIFIER.get(), "Sequenced assembly");
+    }
+
+    static void gyroscopeCalibration(GameTestHelper helper) {
+        assertAssemblyWithFinalPress(helper, AllItems.BRASS_SHEET.get(),
+                INCOMPLETE_GYROSCOPE_CALIBRATION_MODIFIER.get(), GYROSCOPE_CALIBRATION_MODIFIER.get(),
+                ItemRegistry.CLOCKWORK_COMPONENTS.get(), Items.COMPASS, Items.QUARTZ);
+    }
+
+    static void shockAbsorber(GameTestHelper helper) {
+        assertAssemblyWithFinalPress(helper, ItemRegistry.CLOCKWORK_COMPONENTS.get(),
+                INCOMPLETE_SHOCK_ABSORBER_MODIFIER.get(), SHOCK_ABSORBER_MODIFIER.get(),
+                ItemRegistry.BUFFER_SPRING.get(), Items.SLIME_BALL, Items.NETHERITE_SCRAP);
+    }
+
+    private static void assertAssemblyWithFinalPress(GameTestHelper helper, ItemLike base,
+                                                     ItemLike incomplete, ItemLike result, ItemLike... ingredients) {
+        var current = new ItemStack(base);
+        int step = 0;
+        for (var ingredient : ingredients) {
+            current = deploy(helper, current, ingredient);
+            assertIntermediate(helper, current, incomplete, ++step);
+        }
+        ModifierRecipeGameTests.assertResult(helper, press(helper, current), result, "Sequenced assembly");
     }
 
     static void fortuneMedal(GameTestHelper helper) {
