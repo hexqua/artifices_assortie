@@ -23,5 +23,8 @@ public final class SoundDataProvider extends SoundDefinitionsProvider {
         add(SoundRegistry.PRECISION_FIRE_HEADSHOT.getId(), definition()
                 .subtitle("subtitle.artificesassortie.sound.precision_fire_headshot")
                 .with(sound(ResourceLocation.withDefaultNamespace("random/anvil_land"))));
+        add(SoundRegistry.NOTIFY_STANDING_SNIPE.getId(), definition()
+                .subtitle("subtitle.artificesassortie.sound.notify_standing_snipe")
+                .with(sound(ResourceLocation.withDefaultNamespace("random/orb")).volume(0.2F).pitch(0.85F)));
     }
 }

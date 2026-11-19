@@ -1,4 +1,14 @@
 {
+  "notify_standing_snipe": {
+    "sounds": [
+      {
+        "name": "random/orb",
+        "pitch": 0.85,
+        "volume": 0.2
+      }
+    ],
+    "subtitle": "subtitle.artificesassortie.sound.notify_standing_snipe"
+  },
   "precision_fire_headshot": {
     "sounds": [
       "random/anvil_land"

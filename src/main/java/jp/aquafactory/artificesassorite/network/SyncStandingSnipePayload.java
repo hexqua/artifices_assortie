@@ -17,6 +17,10 @@ public record SyncStandingSnipePayload(int filledRows) implements CustomPacketPa
     public static final StreamCodec<FriendlyByteBuf, SyncStandingSnipePayload> STREAM_CODEC =
             StreamCodec.composite(ByteBufCodecs.VAR_INT, SyncStandingSnipePayload::filledRows, SyncStandingSnipePayload::new);
 
+    public static boolean completedWhileShown(int previousRows, int currentRows) {
+        return previousRows >= 0 && previousRows < FULL && currentRows == FULL;
+    }
+
     @Override
     public @NotNull Type<SyncStandingSnipePayload> type() {
         return TYPE;

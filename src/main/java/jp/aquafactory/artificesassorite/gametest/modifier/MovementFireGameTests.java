@@ -1,5 +1,6 @@
 package jp.aquafactory.artificesassorite.gametest.modifier;
 
+import com.mojang.authlib.GameProfile;
 import io.redspace.irons_artifice.api.GunShootEvent;
 import io.redspace.irons_artifice.data.ShotComponents;
 import io.redspace.irons_artifice.entity.Bullet;
@@ -12,9 +13,20 @@ import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.movementfire.MovementFireEvents;
+import jp.aquafactory.artificesassorite.network.SyncStandingSnipePayload;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -23,6 +35,11 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @GameTestHolder(ArtificesAssortie.MODID)
 @PrefixGameTestTemplate(false)
@@ -96,6 +113,67 @@ public final class MovementFireGameTests {
                 throw new IllegalStateException(failure);
             }
         });
+    }
+
+    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier", timeoutTicks = 60)
+    public static void standingHudDistinguishesEquippingFromCompletion(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var profile = new GameProfile(UUID.randomUUID(), "standing_hud_test");
+        var cookie = CommonListenerCookie.createInitial(profile, false);
+        var player = new ServerPlayer(level.getServer(), level, profile, cookie.clientInformation());
+        var progress = new ArrayList<Integer>();
+        new ServerGamePacketListenerImpl(level.getServer(), new Connection(PacketFlow.SERVERBOUND), player, cookie) {
+            @Override
+            public void send(@NotNull Packet<?> packet) {
+                if (packet instanceof ClientboundCustomPayloadPacket custom
+                        && custom.payload() instanceof SyncStandingSnipePayload standing) {
+                    progress.add(standing.filledRows());
+                }
+            }
+        };
+        var gun = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("irons_artifice", "musket")));
+        var slots = new GunContainer(gun);
+        slots.setItem(0, new ItemStack(ItemRegistry.STANDING_SNIPE_MODIFIER.get()));
+        slots.setChanged();
+        int requiredTicks = ModifierValues.DEFAULT_MOVEMENT_FIRE.standingTicks();
+        int full = SyncStandingSnipePayload.FULL;
+        int hidden = SyncStandingSnipePayload.HIDDEN;
+        helper.startSequence()
+                .thenExecute(() -> tickStandingHud(player))
+                .thenExecuteAfter(requiredTicks, () -> {
+                    player.setItemInHand(InteractionHand.MAIN_HAND, gun);
+                    tickStandingHud(player);
+                    helper.assertTrue(progress.equals(List.of(full))
+                                    && !SyncStandingSnipePayload.completedWhileShown(hidden, progress.getFirst()),
+                            "Equipping while ready must show a full HUD without signaling completion: " + progress);
+                    player.setPos(player.position().add(0.5, 0, 0));
+                    tickStandingHud(player);
+                    helper.assertTrue(progress.equals(List.of(full, 0)), "Moving with the gun must show an empty HUD: " + progress);
+                })
+                .thenExecuteAfter(requiredTicks, () -> {
+                    try {
+                        tickStandingHud(player);
+                        tickStandingHud(player);
+                        helper.assertTrue(progress.equals(List.of(full, 0, full))
+                                        && SyncStandingSnipePayload.completedWhileShown(progress.get(1), progress.getLast())
+                                        && !SyncStandingSnipePayload.completedWhileShown(full, full),
+                                "Holding the gun through a stop must signal completion once: " + progress);
+                        player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+                        tickStandingHud(player);
+                        helper.assertTrue(progress.equals(List.of(full, 0, full, hidden)), "Unequipping must hide the HUD: " + progress);
+                    } finally {
+                        MovementFireEvents.onLogout(new PlayerEvent.PlayerLoggedOutEvent(player));
+                    }
+                })
+                .thenSucceed();
+    }
+
+    private static void tickStandingHud(ServerPlayer player) {
+        try (var ignored = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS)) {
+            MovementFireEvents.onTick(new PlayerTickEvent.Post(player));
+        } catch (Exception failure) {
+            throw new IllegalStateException(failure);
+        }
     }
 
     private static void assertShotProfile(ModifierTestFixture fixture, double multiplier, String message) {

@@ -119,6 +119,8 @@
   "ui.artificesassortie.insufficient_mana": "Not enough mana to fire!",
 
   "subtitle.artificesassortie.sound.precision_fire_headshot": "Bullet hits critically",
+  "subtitle.artificesassortie.sound.notify_standing_snipe": "Standing snipe ready",
+
   "death.attack.artificesassortie.oil_bullet": "%1$s was shot with potion oil",
   "death.attack.artificesassortie.oil_bullet.player": "%1$s was shot with potion oil by %2$s",
   "death.attack.artificesassortie.oil_bullet.item": "%1$s was shot with potion oil by %2$s using %3$s",
