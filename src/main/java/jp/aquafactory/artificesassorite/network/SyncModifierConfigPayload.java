@@ -44,6 +44,10 @@ public record SyncModifierConfigPayload(ModifierValues values) implements Custom
         buffer.writeDouble(gyroscope.sprintSpreadReduction());
         buffer.writeDouble(gyroscope.maxSpreadReduction());
         buffer.writeVarInt(gyroscope.decayTicks());
+        var shockAbsorber = payload.values.shockAbsorber();
+        buffer.writeDouble(shockAbsorber.fixedSpreadPenalty());
+        buffer.writeDouble(shockAbsorber.spreadReductionPerTick());
+        buffer.writeDouble(shockAbsorber.recoilSuppressionSeconds());
     }
 
     private static SyncModifierConfigPayload read(FriendlyByteBuf buffer) {
@@ -55,7 +59,8 @@ public record SyncModifierConfigPayload(ModifierValues values) implements Custom
                 new ModifierValues.Excavation(buffer.readDouble(), buffer.readVarInt()),
                 new ModifierValues.Oil(buffer.readDouble()), new ModifierValues.Oil(buffer.readDouble()),
                 new ModifierValues.MovementFire(buffer.readVarInt(), buffer.readDouble(), buffer.readVarInt(), buffer.readDouble()),
-                new ModifierValues.GyroscopeCalibration(buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readVarInt())));
+                new ModifierValues.GyroscopeCalibration(buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readVarInt()),
+                new ModifierValues.ShockAbsorber(buffer.readDouble(), buffer.readDouble(), buffer.readDouble())));
     }
 
     @Override

@@ -13,6 +13,7 @@ public final class ServerConfig {
     private static final ModConfigSpec.IntValue STANDING_SNIPE_TICKS, MOVING_FIRE_TICKS;
     private static final ModConfigSpec.DoubleValue GYROSCOPE_FIXED_SPREAD, GYROSCOPE_SPRINT_REDUCTION, GYROSCOPE_MAX_REDUCTION;
     private static final ModConfigSpec.IntValue GYROSCOPE_DECAY_TICKS;
+    private static final ModConfigSpec.DoubleValue SHOCK_FIXED_SPREAD, SHOCK_SPREAD_REDUCTION, SHOCK_RECOIL_SECONDS;
     private static final ModConfigSpec.IntValue EXCAVATION_FORTUNE_LIMIT;
     private static final ModConfigSpec.DoubleValue IMBUEMENT_FIRST, IMBUEMENT_ADDITIONAL, IMBUEMENT_NORMAL_MANA, IMBUEMENT_MAGIC_MANA;
     private static volatile ModifierValues serverValues = ModifierValues.DEFAULTS;
@@ -87,6 +88,15 @@ public final class ServerConfig {
                 .defineInRange("maxSpreadReduction", gyroscope.maxSpreadReduction(), 0.0, Double.MAX_VALUE);
         GYROSCOPE_DECAY_TICKS = builder.comment("Ticks for the movement spread reduction to fade after stopping. 0 disables the fade.")
                 .defineInRange("decayTicks", gyroscope.decayTicks(), 0, Integer.MAX_VALUE);
+        var shockAbsorber = ModifierValues.DEFAULT_SHOCK_ABSORBER;
+        builder.pop().push("ShockAbsorberModifier");
+        SHOCK_FIXED_SPREAD = builder.comment("Bullet spread added once, regardless of firing mode or the number installed.")
+                .defineInRange("fixedSpreadPenalty", shockAbsorber.fixedSpreadPenalty(), 0.0, 1000.0);
+        SHOCK_SPREAD_REDUCTION = builder.comment("Bullet spread removed per tick of sustained full-auto fire per installed modifier. 0 disables spread reduction.")
+                .defineInRange("spreadReductionPerTick", shockAbsorber.spreadReductionPerTick(), 0.0, Double.MAX_VALUE);
+        SHOCK_RECOIL_SECONDS = builder.comment("Seconds of sustained full-auto fire to reach zero added temporary recoil with one modifier.",
+                        "Additional modifiers shorten this time proportionally. 0 removes added temporary recoil from the second consecutive shot.")
+                .defineInRange("recoilSuppressionSeconds", shockAbsorber.recoilSuppressionSeconds(), 0.0, Double.MAX_VALUE);
         builder.pop();
         AugmentationConfig.define(builder);
         SPEC = builder.build();
@@ -104,7 +114,8 @@ public final class ServerConfig {
                 new ModifierValues.MovementFire(STANDING_SNIPE_TICKS.get(), STANDING_SNIPE_DAMAGE.get(),
                          MOVING_FIRE_TICKS.get(), MOVING_FIRE_DAMAGE.get()),
                  new ModifierValues.GyroscopeCalibration(GYROSCOPE_FIXED_SPREAD.get(), GYROSCOPE_SPRINT_REDUCTION.get(),
-                         GYROSCOPE_MAX_REDUCTION.get(), GYROSCOPE_DECAY_TICKS.get()));
+                          GYROSCOPE_MAX_REDUCTION.get(), GYROSCOPE_DECAY_TICKS.get()),
+                 new ModifierValues.ShockAbsorber(SHOCK_FIXED_SPREAD.get(), SHOCK_SPREAD_REDUCTION.get(), SHOCK_RECOIL_SECONDS.get()));
     }
 
     public static ModifierValues serverValues() { return serverValues; }

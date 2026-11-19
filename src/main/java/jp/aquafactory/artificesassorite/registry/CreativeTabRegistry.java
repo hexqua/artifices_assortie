@@ -37,6 +37,7 @@ public final class CreativeTabRegistry {
         output.accept(ItemRegistry.STANDING_SNIPE_MODIFIER.get());
         output.accept(ItemRegistry.MOVING_FIRE_MODIFIER.get());
         output.accept(ItemRegistry.GYROSCOPE_CALIBRATION_MODIFIER.get());
+        output.accept(ItemRegistry.SHOCK_ABSORBER_MODIFIER.get());
 
         if (SpellImbuementCompat.isAvailable()) {
             output.accept(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get());

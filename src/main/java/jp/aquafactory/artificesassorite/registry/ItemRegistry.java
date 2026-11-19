@@ -7,6 +7,7 @@ import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.modifier.fortunemedal.FortuneMedalModifier;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldStabilizationModifier;
 import jp.aquafactory.artificesassorite.item.modifier.gyroscope.GyroscopeCalibrationModifier;
+import jp.aquafactory.artificesassorite.item.modifier.shockabsorber.ShockAbsorberModifier;
 import jp.aquafactory.artificesassorite.item.modifier.itemtransfer.ItemTransferModifier;
 import jp.aquafactory.artificesassorite.item.modifier.movementfire.MovementFireModifier;
 import jp.aquafactory.artificesassorite.item.modifier.precisionfire.PrecisionFireModifier;
@@ -45,6 +46,8 @@ public final class ItemRegistry {
             properties -> new ModifierItem(properties.stacksTo(1), MovementFireModifier.MOVING_FIRE));
     public static final DeferredItem<ModifierItem> GYROSCOPE_CALIBRATION_MODIFIER = ITEMS.registerItem("gyroscope_calibration_modifier",
             properties -> new ModifierItem(properties.stacksTo(1), new GyroscopeCalibrationModifier()));
+    public static final DeferredItem<ModifierItem> SHOCK_ABSORBER_MODIFIER = ITEMS.registerItem("shock_absorber_modifier",
+            properties -> new ModifierItem(properties.stacksTo(1), new ShockAbsorberModifier()));
     public static final DeferredItem<Item> INCOMPLETE_FORTUNE_MEDAL_MODIFIER = ITEMS.registerSimpleItem("incomplete_fortune_medal_modifier");
     public static final DeferredItem<Item> INCOMPLETE_MODIFIER_AUGMENTATION_KIT = ITEMS.registerSimpleItem("incomplete_modifier_augmentation_kit");
     public static final DeferredItem<Item> INCOMPLETE_HEALING_OIL_MODIFIER = ITEMS.registerSimpleItem("incomplete_healing_oil_modifier");

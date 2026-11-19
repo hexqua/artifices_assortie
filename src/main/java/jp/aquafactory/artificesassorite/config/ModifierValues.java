@@ -2,14 +2,24 @@ package jp.aquafactory.artificesassorite.config;
 
 public record ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization, FortuneMedal fortuneMedal,
                              SpellImbuement spellImbuement, Excavation excavation, Oil healingOil, Oil harmingOil,
-                             MovementFire movementFire, GyroscopeCalibration gyroscopeCalibration) {
+                              MovementFire movementFire, GyroscopeCalibration gyroscopeCalibration,
+                              ShockAbsorber shockAbsorber) {
     public static final MovementFire DEFAULT_MOVEMENT_FIRE = new MovementFire(20, 1.2, 5, 1.1);
     public static final GyroscopeCalibration DEFAULT_GYROSCOPE_CALIBRATION = new GyroscopeCalibration(1.0, 0.5, 3.0, 5);
+    public static final ShockAbsorber DEFAULT_SHOCK_ABSORBER = new ShockAbsorber(1.0, 0.0375, 5.0);
     public static final ModifierValues DEFAULTS = new ModifierValues(
             new PrecisionFire(1.5, 0.25, 0.5),
             new GripHoldStabilization(0.5, 0.75, -0.5, 0.75, 0.4), new FortuneMedal(3),
             new SpellImbuement(0.5, 0.15, 1.0, 0.25), new Excavation(6, 3), new Oil(0.9), new Oil(0.9),
-            DEFAULT_MOVEMENT_FIRE, DEFAULT_GYROSCOPE_CALIBRATION);
+            DEFAULT_MOVEMENT_FIRE, DEFAULT_GYROSCOPE_CALIBRATION, DEFAULT_SHOCK_ABSORBER);
+
+    public ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization,
+                          FortuneMedal fortuneMedal, SpellImbuement spellImbuement, Excavation excavation,
+                          Oil healingOil, Oil harmingOil, MovementFire movementFire,
+                          GyroscopeCalibration gyroscopeCalibration) {
+        this(precisionFire, gripHoldStabilization, fortuneMedal, spellImbuement, excavation, healingOil, harmingOil,
+                movementFire, gyroscopeCalibration, DEFAULT_SHOCK_ABSORBER);
+    }
 
     public ModifierValues(PrecisionFire precisionFire, GripHoldStabilization gripHoldStabilization,
                           FortuneMedal fortuneMedal, SpellImbuement spellImbuement, Excavation excavation,
@@ -74,6 +84,8 @@ public record ModifierValues(PrecisionFire precisionFire, GripHoldStabilization 
             return sprintSpreadReduction > 0 && maxSpreadReduction > 0;
         }
     }
+
+    public record ShockAbsorber(double fixedSpreadPenalty, double spreadReductionPerTick, double recoilSuppressionSeconds) {}
 
     public record MovementFire(int standingTicks, double standingMultiplier, int movingTicks, double movingMultiplier) {
         public MovementFire {

@@ -16,11 +16,14 @@
     "PotionImbuementCloudMixin",
     "OilBlastMixin",
     "OilCowboyHatMixin",
-    "GyroscopeSpreadMixin"
+    "GyroscopeSpreadMixin",
+    "ShockAbsorberGunplayMixin",
+    "ShockAbsorberRecoilMixin"
   ],
   "client": [
     "GripHoldRecoilMixin",
-    "GripHoldCrosshairMixin"
+    "GripHoldCrosshairMixin",
+    "ShockAbsorberClientRecoilMixin"
   ],
   "injectors": {
     "defaultRequire": 1

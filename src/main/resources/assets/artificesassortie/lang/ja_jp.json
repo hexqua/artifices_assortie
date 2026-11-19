@@ -111,7 +111,7 @@
   "item.artificesassortie.shock_absorber_modifier.desc_2": "フルオートで撃ち続けると、次の効果が徐々に強まる",
   "item.artificesassortie.shock_absorber_modifier.desc_3": "弾の拡散が減る",
   "item.artificesassortie.shock_absorber_modifier.desc_4": "1発ごとに生じる反動が弱まる",
-  "item.artificesassortie.shock_absorber_modifier.desc_5": "装着数が多いほど、両方の効果が早く強まる",
+  "item.artificesassortie.shock_absorber_modifier.desc_5": "装着数が多いほど、時間経過による強化が速くなる",
   "item.artificesassortie.spell_imbuement_modifier.tooltip": "系統のルーンとクラフトすることで系統を変更できる",
   "item.artificesassortie.spell_imbuement_modifier.desc_1": "%1$s%% ダメージ(モディファイア追加分は+%2$s%%)",
   "item.artificesassortie.spell_imbuement_modifier.desc_2": "%s系統として呪文耐性の影響を受ける",
