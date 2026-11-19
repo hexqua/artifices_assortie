@@ -11,13 +11,16 @@
     "D": {
       "item": "minecraft:polished_deepslate"
     },
+    "G": {
+      "item": "minecraft:diamond"
+    },
     "R": {
       "item": "minecraft:redstone"
     }
   },
   "pattern": [
     " A ",
-    "RCR",
+    "RCG",
     "ADA"
   ],
   "result": {

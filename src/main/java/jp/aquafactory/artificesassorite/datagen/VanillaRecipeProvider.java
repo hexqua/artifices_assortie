@@ -173,23 +173,25 @@ public final class VanillaRecipeProvider extends RecipeProvider {
         // 入手時期がMODに左右されないようにCreate 導入時でもレシピを変更しない.
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, STANDING_SNIPE_MODIFIER.get())
                 .pattern(" A ")
-                .pattern("RCR")
+                .pattern("RCG")
                 .pattern("ADA")
                 .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
                 .define('A', Items.AMETHYST_SHARD)
                 .define('R', Items.REDSTONE)
                 .define('D', Items.POLISHED_DEEPSLATE)
+                .define('G', Items.DIAMOND)
                 .unlockedBy("has_mechanical_components", has(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
                 .save(output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MOVING_FIRE_MODIFIER.get())
                 .pattern(" A ")
-                .pattern("RCR")
+                .pattern("RCG")
                 .pattern("ASA")
                 .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
                 .define('A', Items.AMETHYST_SHARD)
                 .define('R', Items.REDSTONE)
                 .define('S', Items.SUGAR)
+                .define('G', Items.DIAMOND)
                 .unlockedBy("has_mechanical_components", has(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
                 .save(output);
 

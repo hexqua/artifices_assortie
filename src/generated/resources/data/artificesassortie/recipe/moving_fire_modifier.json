@@ -8,6 +8,9 @@
     "C": {
       "item": "irons_artifice:clockwork_components"
     },
+    "G": {
+      "item": "minecraft:diamond"
+    },
     "R": {
       "item": "minecraft:redstone"
     },
@@ -17,7 +20,7 @@
   },
   "pattern": [
     " A ",
-    "RCR",
+    "RCG",
     "ASA"
   ],
   "result": {
