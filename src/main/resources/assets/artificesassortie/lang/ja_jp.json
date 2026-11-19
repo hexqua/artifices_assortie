@@ -102,7 +102,7 @@
   "item.artificesassortie.moving_fire_modifier.desc_1": "移動中、止まるまで下記効果を得る",
   "item.artificesassortie.moving_fire_modifier.desc_2": "%s%% ダメージ",
   "item.artificesassortie.moving_fire_modifier.desc_3": "ノックバックなどの外的要因でも効果を得る",
-  "item.artificesassortie.gyroscope_calibration_modifier.desc_1": "%s 集弾率/拡散",
+  "item.artificesassortie.gyroscope_calibration_modifier.desc_1": "%s 集弾率/拡散（重複なし）",
   "item.artificesassortie.gyroscope_calibration_modifier.desc_2": "移動速度による拡散増加を無効化する",
   "item.artificesassortie.gyroscope_calibration_modifier.desc_3": "2個以上装着時、移動速度と装着数に応じて拡散が減少する",
   "item.artificesassortie.spell_imbuement_modifier.tooltip": "系統のルーンとクラフトすることで系統を変更できる",

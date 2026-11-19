@@ -4,6 +4,7 @@ import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.config.ClientConfig;
 import jp.aquafactory.artificesassorite.item.augmentation.GunAugmentation;
 import jp.aquafactory.artificesassorite.item.augmentation.AugmentationRecipe;
+import jp.aquafactory.artificesassorite.item.modifier.gyroscope.GyroscopeCalibrationEvents;
 import jp.aquafactory.artificesassorite.datagen.ModItemTagsProvider;
 import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementCompat;
 import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementRecipe;
@@ -34,6 +35,7 @@ public class ArtificesAssortie {
         container.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
         ItemRegistry.ITEMS.register(bus);
+        GyroscopeCalibrationEvents.ATTACHMENTS.register(bus);
         GunAugmentation.COMPONENTS.register(bus);
         AugmentationRecipe.SERIALIZERS.register(bus);
         SpellImbuementStorage.COMPONENTS.register(bus);

@@ -15,7 +15,8 @@
     "OilBulletMixin",
     "PotionImbuementCloudMixin",
     "OilBlastMixin",
-    "OilCowboyHatMixin"
+    "OilCowboyHatMixin",
+    "GyroscopeSpreadMixin"
   ],
   "client": [
     "GripHoldRecoilMixin",
