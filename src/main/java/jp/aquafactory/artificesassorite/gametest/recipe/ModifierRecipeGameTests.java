@@ -22,6 +22,8 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_F
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AUGMENTATION_KIT;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GYROSCOPE_CALIBRATION_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.SHOCK_ABSORBER_MODIFIER;
 
 @GameTestHolder(ArtificesAssortie.MODID)
 @PrefixGameTestTemplate(false)
@@ -107,6 +109,51 @@ public final class ModifierRecipeGameTests {
             assertNoCraftingRecipe(helper, incomplete, "Precision fire must require all three spectral arrows");
         }
         helper.succeed();
+    }
+
+    @GameTest(template = "gametest/basic_floor")
+    public static void gyroscopeCalibrationRecipeSwitchesWithCreate(GameTestHelper helper) {
+        boolean createLoaded = ModList.get().isLoaded("create");
+        assertRecipeVariants(helper, "gyroscope_calibration_modifier",
+                "sequenced_assembly/gyroscope_calibration_modifier", createLoaded);
+        var fallback = gyroscopeInput(Items.QUARTZ);
+        if (createLoaded) {
+            assertNoCraftingRecipe(helper, fallback, "Create must disable gyroscope calibration crafting");
+            CreateModifierRecipeScenarios.gyroscopeCalibration(helper);
+        } else {
+            assertCrafts(helper, fallback, GYROSCOPE_CALIBRATION_MODIFIER.get());
+            assertNoCraftingRecipe(helper, gyroscopeInput(Items.AIR), "Gyroscope calibration must require Nether quartz");
+        }
+        helper.succeed();
+    }
+
+    private static CraftingInput gyroscopeInput(ItemLike quartz) {
+        return input(3, 3,
+                Items.AIR, quartz, Items.AIR,
+                Items.COPPER_INGOT, Items.COMPASS, Items.COPPER_INGOT,
+                Items.AIR, ItemRegistry.CLOCKWORK_COMPONENTS.get(), Items.AIR);
+    }
+
+    @GameTest(template = "gametest/basic_floor")
+    public static void shockAbsorberRecipeSwitchesWithCreate(GameTestHelper helper) {
+        boolean createLoaded = ModList.get().isLoaded("create");
+        assertRecipeVariants(helper, "shock_absorber_modifier", "sequenced_assembly/shock_absorber_modifier", createLoaded);
+        var fallback = shockAbsorberInput(Items.NETHERITE_SCRAP);
+        if (createLoaded) {
+            assertNoCraftingRecipe(helper, fallback, "Create must disable shock absorber crafting");
+            CreateModifierRecipeScenarios.shockAbsorber(helper);
+        } else {
+            assertCrafts(helper, fallback, SHOCK_ABSORBER_MODIFIER.get());
+            assertNoCraftingRecipe(helper, shockAbsorberInput(Items.AIR), "Shock absorber must require netherite scrap");
+        }
+        helper.succeed();
+    }
+
+    private static CraftingInput shockAbsorberInput(ItemLike scrap) {
+        return input(3, 3,
+                Items.AIR, scrap, Items.AIR,
+                Items.SLIME_BALL, ItemRegistry.BUFFER_SPRING.get(), Items.AIR,
+                Items.AIR, ItemRegistry.CLOCKWORK_COMPONENTS.get(), Items.AIR);
     }
 
     @GameTest(template = "gametest/basic_floor")

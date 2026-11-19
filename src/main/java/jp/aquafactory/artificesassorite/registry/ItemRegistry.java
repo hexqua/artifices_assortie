@@ -48,6 +48,8 @@ public final class ItemRegistry {
             properties -> new ModifierItem(properties.stacksTo(1), new GyroscopeCalibrationModifier()));
     public static final DeferredItem<ModifierItem> SHOCK_ABSORBER_MODIFIER = ITEMS.registerItem("shock_absorber_modifier",
             properties -> new ModifierItem(properties.stacksTo(1), new ShockAbsorberModifier()));
+    public static final DeferredItem<Item> INCOMPLETE_GYROSCOPE_CALIBRATION_MODIFIER = ITEMS.registerSimpleItem("incomplete_gyroscope_calibration_modifier");
+    public static final DeferredItem<Item> INCOMPLETE_SHOCK_ABSORBER_MODIFIER = ITEMS.registerSimpleItem("incomplete_shock_absorber_modifier");
     public static final DeferredItem<Item> INCOMPLETE_FORTUNE_MEDAL_MODIFIER = ITEMS.registerSimpleItem("incomplete_fortune_medal_modifier");
     public static final DeferredItem<Item> INCOMPLETE_MODIFIER_AUGMENTATION_KIT = ITEMS.registerSimpleItem("incomplete_modifier_augmentation_kit");
     public static final DeferredItem<Item> INCOMPLETE_HEALING_OIL_MODIFIER = ITEMS.registerSimpleItem("incomplete_healing_oil_modifier");

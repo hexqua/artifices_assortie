@@ -20,6 +20,10 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_F
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_PRECISION_FIRE_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GYROSCOPE_CALIBRATION_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.SHOCK_ABSORBER_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_GYROSCOPE_CALIBRATION_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_SHOCK_ABSORBER_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.MODIFIER_AUGMENTATION_KIT;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_MODIFIER_AUGMENTATION_KIT;
@@ -86,6 +90,28 @@ final class CreateRecipes {
                 .addStep(DeployerApplicationRecipe::new, step -> step.require(AllItems.ELECTRON_TUBE.get()))
                 .loops(1)
                 .addOutput(PRECISION_FIRE_MODIFIER.get(), 1)
+                .build(createOutput);
+
+        new SequencedAssemblyRecipeBuilder(id("gyroscope_calibration_modifier"))
+                .require(AllItems.BRASS_SHEET.get())
+                .transitionTo(INCOMPLETE_GYROSCOPE_CALIBRATION_MODIFIER.get())
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(Items.COMPASS))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(Items.QUARTZ))
+                .addStep(PressingRecipe::new, step -> step)
+                .loops(1)
+                .addOutput(GYROSCOPE_CALIBRATION_MODIFIER.get(), 1)
+                .build(createOutput);
+
+        new SequencedAssemblyRecipeBuilder(id("shock_absorber_modifier"))
+                .require(ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .transitionTo(INCOMPLETE_SHOCK_ABSORBER_MODIFIER.get())
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.BUFFER_SPRING.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(Items.SLIME_BALL))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(Items.NETHERITE_SCRAP))
+                .addStep(PressingRecipe::new, step -> step)
+                .loops(1)
+                .addOutput(SHOCK_ABSORBER_MODIFIER.get(), 1)
                 .build(createOutput);
 
         new SequencedAssemblyRecipeBuilder(id("fortune_medal_modifier"))
