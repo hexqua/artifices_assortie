@@ -1,8 +1,5 @@
 package jp.aquafactory.artificesassorite.item.modifier.gyroscope;
 
-import io.redspace.irons_artifice.api.ComposeShotEvent;
-import io.redspace.irons_artifice.data.ShotComponents;
-import io.redspace.irons_artifice.data.ValueModifier;
 import io.redspace.irons_artifice.item.GunItem;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
@@ -32,19 +29,6 @@ public final class GyroscopeCalibrationEvents {
     private static final double SPRINT_SPEED = 0.2806;
 
     private GyroscopeCalibrationEvents() {}
-
-    @SubscribeEvent
-    public static void onCompose(ComposeShotEvent event) {
-        var profile = event.getShotProfile();
-        if (profile.peek(GyroscopeCalibrationModifier.COUNT) == 0) {
-            return;
-        }
-        double penalty = values(event.getEntity()).fixedSpreadPenalty();
-        if (penalty > 0) {
-            profile.modifyValue(ShotComponents.SPREAD,
-                    new ValueModifier(penalty, ValueModifier.Operation.ADD, ValueModifier.Type.HARMFUL));
-        }
-    }
 
     @SubscribeEvent
     public static void onEntityTick(EntityTickEvent.Post event) {

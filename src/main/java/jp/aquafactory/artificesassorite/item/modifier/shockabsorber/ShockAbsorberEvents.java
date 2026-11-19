@@ -62,15 +62,13 @@ public final class ShockAbsorberEvents {
 
     public static double adjustSpread(double spread, ShotProfile profile, Entity shooter) {
         int count = profile.peek(ShockAbsorberModifier.COUNT);
-        if (count == 0) {
+        if (count == 0 || profile.fireMode() != FireMode.AUTO) {
             return spread;
         }
-        var values = values(shooter);
-        long elapsed = profile.fireMode() == FireMode.AUTO ? elapsedTicks(shooter, profile.itemStack()) : -1;
-        double reduction = elapsed > 0 ? elapsed * (double) count * values.spreadReductionPerTick() : 0;
-        double gunSpread = spread + values.fixedSpreadPenalty();
+        long elapsed = elapsedTicks(shooter, profile.itemStack());
+        double reduction = elapsed > 0 ? elapsed * (double) count * values(shooter).spreadReductionPerTick() : 0;
         // 既存の補正で銃の散布がすでに負なら、その値には連射による減算を加えない。
-        return gunSpread - Math.clamp(gunSpread, 0, reduction);
+        return spread - Math.clamp(spread, 0, reduction);
     }
 
     public static void recordShot(LivingEntity shooter, ShotProfile profile) {

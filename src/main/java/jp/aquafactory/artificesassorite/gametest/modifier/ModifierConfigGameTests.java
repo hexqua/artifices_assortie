@@ -39,19 +39,17 @@ public final class ModifierConfigGameTests {
                     new ModifierValues.SpellImbuement(0.7, 0.2, 0.3, 0.1), new ModifierValues.Excavation(0, 2),
                     new ModifierValues.Oil(0.8), new ModifierValues.Oil(1.2),
                     new ModifierValues.MovementFire(15, 1.35, 25, 1.15),
-                    new ModifierValues.GyroscopeCalibration(1.25, 0.75, 2.5, 8));
+                    new ModifierValues.GyroscopeCalibration(0.75, 2.5, 8),
+                    new ModifierValues.ShockAbsorber(0.125, 4.0));
             SyncModifierConfigPayload.STREAM_CODEC.encode(buffer, new SyncModifierConfigPayload(values));
             var decoded = SyncModifierConfigPayload.STREAM_CODEC.decode(buffer);
             h.assertTrue(decoded.values().equals(values), "Config codec must preserve all gameplay and tooltip values");
             ServerConfig.updateClient(decoded.values());
             var gyroscope = new ArrayList<Component>();
             new GyroscopeCalibrationModifier().getDescriptionText(gyroscope::add);
-            h.assertTrue(gyroscope.size() == 3 && ((TranslatableContents) gyroscope.getFirst().getContents()).getArgs()[0].equals("+1.25"),
-                    "Gyroscope tooltip must read the synchronized fixed spread penalty");
-            h.assertTrue(Objects.equals(gyroscope.getFirst().getStyle().getColor(), TextColor.fromLegacyFormat(ChatFormatting.RED))
-                            && gyroscope.subList(1, 3).stream().allMatch(line -> Objects.equals(
+            h.assertTrue(gyroscope.size() == 4 && gyroscope.stream().allMatch(line -> Objects.equals(
                             line.getStyle().getColor(), TextColor.fromLegacyFormat(ChatFormatting.AQUA))),
-                    "Gyroscope tooltip must distinguish the fixed penalty from the movement benefits");
+                    "All four gyroscope benefits must appear in aqua");
             var movement = new ArrayList<Component>();
             MovementFireModifier.STANDING_SNIPE.getDescriptionText(movement::add);
             h.assertTrue(((TranslatableContents) movement.getFirst().getContents()).getArgs()[0].equals("0.75"),
@@ -117,8 +115,8 @@ public final class ModifierConfigGameTests {
         var defaults = ModifierValues.DEFAULTS;
         try {
             var disabled = new ModifierValues.GyroscopeCalibration[]{
-                    new ModifierValues.GyroscopeCalibration(0, 0, 3, 5),
-                    new ModifierValues.GyroscopeCalibration(0, 0.5, 0, 5)
+                    new ModifierValues.GyroscopeCalibration(0, 3, 5),
+                    new ModifierValues.GyroscopeCalibration(0.5, 0, 5)
             };
             for (var gyroscope : disabled) {
                 ServerConfig.updateClient(new ModifierValues(defaults.precisionFire(), defaults.gripHoldStabilization(),
@@ -126,9 +124,9 @@ public final class ModifierConfigGameTests {
                         defaults.harmingOil(), defaults.movementFire(), gyroscope));
                 var tooltip = new ArrayList<Component>();
                 new GyroscopeCalibrationModifier().getDescriptionText(tooltip::add);
-                h.assertTrue(tooltip.size() == 1 && ((TranslatableContents) tooltip.getFirst().getContents()).getKey()
-                                .equals("item.artificesassortie.gyroscope_calibration_modifier.desc_2"),
-                        "Gyroscope tooltip must keep only speed penalty cancellation when both other effects are disabled");
+                h.assertTrue(tooltip.size() == 3 && tooltip.stream().noneMatch(line -> ((TranslatableContents) line.getContents())
+                                .getKey().equals("item.artificesassortie.gyroscope_calibration_modifier.desc_4")),
+                        "Gyroscope tooltip must keep the three penalty cancellations when stacking is disabled");
             }
         } finally {
             ServerConfig.updateClient(previous);

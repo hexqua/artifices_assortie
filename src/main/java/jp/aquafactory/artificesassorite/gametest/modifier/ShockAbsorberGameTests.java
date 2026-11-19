@@ -30,9 +30,9 @@ public final class ShockAbsorberGameTests {
     public static void sustainedFireReducesSpreadAndAddedRecoil(GameTestHelper helper) {
         var fixture = new ModifierTestFixture(helper);
         try {
-            var stack = fixture.equip("clockwork_rifle", ItemRegistry.SHOCK_ABSORBER_MODIFIER.get(), 5);
+            var stack = fixture.equip("clockwork_rifle", ItemRegistry.SHOCK_ABSORBER_MODIFIER.get(), 2);
             MagazineContents.set(stack, new MagazineContents(10));
-            checkShot(fixture, 3.0, 1.0);
+            checkShot(fixture, 2.0, 1.0);
         } catch (RuntimeException | Error exception) {
             fixture.close();
             throw exception;
@@ -42,12 +42,12 @@ public final class ShockAbsorberGameTests {
             helper.runAfterDelay(elapsed, () -> {
                 try {
                     double expectedSpread = switch (elapsed) {
-                        case 4 -> 2.25;
-                        case 8 -> 1.50;
-                        case 12 -> 0.75;
+                        case 4 -> 1.5;
+                        case 8 -> 1.0;
+                        case 12 -> 0.5;
                         default -> 0;
                     };
-                    checkShot(fixture, expectedSpread, 1 - elapsed / 20.0);
+                    checkShot(fixture, expectedSpread, 1 - elapsed / 30.0);
                 } catch (RuntimeException | Error exception) {
                     fixture.close();
                     throw exception;
@@ -56,7 +56,7 @@ public final class ShockAbsorberGameTests {
         }
         helper.runAfterDelay(27, () -> {
             try (fixture) {
-                checkShot(fixture, 3.0, 1.0);
+                checkShot(fixture, 2.0, 1.0);
                 helper.succeed();
             }
         });
@@ -67,7 +67,7 @@ public final class ShockAbsorberGameTests {
         var defaults = ModifierValues.DEFAULTS;
         var config = new ModifierValues(defaults.precisionFire(), defaults.gripHoldStabilization(), defaults.fortuneMedal(),
                 defaults.spellImbuement(), defaults.excavation(), defaults.healingOil(), defaults.harmingOil(),
-                defaults.movementFire(), defaults.gyroscopeCalibration(), new ModifierValues.ShockAbsorber(1, 0, 0));
+                defaults.movementFire(), defaults.gyroscopeCalibration(), new ModifierValues.ShockAbsorber(0, 0));
         try (var settings = ServerConfig.overrideForGameTest(config);
              var fixture = new ModifierTestFixture(helper)) {
             var modifier = ItemRegistry.SHOCK_ABSORBER_MODIFIER.get();
@@ -76,18 +76,18 @@ public final class ShockAbsorberGameTests {
             helper.assertTrue(!GunplayManager.tryFire(fixture.player, DIRECTION).fired(),
                     "An empty gun must not start the sustained-fire effect");
             MagazineContents.set(clockwork, new MagazineContents(5));
-            checkShot(fixture, 3.0, 1.0);
-            checkShot(fixture, 3.0, 0.0);
+            checkShot(fixture, 2.0, 1.0);
+            checkShot(fixture, 2.0, 0.0);
             fixture.equip("clockwork_rifle", modifier, 1);
-            checkShot(fixture, 3.0, 1.0);
+            checkShot(fixture, 2.0, 1.0);
             var sixShooter = fixture.equip("six_shooter", modifier, 2);
-            checkShot(fixture, 3.5, 1.0);
-            checkShot(fixture, 3.5, 1.0);
+            checkShot(fixture, 2.5, 1.0);
+            checkShot(fixture, 2.5, 1.0);
             var slots = new GunContainer(sixShooter);
             slots.setItem(2, new ItemStack(io.redspace.irons_artifice.registry.ItemRegistry.MECHANICAL_REPEATER.get()));
             slots.setChanged();
-            checkShot(fixture, 3.5, 1.0);
-            checkShot(fixture, 3.5, 0.0);
+            checkShot(fixture, 2.5, 1.0);
+            checkShot(fixture, 2.5, 0.0);
         }
         helper.succeed();
     }
