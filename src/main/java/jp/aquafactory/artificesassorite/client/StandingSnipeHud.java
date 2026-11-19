@@ -4,11 +4,14 @@ import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
+import jp.aquafactory.artificesassorite.config.ClientConfig;
 import jp.aquafactory.artificesassorite.item.modifier.movementfire.MovementFireModifier;
 import jp.aquafactory.artificesassorite.item.modifier.movementfire.StandingSnipeClientBridge;
 import jp.aquafactory.artificesassorite.network.SyncStandingSnipePayload;
+import jp.aquafactory.artificesassorite.registry.SoundRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -33,7 +36,7 @@ public final class StandingSnipeHud {
 
     @SubscribeEvent
     public static void registerLayer(RegisterGuiLayersEvent event) {
-        StandingSnipeClientBridge.progress = value -> filledRows = value;
+        StandingSnipeClientBridge.progress = StandingSnipeHud::updateProgress;
         event.registerAbove(VanillaGuiLayers.CROSSHAIR, LAYER, (graphics, delta) -> render(graphics));
     }
 
@@ -42,11 +45,25 @@ public final class StandingSnipeHud {
         filledRows = SyncStandingSnipePayload.HIDDEN;
     }
 
-    private static void render(GuiGraphics graphics) {
+    private static void updateProgress(int rows) {
+        int previousRows = filledRows;
+        filledRows = rows;
         var client = Minecraft.getInstance();
+        if (SyncStandingSnipePayload.completedWhileShown(previousRows, rows) && shouldShowHud(client)
+                && ClientConfig.STANDING_SNIPE_PLAY_READY_SOUND.get()) {
+            float volume = ClientConfig.STANDING_SNIPE_READY_SOUND_VOLUME.get().floatValue();
+            client.getSoundManager().play(SimpleSoundInstance.forUI(SoundRegistry.NOTIFY_STANDING_SNIPE.get(), 1.0F, volume));
+        }
+    }
+
+    private static boolean shouldShowHud(Minecraft client) {
         var player = client.player;
-        if (player == null || !player.isAlive() || player.isSpectator() || client.options.hideGui
-                || !MovementFireModifier.hasStandingSnipe(player.getMainHandItem())) {
+        return player != null && player.isAlive() && !player.isSpectator() && !client.options.hideGui
+                && MovementFireModifier.hasStandingSnipe(player.getMainHandItem());
+    }
+
+    private static void render(GuiGraphics graphics) {
+        if (!shouldShowHud(Minecraft.getInstance())) {
             return;
         }
 

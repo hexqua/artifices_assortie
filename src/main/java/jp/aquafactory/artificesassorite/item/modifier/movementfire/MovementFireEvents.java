@@ -140,11 +140,11 @@ public final class MovementFireEvents {
         }
 
         private int hudProgress(long now, int requiredTicks) {
+            // 前半は空のゲージとして同期し、成立済みでHUDを開いた場合と区別する。
             // 時間を2倍してから引くと、奇数設定でも半分の時点を丸めずに済む。
             long elapsed = Math.min(now - stationarySince, requiredTicks);
-            long progress = 2 * elapsed - requiredTicks;
-            return progress < 0 ? SyncStandingSnipePayload.HIDDEN
-                    : (int) (progress * SyncStandingSnipePayload.FULL / requiredTicks);
+            long progress = Math.max(0, 2 * elapsed - requiredTicks);
+            return (int) (progress * SyncStandingSnipePayload.FULL / requiredTicks);
         }
 
         private boolean recentlyMoved(long now, int windowTicks) {

@@ -119,6 +119,8 @@
   "ui.artificesassortie.insufficient_mana": "発射するのに十分なマナが足りない！",
 
   "subtitle.artificesassortie.sound.precision_fire_headshot": "銃弾が鋭く当たる",
+  "subtitle.artificesassortie.sound.notify_standing_snipe": "静止狙撃状態の通知音がなる",
+
   "death.attack.artificesassortie.oil_bullet": "%1$sはポーションオイルを塗った銃弾に撃たれた",
   "death.attack.artificesassortie.oil_bullet.player": "%1$sは%2$sのポーションオイルを塗った銃弾に撃たれた",
   "death.attack.artificesassortie.oil_bullet.item": "%1$sは%2$sの%3$sから放たれたポーションオイルを塗った銃弾に撃たれた",

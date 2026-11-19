@@ -11,6 +11,8 @@ public final class SoundRegistry {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, ArtificesAssortie.MODID);
     public static final DeferredHolder<SoundEvent, SoundEvent> PRECISION_FIRE_HEADSHOT = SOUNDS.register("precision_fire_headshot",
             () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "precision_fire_headshot")));
+    public static final DeferredHolder<SoundEvent, SoundEvent> NOTIFY_STANDING_SNIPE = SOUNDS.register("notify_standing_snipe",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "notify_standing_snipe")));
 
     private SoundRegistry() {}
 }
