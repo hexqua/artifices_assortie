@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
+import jp.aquafactory.artificesassorite.config.ClientConfig;
 import jp.aquafactory.artificesassorite.item.modifier.movementfire.MovementFireModifier;
 import jp.aquafactory.artificesassorite.item.modifier.movementfire.StandingSnipeClientBridge;
 import jp.aquafactory.artificesassorite.network.SyncStandingSnipePayload;
@@ -48,8 +49,10 @@ public final class StandingSnipeHud {
         int previousRows = filledRows;
         filledRows = rows;
         var client = Minecraft.getInstance();
-        if (SyncStandingSnipePayload.completedWhileShown(previousRows, rows) && shouldShowHud(client)) {
-            client.getSoundManager().play(SimpleSoundInstance.forUI(SoundRegistry.NOTIFY_STANDING_SNIPE.get(), 1.0F, 1.0F));
+        if (SyncStandingSnipePayload.completedWhileShown(previousRows, rows) && shouldShowHud(client)
+                && ClientConfig.STANDING_SNIPE_PLAY_READY_SOUND.get()) {
+            float volume = ClientConfig.STANDING_SNIPE_READY_SOUND_VOLUME.get().floatValue();
+            client.getSoundManager().play(SimpleSoundInstance.forUI(SoundRegistry.NOTIFY_STANDING_SNIPE.get(), 1.0F, volume));
         }
     }
 
