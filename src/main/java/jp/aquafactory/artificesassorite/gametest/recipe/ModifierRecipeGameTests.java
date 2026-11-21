@@ -16,6 +16,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.Arrays;
 
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.EXCAVATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
@@ -29,6 +30,31 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.SHOCK_ABSOR
 @PrefixGameTestTemplate(false)
 public final class ModifierRecipeGameTests {
     private ModifierRecipeGameTests() {}
+
+    @GameTest(template = "gametest/basic_floor")
+    public static void enchantedMagazineRecipeSwitchesWithCreate(GameTestHelper helper) {
+        boolean createLoaded = ModList.get().isLoaded("create");
+        assertRecipeVariants(helper, "enchanted_magazine_modifier",
+                "sequenced_assembly/enchanted_magazine_modifier", createLoaded);
+        var fallback = enchantedMagazineInput(Items.EXPERIENCE_BOTTLE);
+        if (createLoaded) {
+            assertNoCraftingRecipe(helper, fallback, "Create must disable enchanted magazine crafting");
+            CreateModifierRecipeScenarios.enchantedMagazine(helper);
+        } else {
+            assertCrafts(helper, fallback, ENCHANTED_MAGAZINE_MODIFIER.get());
+            assertNoCraftingRecipe(helper, enchantedMagazineInput(Items.GLASS_BOTTLE),
+                    "Enchanted magazine crafting must require two bottles o' enchanting");
+        }
+        helper.succeed();
+    }
+
+    private static CraftingInput enchantedMagazineInput(ItemLike secondBottle) {
+        var bullet = ItemRegistry.ENCHANTED_BULLET_MODIFIER.get();
+        return input(3, 3,
+                Items.GOLD_INGOT, Items.QUARTZ_BLOCK, Items.AIR,
+                bullet, bullet, Items.QUARTZ_BLOCK,
+                Items.GOLD_INGOT, Items.EXPERIENCE_BOTTLE, secondBottle);
+    }
 
     @GameTest(template = "gametest/basic_floor")
     public static void excavationRecipeSwitchesWithCreate(GameTestHelper helper) {

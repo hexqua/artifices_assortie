@@ -16,6 +16,8 @@ import net.minecraft.world.item.alchemy.Potions;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_ENCHANTED_MAGAZINE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ITEM_TRANSFER_MODIFIER;
@@ -39,6 +41,18 @@ final class CreateRecipes {
 
     static void buildRecipes(RecipeOutput output) {
         var createOutput = output.withConditions(new ModLoadedCondition("create"));
+        new SequencedAssemblyRecipeBuilder(id("enchanted_magazine_modifier"))
+                .require(AllItems.BRASS_SHEET.get())
+                .transitionTo(INCOMPLETE_ENCHANTED_MAGAZINE_MODIFIER.get())
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.ENCHANTED_BULLET_MODIFIER.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.ENCHANTED_BULLET_MODIFIER.get()))
+                .addStep(PressingRecipe::new, step -> step)
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(AllItems.EXP_NUGGET.get()))
+                .addStep(PressingRecipe::new, step -> step)
+                .loops(1)
+                .addOutput(ENCHANTED_MAGAZINE_MODIFIER.get(), 1)
+                .build(createOutput);
+
         new SequencedAssemblyRecipeBuilder(id("healing_oil_modifier"))
                 .require(ItemRegistry.GUN_OIL.get())
                 .transitionTo(INCOMPLETE_HEALING_OIL_MODIFIER.get())

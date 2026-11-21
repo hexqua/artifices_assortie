@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:mod_loaded",
+        "modid": "create"
+      }
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:experience_bottle"
+    },
+    "E": {
+      "item": "irons_artifice:enchanted_bullet_modifier"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "Q": {
+      "item": "minecraft:quartz_block"
+    }
+  },
+  "pattern": [
+    "GQ ",
+    "EEQ",
+    "GBB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:enchanted_magazine_modifier"
+  }
+}
