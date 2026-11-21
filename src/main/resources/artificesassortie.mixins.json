@@ -2,6 +2,7 @@
   "required": true,
   "package": "jp.aquafactory.artificesassorite.mixin",
   "compatibilityLevel": "JAVA_21",
+  "plugin": "jp.aquafactory.artificesassorite.compat.EnchantedMagazineHudMixinPlugin",
   "mixins": [
     "AugmentedGunContainerMixin",
     "AugmentedGunTooltipMixin",
