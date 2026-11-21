@@ -1,11 +1,11 @@
 package jp.aquafactory.artificesassorite.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import io.redspace.irons_artifice.client.gui.AmmoCountHudOverlay;
 import io.redspace.irons_artifice.config.ClientConfig;
+import jp.aquafactory.artificesassorite.compat.EnchantedMagazineHudMixinPlugin;
 import jp.aquafactory.artificesassorite.item.modifier.enchantedmagazine.EnchantedMagazine;
 import jp.aquafactory.artificesassorite.item.modifier.enchantedmagazine.EnchantedMagazine.ReserveDisplay;
 import net.minecraft.ChatFormatting;
@@ -21,8 +21,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import software.bernie.geckolib.GeckoLibConstants;
+
+import static jp.aquafactory.artificesassorite.config.ClientConfig.ENCHANTED_MAGAZINE_RESERVE_HUD_Y_OFFSET;
+import static jp.aquafactory.artificesassorite.config.ClientConfig.ENCHANTED_MAGAZINE_SHOW_RESERVE_HUD;
 
 @Mixin(value = AmmoCountHudOverlay.class, remap = false)
 public abstract class EnchantedMagazineHudMixin {
@@ -37,33 +41,35 @@ public abstract class EnchantedMagazineHudMixin {
         throw new AssertionError();
     }
 
-    @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F", ordinal = 0))
+    // MixinExtras の遅延注入より前に、描画と tick の全注入をまとめて検証できるようにする。
+    @ModifyVariable(method = "render", at = @At("STORE"), name = "textColumnWidth", require = 0, expect = 0)
     private static float artificesassortie$includeReserveWidth(float original, @Local(name = "player") LocalPlayer player,
                                                                @Local(name = "held") ItemStack held, @Local(name = "font") Font font, @Local(name = "reserveScale") float scale,
                                                                @Share("enchantedMagazine") LocalRef<ReserveDisplay> row) {
+        if (!artificesassortie$hudEnabled()) return original;
         var reserve = EnchantedMagazine.reserveDisplay(player, held);
         row.set(reserve);
         return reserve.installed() ? Math.max(original, font.width("+" + reserve.rounds()) * scale) : original;
     }
 
-    @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F", ordinal = 1))
+    @ModifyVariable(method = "render", at = @At("STORE"), name = "totalHeight", require = 0, expect = 0)
     private static float artificesassortie$includeReserveHeight(float original, @Local(name = "font") Font font,
             @Local(name = "reserveScale") float scale, @Local(name = "magazineHeight") float magazineHeight,
             @Local(name = "reserveHeight") float reserveHeight, @Local(name = "gapBetweenRows") float gap,
             @Share("enchantedMagazine") LocalRef<ReserveDisplay> row) {
-        return row.get().installed()
+        return row.get() != null && row.get().installed()
                 ? Math.max(original, artificesassortie$rowHeight(font, scale) + magazineHeight + gap + reserveHeight) : original;
     }
 
-    @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F", ordinal = 2))
+    @ModifyVariable(method = "render", at = @At("STORE"), name = "magazineTop", require = 0, expect = 0)
     private static float artificesassortie$positionMagazine(float original, @Local(name = "font") Font font,
             @Local(name = "reserveScale") float scale, @Share("enchantedMagazine") LocalRef<ReserveDisplay> row) {
         // 本体の中央揃えが新しい行の高さを数えないため、その半分を足して装弾数の位置を補正する。
-        return row.get().installed() ? original + artificesassortie$rowHeight(font, scale) / 2 : original;
+        return row.get() != null && row.get().installed() ? original + artificesassortie$rowHeight(font, scale) / 2 : original;
     }
 
     // 予備弾の描画を追加し、既存の装弾数描画をラップする他の Mod に追加分を流さない。
-    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 0,
+    @Inject(method = "render", require = 0, expect = 0, at = @At(value = "INVOKE", ordinal = 0,
             target = "Lio/redspace/irons_artifice/client/gui/AmmoCountHudOverlay;drawScaledText(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Ljava/lang/String;FFFIZ)V"))
     private static void artificesassortie$drawReserve(GuiGraphics graphics, DeltaTracker deltaTracker, CallbackInfo callback,
                                                       @Local(name = "font") Font font, @Local(name = "anchor") ClientConfig.Anchor anchor, @Local(name = "shadow") boolean shadow,
@@ -71,7 +77,7 @@ public abstract class EnchantedMagazineHudMixin {
                                                       @Local(name = "textLeft") float textLeft,
                                                       @Local(name = "textColumnWidth") float textColumnWidth, @Share("enchantedMagazine") LocalRef<ReserveDisplay> row) {
         var reserve = row.get();
-        if (reserve.installed()) {
+        if (reserve != null && reserve.installed()) {
             String reserveText = "+" + reserve.rounds();
             float spareWidth = textColumnWidth - font.width(reserveText) * reserveScale;
             float reserveX = textLeft;
@@ -81,7 +87,8 @@ public abstract class EnchantedMagazineHudMixin {
                 reserveX += spareWidth / 2;
             }
             int reserveColor = reserve.rounds() == 0 ? ClientConfig.colorEmpty() : 0xFF000000 | ChatFormatting.AQUA.getColor();
-            drawScaledText(graphics, font, reserveText, reserveX, magazineBaselineY - artificesassortie$rowHeight(font, reserveScale),
+            float reserveY = magazineBaselineY - artificesassortie$rowHeight(font, reserveScale) + ENCHANTED_MAGAZINE_RESERVE_HUD_Y_OFFSET.get();
+            drawScaledText(graphics, font, reserveText, reserveX, reserveY,
                     reserveScale, reserveColor, shadow);
         }
     }
@@ -91,8 +98,13 @@ public abstract class EnchantedMagazineHudMixin {
         return font.lineHeight * scale + 2;
     }
 
-    @Inject(method = "onClientTick", at = @At("HEAD"))
+    @Inject(method = "onClientTick", at = @At("HEAD"), require = 0, expect = 0)
     private static void artificesassortie$resetFlashOnGunChange(ClientTickEvent.Post event, CallbackInfo callback) {
+        if (!artificesassortie$hudEnabled()) {
+            artificesassortie$previousGun = ItemStack.EMPTY;
+            artificesassortie$previousSlot = -1;
+            return;
+        }
         var player = Minecraft.getInstance().player;
         ItemStack held = player == null ? ItemStack.EMPTY : player.getMainHandItem();
         int slot = player == null ? -1 : player.getInventory().selected;
@@ -109,9 +121,13 @@ public abstract class EnchantedMagazineHudMixin {
         artificesassortie$previousSlot = slot;
     }
 
-    @ModifyExpressionValue(method = "onClientTick", at = @At(value = "INVOKE",
-            target = "Lio/redspace/irons_artifice/item/MagazineContents;count()I"))
+    @ModifyVariable(method = "onClientTick", at = @At("STORE"), name = "loaded", require = 0, expect = 0)
     private static int artificesassortie$countUsableAmmo(int loaded, @Local(name = "player") LocalPlayer player, @Local(name = "held") ItemStack held) {
-        return loaded == 0 && EnchantedMagazine.reserveDisplay(player, held).rounds() > 0 ? 1 : loaded;
+        return loaded == 0 && artificesassortie$hudEnabled() && EnchantedMagazine.reserveDisplay(player, held).rounds() > 0 ? 1 : loaded;
+    }
+
+    @Unique
+    private static boolean artificesassortie$hudEnabled() {
+        return EnchantedMagazineHudMixinPlugin.isHudApplied() && ENCHANTED_MAGAZINE_SHOW_RESERVE_HUD.get();
     }
 }

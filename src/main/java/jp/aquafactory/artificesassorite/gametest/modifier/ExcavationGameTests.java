@@ -6,6 +6,7 @@ import io.redspace.irons_artifice.data.Value;
 import io.redspace.irons_artifice.gun.ShotProfile;
 import io.redspace.irons_artifice.menu.GunContainer;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
+import jp.aquafactory.artificesassorite.api.event.ExcavationBreakEvent;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.excavation.ExcavationModifier;
@@ -360,6 +361,54 @@ public final class ExcavationGameTests {
         h.succeed();
     }
 
+    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
+    public static void excavationBreakListenerCanVetoPlayerAndMobHarvests(GameTestHelper h) throws Exception {
+        try (var s = new Scenario(h); var ignored = config(6, 3)) {
+            var level = h.getLevel();
+            var mob = Objects.requireNonNull(EntityType.ZOMBIE.create(level));
+            var rule = level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING);
+            boolean previous = rule.get();
+            rule.set(true, level.getServer());
+            try {
+                var profile = s.power(s.profile(MINING), 1000);
+                for (Entity shooter : List.of(s.f.player, mob)) {
+                    for (Block block : List.of(Blocks.DIAMOND_ORE, Blocks.TORCH)) {
+                        s.place(block);
+                        var calls = new ArrayList<String>();
+                        Consumer<BlockEvent.BreakEvent> observeBreak = event -> {
+                            if (event.getLevel() == level && event.getPos().equals(s.pos)) calls.add("upstream");
+                        };
+                        Consumer<ExcavationBreakEvent> deny = event -> {
+                            if (event.getLevel() != level || !event.getPos().equals(s.pos)) return;
+                            calls.add("excavation");
+                            h.assertTrue(event.getShooter() == shooter && event.getState() == s.state()
+                                    && event.getTool().is(Items.IRON_PICKAXE), "Break listener must receive the live target, shooter and virtual tool");
+                            event.setCanceled(true);
+                        };
+                        NeoForge.EVENT_BUS.addListener(observeBreak);
+                        NeoForge.EVENT_BUS.addListener(deny);
+                        try {
+                            s.hit(profile, shooter);
+                            var expected = shooter == s.f.player ? List.of("upstream", "excavation") : List.of("excavation");
+                            h.assertTrue(calls.equals(expected), "Break events must fire once in order: " + block + " " + calls);
+                            h.assertTrue(s.state().is(block) && s.entities.isEmpty(), "Canceled excavation must preserve the block without producing loot: " + block);
+                        } finally {
+                            NeoForge.EVENT_BUS.unregister(deny);
+                            NeoForge.EVENT_BUS.unregister(observeBreak);
+                        }
+                        s.hit(profile, shooter);
+                        h.assertTrue(s.state().isAir(), "Excavation must proceed once the veto is removed: " + block);
+                        s.clearEntities();
+                    }
+                }
+            } finally {
+                rule.set(previous, level.getServer());
+                mob.discard();
+            }
+        }
+        h.succeed();
+    }
+
     private static String key(Component component) {
         return ((TranslatableContents) component.getContents()).getKey();
     }
@@ -628,7 +677,12 @@ public final class ExcavationGameTests {
         }
 
         void hit(ShotProfile profile) {
+            hit(profile, f.player);
+        }
+
+        void hit(ShotProfile profile, Entity shooter) {
             var bullet = f.bullet(profile.deepCopy());
+            bullet.setOwner(shooter);
             bullet.setDeltaMovement(new Vec3(0, 0, 3));
             capturing = true;
             try { bullet.hit(new BlockHitResult(Vec3.atCenterOf(pos), Direction.NORTH, pos, false)); }

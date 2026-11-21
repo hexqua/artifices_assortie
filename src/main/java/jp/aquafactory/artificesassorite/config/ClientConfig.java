@@ -9,6 +9,8 @@ public final class ClientConfig {
     public static final ModConfigSpec.IntValue EXCAVATION_SOUND_BLOCK_LIMIT;
     public static final ModConfigSpec.BooleanValue STANDING_SNIPE_PLAY_READY_SOUND;
     public static final ModConfigSpec.DoubleValue STANDING_SNIPE_READY_SOUND_VOLUME;
+    public static final ModConfigSpec.BooleanValue ENCHANTED_MAGAZINE_SHOW_RESERVE_HUD;
+    public static final ModConfigSpec.IntValue ENCHANTED_MAGAZINE_RESERVE_HUD_Y_OFFSET;
 
     static {
         var builder = new ModConfigSpec.Builder();
@@ -27,6 +29,12 @@ public final class ClientConfig {
                 .define("playReadySound", true);
         STANDING_SNIPE_READY_SOUND_VOLUME = builder.comment("Standing Snipe ready sound volume multiplier. 1.0 is the default volume.")
                 .defineInRange("readySoundVolume", 1.0, 0.0, 5.0);
+        builder.pop();
+        builder.push("EnchantedMagazineModifier");
+        ENCHANTED_MAGAZINE_SHOW_RESERVE_HUD = builder.comment("Show the Enchanted Magazine reserve row and adjust the empty-magazine flash for usable reserve ammo.")
+                .define("showReserveHud", true);
+        ENCHANTED_MAGAZINE_RESERVE_HUD_Y_OFFSET = builder.comment("Vertical offset of the Enchanted Magazine reserve row in GUI pixels. Positive values move it down.")
+                .defineInRange("reserveHudYOffset", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
         builder.pop();
         SPEC = builder.build();
     }

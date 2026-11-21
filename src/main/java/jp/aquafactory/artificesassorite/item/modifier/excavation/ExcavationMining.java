@@ -2,6 +2,7 @@ package jp.aquafactory.artificesassorite.item.modifier.excavation;
 
 import io.redspace.irons_artifice.entity.Bullet;
 import io.redspace.irons_artifice.utils.IronsArtificeTags;
+import jp.aquafactory.artificesassorite.api.event.ExcavationBreakEvent;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.fortunemedal.FortuneMedalModifier;
 import net.minecraft.core.BlockPos;
@@ -88,6 +89,8 @@ public final class ExcavationMining {
         int limit = ServerConfig.serverValues().excavation().maxFortuneCount();
         int fortune = limit == 0 ? count : Math.min(count, limit);
         if (fortune > 0) tool.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.FORTUNE), fortune);
+        if (NeoForge.EVENT_BUS.post(new ExcavationBreakEvent(level, pos, state, bullet.getOwner(), tool)).isCanceled()
+                || level.getBlockState(pos) != state) return false;
         BlockEntity blockEntity = level.getBlockEntity(pos);
         var previous = ExcavationDrops.begin(level, pos, bullet);
         try (var ignored = ExcavationEffectBatch.harvesting(level, pos, state)) {
