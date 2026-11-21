@@ -4,6 +4,7 @@ import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.config.ClientConfig;
 import jp.aquafactory.artificesassorite.item.augmentation.GunAugmentation;
 import jp.aquafactory.artificesassorite.item.augmentation.AugmentationRecipe;
+import jp.aquafactory.artificesassorite.item.modifier.enchantedmagazine.EnchantedMagazine;
 import jp.aquafactory.artificesassorite.item.modifier.gyroscope.GyroscopeCalibrationEvents;
 import jp.aquafactory.artificesassorite.item.modifier.shockabsorber.ShockAbsorberEvents;
 import jp.aquafactory.artificesassorite.datagen.ModItemTagsProvider;
@@ -42,6 +43,7 @@ public class ArtificesAssortie {
         AugmentationRecipe.SERIALIZERS.register(bus);
         SpellImbuementStorage.COMPONENTS.register(bus);
         PotionImbuementStorage.COMPONENTS.register(bus);
+        EnchantedMagazine.COMPONENTS.register(bus);
         // Create 固有型を持つ handler は、導入済みの環境だけでロードする。
         bus.addListener((RegisterCapabilitiesEvent event) -> {
             if (ModList.get().isLoaded("create")) PotionImbuementCreate.register(event);

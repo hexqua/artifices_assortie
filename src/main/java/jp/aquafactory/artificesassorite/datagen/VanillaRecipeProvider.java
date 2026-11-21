@@ -40,6 +40,17 @@ public final class VanillaRecipeProvider extends RecipeProvider {
         var createLoaded = new ModLoadedCondition("create");
         var fallback = output.withConditions(new NotCondition(createLoaded));
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ENCHANTED_MAGAZINE_MODIFIER.get())
+                .pattern("GQ ")
+                .pattern("EEQ")
+                .pattern("GBB")
+                .define('G', Items.GOLD_INGOT)
+                .define('E', ItemRegistry.ENCHANTED_BULLET_MODIFIER.get())
+                .define('B', Items.EXPERIENCE_BOTTLE)
+                .define('Q', Items.QUARTZ_BLOCK)
+                .unlockedBy("has_enchanted_bullet_modifier", has(ItemRegistry.ENCHANTED_BULLET_MODIFIER.get()))
+                .save(fallback, id("crafting/enchanted_magazine_modifier"));
+
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, HEALING_OIL_MODIFIER.get())
                 .pattern(" M ")
                 .pattern("MPM")

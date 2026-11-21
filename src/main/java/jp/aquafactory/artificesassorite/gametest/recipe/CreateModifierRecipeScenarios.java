@@ -28,6 +28,8 @@ import net.neoforged.neoforge.items.wrapper.RecipeWrapper;
 
 import java.util.ArrayList;
 
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_ENCHANTED_MAGAZINE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.EXCAVATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
@@ -170,6 +172,21 @@ final class CreateModifierRecipeScenarios {
             assertIntermediate(helper, current, incomplete, ++step);
         }
         ModifierRecipeGameTests.assertResult(helper, press(helper, current), result, "Sequenced assembly");
+    }
+
+    static void enchantedMagazine(GameTestHelper helper) {
+        var incomplete = INCOMPLETE_ENCHANTED_MAGAZINE_MODIFIER.get();
+        var bullet = ItemRegistry.ENCHANTED_BULLET_MODIFIER.get();
+        var current = deploy(helper, new ItemStack(AllItems.BRASS_SHEET.get()), bullet);
+        assertIntermediate(helper, current, incomplete, 1);
+        current = deploy(helper, current, bullet);
+        assertIntermediate(helper, current, incomplete, 2);
+        current = press(helper, current);
+        assertIntermediate(helper, current, incomplete, 3);
+        current = deploy(helper, current, AllItems.EXP_NUGGET.get());
+        assertIntermediate(helper, current, incomplete, 4);
+        ModifierRecipeGameTests.assertResult(helper, press(helper, current), ENCHANTED_MAGAZINE_MODIFIER.get(),
+                "Enchanted magazine assembly");
     }
 
     static void fortuneMedal(GameTestHelper helper) {
