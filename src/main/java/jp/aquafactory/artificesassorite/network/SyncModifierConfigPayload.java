@@ -46,6 +46,9 @@ public record SyncModifierConfigPayload(ModifierValues values) implements Custom
         var shockAbsorber = payload.values.shockAbsorber();
         buffer.writeDouble(shockAbsorber.spreadReductionPerTick());
         buffer.writeDouble(shockAbsorber.recoilSuppressionSeconds());
+        var enchantedMagazine = payload.values.enchantedMagazine();
+        buffer.writeDouble(enchantedMagazine.reserveAmmoRatio());
+        buffer.writeBoolean(enchantedMagazine.limitEffectiveCountByCapacity());
     }
 
     private static SyncModifierConfigPayload read(FriendlyByteBuf buffer) {
@@ -58,7 +61,8 @@ public record SyncModifierConfigPayload(ModifierValues values) implements Custom
                 new ModifierValues.Oil(buffer.readDouble()), new ModifierValues.Oil(buffer.readDouble()),
                 new ModifierValues.MovementFire(buffer.readVarInt(), buffer.readDouble(), buffer.readVarInt(), buffer.readDouble()),
                 new ModifierValues.GyroscopeCalibration(buffer.readDouble(), buffer.readDouble(), buffer.readVarInt()),
-                new ModifierValues.ShockAbsorber(buffer.readDouble(), buffer.readDouble())));
+                new ModifierValues.ShockAbsorber(buffer.readDouble(), buffer.readDouble()),
+                new ModifierValues.EnchantedMagazine(buffer.readDouble(), buffer.readBoolean())));
     }
 
     @Override

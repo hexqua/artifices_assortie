@@ -31,6 +31,7 @@ public final class ModItemModelProvider extends ItemModelProvider {
         basicItem(ItemRegistry.MOVING_FIRE_MODIFIER.get());
         basicItem(ItemRegistry.GYROSCOPE_CALIBRATION_MODIFIER.get());
         basicItem(ItemRegistry.SHOCK_ABSORBER_MODIFIER.get());
+        basicItem(ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER.get());
         basicItem(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_PRECISION_FIRE_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_GYROSCOPE_CALIBRATION_MODIFIER.get());

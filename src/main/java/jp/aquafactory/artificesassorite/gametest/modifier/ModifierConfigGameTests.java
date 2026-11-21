@@ -40,7 +40,8 @@ public final class ModifierConfigGameTests {
                     new ModifierValues.Oil(0.8), new ModifierValues.Oil(1.2),
                     new ModifierValues.MovementFire(15, 1.35, 25, 1.15),
                     new ModifierValues.GyroscopeCalibration(0.75, 2.5, 8),
-                    new ModifierValues.ShockAbsorber(0.125, 4.0));
+                    new ModifierValues.ShockAbsorber(0.125, 4.0),
+                    new ModifierValues.EnchantedMagazine(0.175, false));
             SyncModifierConfigPayload.STREAM_CODEC.encode(buffer, new SyncModifierConfigPayload(values));
             var decoded = SyncModifierConfigPayload.STREAM_CODEC.decode(buffer);
             h.assertTrue(decoded.values().equals(values), "Config codec must preserve all gameplay and tooltip values");

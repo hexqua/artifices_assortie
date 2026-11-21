@@ -18,12 +18,14 @@
     "OilCowboyHatMixin",
     "GyroscopeSpreadMixin",
     "ShockAbsorberGunplayMixin",
-    "ShockAbsorberRecoilMixin"
+    "ShockAbsorberRecoilMixin",
+    "EnchantedMagazineReloadMixin"
   ],
   "client": [
     "GripHoldRecoilMixin",
     "GripHoldCrosshairMixin",
-    "ShockAbsorberClientRecoilMixin"
+    "ShockAbsorberClientRecoilMixin",
+    "EnchantedMagazineHudMixin"
   ],
   "injectors": {
     "defaultRequire": 1
