@@ -5,7 +5,6 @@ import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.AugmentationConfig;
 import jp.aquafactory.artificesassorite.item.augmentation.AugmentationClientBridge;
 import jp.aquafactory.artificesassorite.item.augmentation.GunAugmentation;
-import jp.aquafactory.artificesassorite.item.augmentation.AugmentationRecipe;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -17,11 +16,15 @@ import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.crafting.Recipe;
+import java.util.Optional;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmithingRecipe;
 import net.minecraft.world.item.crafting.SmithingTransformRecipe;
 import org.jetbrains.annotations.NotNull;
@@ -35,12 +38,12 @@ import java.util.Map;
 @SuppressWarnings("unused")
 @JeiPlugin
 public final class AugmentationJeiPlugin implements IModPlugin {
-    private final Map<ResourceLocation, RecipeHolder<SmithingRecipe>> knownRecipes = new HashMap<>();
+    private final Map<Identifier, RecipeHolder<SmithingRecipe>> knownRecipes = new HashMap<>();
     private List<RecipeHolder<SmithingRecipe>> visibleRecipes = List.of();
     private IRecipeManager manager;
 
     @Override
-    public @NotNull ResourceLocation getPluginUid() { return ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "augmentation"); }
+    public @NotNull Identifier getPluginUid() { return Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "augmentation"); }
 
     @Override
     public void registerItemSubtypes(@NotNull ISubtypeRegistration registration) {
@@ -69,8 +72,7 @@ public final class AugmentationJeiPlugin implements IModPlugin {
         var material = AugmentationConfig.clientMaterial();
         var client = Minecraft.getInstance();
         if (client.level == null || !material.valid()
-                || client.level.getRecipeManager().getAllRecipesFor(RecipeType.SMITHING)
-                .stream().noneMatch(holder -> holder.value() instanceof AugmentationRecipe)) {
+                || !AugmentationClientBridge.recipeAvailable) {
             visibleRecipes = List.of();
             return;
         }
@@ -79,13 +81,15 @@ public final class AugmentationJeiPlugin implements IModPlugin {
         for (var gun : GunAugmentation.eligibleItems()) {
             var gunId = BuiltInRegistries.ITEM.getKey(gun);
             var materialId = BuiltInRegistries.ITEM.getKey(material.item());
-            var id = ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID,
+            var id = Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID,
                     "jei/augmentation/" + gunId.getNamespace() + "/" + gunId.getPath() + "/" + materialId.getNamespace() + "/" + materialId.getPath());
             var recipe = knownRecipes.get(id);
             if (recipe == null) {
                 // 表示専用の具体例は server の RecipeManager に登録せず、鍛冶カテゴリの標準表示を利用する。
-                recipe = new RecipeHolder<>(id, new SmithingTransformRecipe(Ingredient.of(ItemRegistry.MODIFIER_AUGMENTATION_KIT.get()),
-                        Ingredient.of(gun), Ingredient.of(material.item()), GunAugmentation.augmentCopy(new ItemStack(gun))));
+                var result = GunAugmentation.augmentCopy(new ItemStack(gun));
+                recipe = new RecipeHolder<>(ResourceKey.create(Registries.RECIPE, id), new SmithingTransformRecipe(new Recipe.CommonInfo(false),
+                        Optional.of(Ingredient.of(ItemRegistry.MODIFIER_AUGMENTATION_KIT.get())), Ingredient.of(gun),
+                        Optional.of(Ingredient.of(material.item())), new ItemStackTemplate(gun, 1, result.getComponentsPatch())));
                 knownRecipes.put(id, recipe);
                 added.add(recipe);
             }
@@ -99,10 +103,5 @@ public final class AugmentationJeiPlugin implements IModPlugin {
     private static final class AugmentedSubtype implements ISubtypeInterpreter<ItemStack> {
         @Override
         public Object getSubtypeData(@NotNull ItemStack ingredient, @NotNull UidContext context) { return GunAugmentation.isAugmented(ingredient); }
-
-        @Override
-        public @NotNull String getLegacyStringSubtypeInfo(@NotNull ItemStack ingredient, @NotNull UidContext context) {
-            return GunAugmentation.isAugmented(ingredient) ? "augmented" : "";
-        }
     }
 }

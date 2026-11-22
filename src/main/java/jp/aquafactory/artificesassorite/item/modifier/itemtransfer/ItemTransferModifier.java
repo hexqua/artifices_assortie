@@ -7,13 +7,13 @@ import io.redspace.irons_artifice.modifier.GunModifier;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 
 public final class ItemTransferModifier implements GunModifier {
     public static final ComponentType<Integer> COUNT = new ComponentType<>(
-            ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "item_transfer_count"), () -> 0);
+            Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "item_transfer_count"), () -> 0);
 
     @Override
     public void apply(ShotComponentMap components) {

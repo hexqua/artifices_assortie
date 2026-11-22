@@ -1,5 +1,8 @@
 package jp.aquafactory.artificesassorite.gametest.modifier;
 
+import jp.aquafactory.artificesassorite.gametest.TestSnapshots;
+import net.minecraft.world.entity.EntitySpawnReason;
+
 import com.mojang.logging.LogUtils;
 import io.redspace.irons_artifice.api.GunAboutToShootEvent;
 import io.redspace.irons_artifice.api.GunShootEvent;
@@ -11,7 +14,6 @@ import io.redspace.irons_artifice.entity.SoulfireCoin;
 import io.redspace.irons_artifice.gun.ShotProfile;
 import io.redspace.irons_artifice.item.GunplayManager;
 import io.redspace.irons_artifice.menu.GunContainer;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementEffects;
 import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementModifier;
 import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementStorage;
@@ -21,7 +23,6 @@ import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import io.netty.buffer.Unpooled;
@@ -32,11 +33,12 @@ import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.Blocks;
@@ -44,33 +46,24 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.network.connection.ConnectionType;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.concurrent.atomic.AtomicInteger;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 @SuppressWarnings("unused")
 public final class PotionImbuementGameTests {
     private PotionImbuementGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.potion")
     public static void inventoryInjectionCapacityIdentityAndSave(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var modifier = new ItemStack(ItemRegistry.POTION_IMBUEMENT_MODIFIER.get());
             var inventory = new SimpleContainer(2);
             inventory.setItem(0, modifier);
             var slot = new Slot(inventory, 0, 0, 0);
-            var cursor = SlotAccess.forContainer(inventory, 1);
+            var cursor = SlotAccess.of(() -> inventory.getItem(1), stack -> inventory.setItem(1, stack));
             for (int dose = 1; dose <= 64; dose++) {
                 inventory.setItem(1, Bottle.REGULAR.stack(new PotionContents(Potions.SWIFTNESS)));
                 modifier.getItem().overrideOtherStackedOnMe(modifier, cursor.get(), slot, ClickAction.SECONDARY, f.player, cursor);
@@ -84,7 +77,17 @@ public final class PotionImbuementGameTests {
                 h.assertTrue(cursor.get() == potion && potion.getCount() == 1, "Rejected injection must preserve its input");
                 h.assertTrue(contents(modifier).doses() == 64, "Rejected injection must preserve stored doses");
             }
-            var restored = ItemStack.parse(h.getLevel().registryAccess(), modifier.save(h.getLevel().registryAccess())).orElseThrow();
+            var scaled = new ItemStack(ItemRegistry.POTION_IMBUEMENT_MODIFIER.get());
+            var customBottle = Bottle.LINGERING.stack(new PotionContents(Potions.SWIFTNESS));
+            customBottle.set(DataComponents.POTION_DURATION_SCALE, 0.5F);
+            inventory.setItem(1, customBottle);
+            scaled.getItem().overrideOtherStackedOnMe(scaled, cursor.get(), slot, ClickAction.SECONDARY, f.player, cursor);
+            var savedScale = TestSnapshots.load(TestSnapshots.save(scaled, h.getLevel().registryAccess()), h.getLevel().registryAccess());
+            h.assertTrue(contents(savedScale).potionStack().get(DataComponents.POTION_DURATION_SCALE) == 0.5F,
+                    "Custom lingering duration must survive injection and storage");
+            h.assertTrue(PotionImbuementStorage.fill(savedScale, Bottle.LINGERING, new PotionContents(Potions.SWIFTNESS), 1, false) == 0,
+                    "Different effective durations must not mix");
+            var restored = TestSnapshots.load(TestSnapshots.save(modifier, h.getLevel().registryAccess()), h.getLevel().registryAccess());
             h.assertTrue(contents(restored).equals(contents(modifier)), "Stored contents must survive an item save round trip");
             var buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), h.getLevel().registryAccess(), ConnectionType.NEOFORGE);
             try {
@@ -103,22 +106,20 @@ public final class PotionImbuementGameTests {
             var custom = new PotionContents(Potions.SWIFTNESS).withEffectAdded(new MobEffectInstance(MobEffects.REGENERATION, 200));
             h.assertTrue(PotionImbuementStorage.fill(regular, Bottle.REGULAR, custom, 1, false) == 0, "Custom effects must participate in potion identity");
             var originalEffect = new MobEffectInstance(MobEffects.REGENERATION, 200);
-            var changedCures = new MobEffectInstance(MobEffects.REGENERATION, 200);
-            changedCures.getCures().clear();
+            var hiddenParticles = new MobEffectInstance(MobEffects.REGENERATION, 200, 0, false, false);
+
             var customModifier = new ItemStack(ItemRegistry.POTION_IMBUEMENT_MODIFIER.get());
             PotionImbuementStorage.fill(customModifier, Bottle.REGULAR, PotionContents.EMPTY.withEffectAdded(originalEffect), 1, false);
-            h.assertTrue(PotionImbuementStorage.fill(customModifier, Bottle.REGULAR, PotionContents.EMPTY.withEffectAdded(changedCures), 1, false) == 0,
-                    "Matching visible effects must not hide differences in stored curing conditions");
-            h.assertTrue(!contents(customModifier).samePotionAs(new Contents(Bottle.REGULAR, PotionContents.EMPTY.withEffectAdded(changedCures), 8)),
-                    "Consecutive-dose aggregation must also distinguish curing conditions");
+            h.assertTrue(PotionImbuementStorage.fill(customModifier, Bottle.REGULAR, PotionContents.EMPTY.withEffectAdded(hiddenParticles), 1, false) == 0,
+                    "Matching visible effects must not hide differences in stored particle visibility");
+            h.assertTrue(!contents(customModifier).samePotionAs(new Contents(Bottle.REGULAR, PotionContents.EMPTY.withEffectAdded(hiddenParticles), 8)),
+                    "Consecutive-dose aggregation must also distinguish particle visibility");
         } catch (RuntimeException failure) {
             LogUtils.getLogger().error("Potion storage scenario failed", failure);
             throw failure;
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.potion")
     public static void realShotSelectsOneDoseForEveryPelletAndCancellationConsumesNothing(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var gun = equip(f, new Contents(Bottle.SPLASH, new PotionContents(Potions.SWIFTNESS), 2),
@@ -150,8 +151,6 @@ public final class PotionImbuementGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.potion")
     public static void regularPotionReplacesOilDamageAndRetainsPiercingAndTerrainDamage(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             equip(f, new Contents(Bottle.REGULAR, new PotionContents(Potions.SWIFTNESS), 1));
@@ -168,10 +167,10 @@ public final class PotionImbuementGameTests {
                 for (var target : List.of(first, second)) {
                     bullet.hit(new EntityHitResult(target, target.position()));
                     f.close(target.getHealth(), 1000, "Regular potion must replace oil damage");
-                    h.assertTrue(target.hasEffect(MobEffects.MOVEMENT_SPEED), "Every pierced target must receive the potion");
+                    h.assertTrue(target.hasEffect(MobEffects.SPEED), "Every pierced target must receive the potion");
                     PotionImbuementDisplayGameTests.assertDisplayedDuration(h,
                             new Contents(Bottle.REGULAR, new PotionContents(Potions.SWIFTNESS), 1),
-                            Objects.requireNonNull(target.getEffect(MobEffects.MOVEMENT_SPEED)));
+                            Objects.requireNonNull(target.getEffect(MobEffects.SPEED)));
                     f.close(target.getDeltaMovement().length(), 0, "Regular potion must suppress direct knockback");
                     h.assertTrue(!bullet.canTarget(target), "Pierced targets must still be recorded by the bullet");
                 }
@@ -187,12 +186,10 @@ public final class PotionImbuementGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.potion")
     public static void emptyModifiersHitPetsEvenWithBothOils(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
-            var wolf = Objects.requireNonNull(EntityType.WOLF.create(h.getLevel()));
-            wolf.setOwnerUUID(f.player.getUUID());
+            var wolf = Objects.requireNonNull(EntityType.WOLF.create(h.getLevel(), EntitySpawnReason.TRIGGERED));
+            wolf.setOwner(f.player);
             wolf.setPos(f.player.position().add(0, 0, 3));
             wolf.setNoAi(true);
             Objects.requireNonNull(wolf.getAttribute(Attributes.MAX_HEALTH)).setBaseValue(1000);
@@ -224,8 +221,6 @@ public final class PotionImbuementGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.potion")
     public static void splashBurstsIndependentlyOncePerPellet(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             equip(f, new Contents(Bottle.SPLASH, new PotionContents(Potions.SWIFTNESS), 1));
@@ -235,23 +230,21 @@ public final class PotionImbuementGameTests {
             var second = f.bullet(profile.copy());
             try {
                 first.hit(new EntityHitResult(target, target.position()));
-                h.assertTrue(target.getHealth() < 1000 && target.hasEffect(MobEffects.MOVEMENT_SPEED), "Splash must preserve bullet damage and apply the potion");
+                h.assertTrue(target.getHealth() < 1000 && target.hasEffect(MobEffects.SPEED), "Splash must preserve bullet damage and apply the potion");
                 PotionImbuementDisplayGameTests.assertDisplayedDuration(h,
                         new Contents(Bottle.SPLASH, new PotionContents(Potions.SWIFTNESS), 1),
-                        Objects.requireNonNull(target.getEffect(MobEffects.MOVEMENT_SPEED)));
+                        Objects.requireNonNull(target.getEffect(MobEffects.SPEED)));
                 h.assertTrue(first.getProfile().peek(PotionImbuementModifier.PAYLOAD) == null, "First pellet must lose its payload after bursting");
                 h.assertTrue(second.getProfile().peek(PotionImbuementModifier.PAYLOAD) != null, "Other pellets must retain their payload");
                 target.removeAllEffects();
                 first.hit(new BlockHitResult(target.position(), Direction.UP, target.blockPosition().below(), false));
-                h.assertTrue(!target.hasEffect(MobEffects.MOVEMENT_SPEED), "An already burst pellet must not apply potion effects again");
+                h.assertTrue(!target.hasEffect(MobEffects.SPEED), "An already burst pellet must not apply potion effects again");
                 second.hit(new BlockHitResult(target.position(), Direction.UP, target.blockPosition().below(), false));
-                h.assertTrue(target.hasEffect(MobEffects.MOVEMENT_SPEED), "Another pellet must still burst on terrain");
+                h.assertTrue(target.hasEffect(MobEffects.SPEED), "Another pellet must still burst on terrain");
             } finally { first.discard(); second.discard(); target.discard(); }
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.potion")
     public static void lingeringCloudsShrinkAndExpireWithoutWeakeningAppliedEffects(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             equip(f, new Contents(Bottle.LINGERING, new PotionContents(Potions.SWIFTNESS), 1));
@@ -275,11 +268,11 @@ public final class PotionImbuementGameTests {
                         target.removeAllEffects();
                         cloud.setWaitTime(0);
                         for (int tick = 0; tick < 5 && !cloud.isRemoved(); tick++) cloud.tick();
-                        if (pellets == 36) h.assertTrue(cloud.isRemoved() && !target.hasEffect(MobEffects.MOVEMENT_SPEED), "Excessive pellet counts may expire before any application");
+                        if (pellets == 36) h.assertTrue(cloud.isRemoved() && !target.hasEffect(MobEffects.SPEED), "Excessive pellet counts may expire before any application");
                         else {
-                            h.assertTrue(target.hasEffect(MobEffects.MOVEMENT_SPEED), "A viable cloud must apply its potion");
-                            h.assertTrue(Objects.requireNonNull(target.getEffect(MobEffects.MOVEMENT_SPEED)).getDuration() == 900, "Scatter must not reduce the applied effect duration");
-                            PotionImbuementDisplayGameTests.assertDisplayedDuration(h, stored, Objects.requireNonNull(target.getEffect(MobEffects.MOVEMENT_SPEED)));
+                            h.assertTrue(target.hasEffect(MobEffects.SPEED), "A viable cloud must apply its potion");
+                            h.assertTrue(Objects.requireNonNull(target.getEffect(MobEffects.SPEED)).getDuration() == 900, "Scatter must not reduce the applied effect duration");
+                            PotionImbuementDisplayGameTests.assertDisplayedDuration(h, stored, Objects.requireNonNull(target.getEffect(MobEffects.SPEED)));
                             PotionImbuementDisplayGameTests.assertDisplayedDuration(h, stored, Objects.requireNonNull(target.getEffect(MobEffects.REGENERATION)));
                             h.assertTrue(cloud.getDuration() == 600 / pellets, "Scatter must shorten cloud lifetime");
                             for (int tick = 0; tick < 610 && !cloud.isRemoved(); tick++) cloud.tick();
@@ -291,8 +284,6 @@ public final class PotionImbuementGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.potion")
     public static void instantEffectsAndSecondaryDamageDoNotPropagatePotions(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var target = f.target();
@@ -318,22 +309,20 @@ public final class PotionImbuementGameTests {
                 h.assertTrue(soulHits.get() == 0, "Instant potion damage must not trigger bullet-derived soul damage");
                 equip(f, new Contents(Bottle.REGULAR, new PotionContents(Potions.SWIFTNESS), 1));
                 var slots = new GunContainer(f.player.getMainHandItem());
-                slots.setItem(1, new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("irons_artifice", "blackpowder_charge_modifier"))));
-                slots.setItem(2, new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("irons_artifice", "voltaic_core_modifier"))));
+                slots.setItem(1, new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("irons_artifice", "blackpowder_charge_modifier"))));
+                slots.setItem(2, new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("irons_artifice", "voltaic_core_modifier"))));
                 var bullet = f.bullet(selected(f));
                 target.invulnerableTime = 0;
                 try {
                     bullet.hit(new EntityHitResult(target, target.position()));
-                    h.assertTrue(target.hasEffect(MobEffects.MOVEMENT_SPEED), "Primary target must receive the regular potion");
+                    h.assertTrue(target.hasEffect(MobEffects.SPEED), "Primary target must receive the regular potion");
                     h.assertTrue(secondary.getHealth() < 1000, "Existing secondary damage must actually run");
-                    h.assertTrue(!secondary.hasEffect(MobEffects.MOVEMENT_SPEED), "Blast and lightning targets must not receive the regular potion");
+                    h.assertTrue(!secondary.hasEffect(MobEffects.SPEED), "Blast and lightning targets must not receive the regular potion");
                 } finally { bullet.discard(); }
             } finally { NeoForge.EVENT_BUS.unregister(observe); target.discard(); secondary.discard(); }
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.potion")
     public static void regularPotionPreservesCoinConsumptionAndRedirection(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             equip(f, new Contents(Bottle.REGULAR, new PotionContents(Potions.SWIFTNESS), 1));
@@ -345,23 +334,9 @@ public final class PotionImbuementGameTests {
                 h.assertTrue(coin.isRemoved(), "Regular potion bullets must still consume struck soul coins");
                 h.assertTrue(PotionImbuementEffects.regular(bullet) && bullet.getProfile().value(ShotComponents.SOUL_DAMAGE) > 0,
                         "Coin redirection must preserve the potion and existing bullet empowerment");
-                h.assertTrue(!target.hasEffect(MobEffects.MOVEMENT_SPEED), "Coin redirection must not remotely apply potion effects");
+                h.assertTrue(!target.hasEffect(MobEffects.SPEED), "Coin redirection must not remotely apply potion effects");
             } finally { coin.discard(); bullet.discard(); target.discard(); }
         }
-        h.succeed();
-    }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.potion")
-    public static void fluidInjectionFollowsTheRuntimeProfile(GameTestHelper h) {
-        var modifier = new ItemStack(ItemRegistry.POTION_IMBUEMENT_MODIFIER.get());
-        if (ModList.get().isLoaded("create")) {
-            try { PotionImbuementCreateScenarios.filling(h, modifier); }
-            catch (RuntimeException failure) {
-                LogUtils.getLogger().error("Potion fluid injection scenario failed", failure);
-                throw failure;
-            }
-        }
-        else h.assertTrue(modifier.getCapability(Capabilities.FluidHandler.ITEM) == null, "Create fluid handling must not leak into other profiles");
         h.succeed();
     }
 

@@ -1,7 +1,6 @@
 package jp.aquafactory.artificesassorite.registry;
 
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
-import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementCompat;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -40,9 +39,6 @@ public final class CreativeTabRegistry {
         output.accept(ItemRegistry.SHOCK_ABSORBER_MODIFIER.get());
         output.accept(ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER.get());
 
-        if (SpellImbuementCompat.isAvailable()) {
-            output.accept(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get());
-        }
     }
 
     private static void addSpecialItem(CreativeModeTab.Output output) {

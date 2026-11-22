@@ -12,7 +12,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import software.bernie.geckolib.GeckoLibConstants;
+import com.geckolib.GeckoLibConstants;
 
 import static jp.aquafactory.artificesassorite.config.ClientConfig.ENCHANTED_MAGAZINE_RESERVE_HUD_Y_OFFSET;
 import static jp.aquafactory.artificesassorite.config.ClientConfig.ENCHANTED_MAGAZINE_SHOW_RESERVE_HUD;
@@ -36,7 +36,7 @@ public abstract class EnchantedMagazineHudMixin {
     @Unique private static int artificesassortie$previousSlot = -1;
 
     @Shadow
-    private static void drawScaledText(GuiGraphics graphics, Font font, String text, float x, float y,
+    private static void drawScaledText(GuiGraphicsExtractor graphics, Font font, String text, float x, float y,
                                        float scale, int color, boolean shadow) {
         throw new AssertionError();
     }
@@ -70,8 +70,8 @@ public abstract class EnchantedMagazineHudMixin {
 
     // 予備弾の描画を追加し、既存の装弾数描画をラップする他の Mod に追加分を流さない。
     @Inject(method = "render", require = 0, expect = 0, at = @At(value = "INVOKE", ordinal = 0,
-            target = "Lio/redspace/irons_artifice/client/gui/AmmoCountHudOverlay;drawScaledText(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Ljava/lang/String;FFFIZ)V"))
-    private static void artificesassortie$drawReserve(GuiGraphics graphics, DeltaTracker deltaTracker, CallbackInfo callback,
+            target = "Lio/redspace/irons_artifice/client/gui/AmmoCountHudOverlay;drawScaledText(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;Ljava/lang/String;FFFIZ)V"))
+    private static void artificesassortie$drawReserve(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo callback,
                                                       @Local(name = "font") Font font, @Local(name = "anchor") ClientConfig.Anchor anchor, @Local(name = "shadow") boolean shadow,
                                                       @Local(name = "magazineBaselineY") float magazineBaselineY, @Local(name = "reserveScale") float reserveScale,
                                                       @Local(name = "textLeft") float textLeft,
@@ -107,7 +107,7 @@ public abstract class EnchantedMagazineHudMixin {
         }
         var player = Minecraft.getInstance().player;
         ItemStack held = player == null ? ItemStack.EMPTY : player.getMainHandItem();
-        int slot = player == null ? -1 : player.getInventory().selected;
+        int slot = player == null ? -1 : player.getInventory().getSelectedSlot();
         var idComponent = GeckoLibConstants.STACK_ANIMATABLE_ID_COMPONENT.get();
         Long previousId = artificesassortie$previousGun.get(idComponent);
         Long heldId = held.get(idComponent);

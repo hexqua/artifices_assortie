@@ -9,20 +9,18 @@ import io.redspace.irons_artifice.item.GunItem;
 import io.redspace.irons_artifice.item.GunplayManager;
 import io.redspace.irons_artifice.item.MagazineContents;
 import io.redspace.irons_artifice.menu.GunContainer;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.movementfire.MovementFireEvents;
 import jp.aquafactory.artificesassorite.network.SyncStandingSnipePayload;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -33,22 +31,15 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 public final class MovementFireGameTests {
     private static final Vec3 DIRECTION = new Vec3(0, 0, 1);
 
     private MovementFireGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier", timeoutTicks = 70)
     public static void movementWindowsApplyToActualGunfire(GameTestHelper helper) throws Exception {
         var fixture = new ModifierTestFixture(helper);
         var player = fixture.player;
@@ -114,8 +105,6 @@ public final class MovementFireGameTests {
             }
         });
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier", timeoutTicks = 60)
     public static void standingHudDistinguishesEquippingFromCompletion(GameTestHelper helper) {
         var level = helper.getLevel();
         var profile = new GameProfile(UUID.randomUUID(), "standing_hud_test");
@@ -131,7 +120,7 @@ public final class MovementFireGameTests {
                 }
             }
         };
-        var gun = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("irons_artifice", "musket")));
+        var gun = new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("irons_artifice", "musket")));
         var slots = new GunContainer(gun);
         slots.setItem(0, new ItemStack(ItemRegistry.STANDING_SNIPE_MODIFIER.get()));
         slots.setChanged();

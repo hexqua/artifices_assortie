@@ -2,13 +2,11 @@ package jp.aquafactory.artificesassorite.gametest.modifier;
 
 import io.redspace.irons_artifice.item.MagazineContents;
 import io.redspace.irons_artifice.menu.GunContainer;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
@@ -29,18 +27,11 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.enchanting.EnchantedEntityLootEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.Optional;
 import java.util.function.Consumer;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 public final class FortuneMedalGameTests {
     private FortuneMedalGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void effectiveCountLimitsOnlyMedalsAndZeroRemovesLimit(GameTestHelper h) throws Exception {
         try (var f = new ModifierTestFixture(h); var ignored = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS)) {
             var target = f.target();
@@ -67,8 +58,6 @@ public final class FortuneMedalGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void currentHandsUseMaximumAndExistingLootingSurvives(GameTestHelper h) throws Exception {
         try (var f = new ModifierTestFixture(h); var ignored = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS)) {
             var target = f.target();
@@ -99,8 +88,6 @@ public final class FortuneMedalGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void playerKillCreditWorksWithoutGunDamageOrDirectAttacker(GameTestHelper h) throws Exception {
         try (var f = new ModifierTestFixture(h); var ignored = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS)) {
             f.equip("flintlock", ItemRegistry.FORTUNE_MEDAL_MODIFIER.get(), 3);
@@ -109,7 +96,7 @@ public final class FortuneMedalGameTests {
                 var fire = target.damageSources().onFire();
                 assertLoot(h, context(h, target, fire), 0, "Uncredited environmental damage");
                 var attack = target.damageSources().playerAttack(f.player);
-                h.assertTrue(target.hurt(attack, 1), "Ordinary player attack must establish kill credit");
+                h.assertTrue(target.hurtServer(h.getLevel(), attack, 1), "Ordinary player attack must establish kill credit");
                 h.assertTrue(target.getKillCredit() == f.player, "Victim must retain player kill credit");
                 assertLoot(h, context(h, target, attack), 3, "Non-projectile player attack");
                 assertLoot(h, context(h, target, fire), 3, "Fire damage with player kill credit");
@@ -119,8 +106,6 @@ public final class FortuneMedalGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void lowerPriorityBonusAddsAfterMedalLimitInBothLootPaths(GameTestHelper h) throws Exception {
         try (var f = new ModifierTestFixture(h); var ignored = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS)) {
             f.equip("flintlock", ItemRegistry.FORTUNE_MEDAL_MODIFIER.get(), 3);
@@ -144,7 +129,7 @@ public final class FortuneMedalGameTests {
     }
 
     private static Holder<Enchantment> enchantment(GameTestHelper h, ResourceKey<Enchantment> key) {
-        return h.getLevel().registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(key);
+        return h.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(key);
     }
 
     private static LootContext context(GameTestHelper h, LivingEntity victim, DamageSource source) {

@@ -18,7 +18,7 @@ public final class AugmentationTooltips {
         if (!material.valid()) {
             tooltip.accept(Component.translatable(PREFIX + "tooltip.invalid", material.itemId()).withStyle(ChatFormatting.RED));
         } else {
-            tooltip.accept(Component.translatable(PREFIX + "tooltip.desc_1", material.item().getDescription()).withStyle(ChatFormatting.GRAY));
+            tooltip.accept(Component.translatable(PREFIX + "tooltip.desc_1", material.item().getDefaultInstance().getHoverName()).withStyle(ChatFormatting.GRAY));
         }
         tooltip.accept(Component.translatable(PREFIX + "tooltip.desc_2").withStyle(ChatFormatting.GRAY));
         if (!expanded) {
@@ -26,7 +26,7 @@ public final class AugmentationTooltips {
             return;
         }
         tooltip.accept(Component.translatable(PREFIX + "detail.header").withStyle(ChatFormatting.GOLD));
-        eligible.stream().limit(limit).forEach(item -> tooltip.accept(Component.translatable(PREFIX + "detail.item", item.getDescription())
+        eligible.stream().limit(limit).forEach(item -> tooltip.accept(Component.translatable(PREFIX + "detail.item", item.getDefaultInstance().getHoverName())
                 .withStyle(ChatFormatting.GRAY)));
         if (eligible.size() > limit) {
             tooltip.accept(Component.translatable(PREFIX + (jeiLoaded ? "detail.overflow_jei" : "detail.overflow"), eligible.size() - limit)

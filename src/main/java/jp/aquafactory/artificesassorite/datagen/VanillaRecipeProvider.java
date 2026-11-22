@@ -1,46 +1,37 @@
 package jp.aquafactory.artificesassorite.datagen;
 
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.AllItems;
 import io.redspace.irons_artifice.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.augmentation.AugmentationRecipe;
-import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementRecipe;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.SpecialRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
-import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
-import net.neoforged.neoforge.common.conditions.NotCondition;
 import net.neoforged.neoforge.common.Tags;
 
-import java.util.concurrent.CompletableFuture;
 
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.*;
 
 public final class VanillaRecipeProvider extends RecipeProvider {
-    public VanillaRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-        super(output, registries);
+    public VanillaRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
+        super(registries, output);
     }
 
     @Override
-    protected void buildRecipes(RecipeOutput output) {
+    protected void buildRecipes() {
         output.accept(id("smithing/modifier_augmentation"), new AugmentationRecipe(), null);
-        SpecialRecipeBuilder.special(SpellImbuementRecipe::new)
-                .save(output.withConditions(new ModLoadedCondition("irons_spellbooks")), id("crafting/spell_imbuement_school"));
-        var createLoaded = new ModLoadedCondition("create");
-        var fallback = output.withConditions(new NotCondition(createLoaded));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ENCHANTED_MAGAZINE_MODIFIER.get())
+
+        shaped(RecipeCategory.MISC, ENCHANTED_MAGAZINE_MODIFIER.get())
                 .pattern("GQ ")
                 .pattern("EEQ")
                 .pattern("GBB")
@@ -49,9 +40,9 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('B', Items.EXPERIENCE_BOTTLE)
                 .define('Q', Items.QUARTZ_BLOCK)
                 .unlockedBy("has_enchanted_bullet_modifier", has(ItemRegistry.ENCHANTED_BULLET_MODIFIER.get()))
-                .save(fallback, id("crafting/enchanted_magazine_modifier"));
+                .save(output, id("crafting/enchanted_magazine_modifier"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, HEALING_OIL_MODIFIER.get())
+        shaped(RecipeCategory.MISC, HEALING_OIL_MODIFIER.get())
                 .pattern(" M ")
                 .pattern("MPM")
                 .pattern("CG ")
@@ -61,9 +52,9 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
                 .define('G', ItemRegistry.GUN_OIL.get())
                 .unlockedBy("has_gun_oil", has(ItemRegistry.GUN_OIL.get()))
-                .save(fallback, id("crafting/healing_oil_modifier"));
+                .save(output, id("crafting/healing_oil_modifier"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, HARMING_OIL_MODIFIER.get())
+        shaped(RecipeCategory.MISC, HARMING_OIL_MODIFIER.get())
                 .pattern(" F ")
                 .pattern("FPF")
                 .pattern("CG ")
@@ -73,9 +64,9 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
                 .define('G', ItemRegistry.GUN_OIL.get())
                 .unlockedBy("has_gun_oil", has(ItemRegistry.GUN_OIL.get()))
-                .save(fallback, id("crafting/harming_oil_modifier"));
+                .save(output, id("crafting/harming_oil_modifier"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, POTION_IMBUEMENT_MODIFIER.get())
+        shaped(RecipeCategory.MISC, POTION_IMBUEMENT_MODIFIER.get())
                 .pattern(" W ")
                 .pattern("HPD")
                 .pattern("CG ")
@@ -86,9 +77,9 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
                 .define('G', Items.GLASS_BOTTLE)
                 .unlockedBy("has_venom_capsule", has(ItemRegistry.VENOM_CAPSULE.get()))
-                .save(fallback, id("crafting/potion_imbuement_modifier"));
+                .save(output, id("crafting/potion_imbuement_modifier"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, EXCAVATION_MODIFIER.get())
+        shaped(RecipeCategory.MISC, EXCAVATION_MODIFIER.get())
                 .pattern(" P ")
                 .pattern("DMD")
                 .pattern("FCF")
@@ -98,20 +89,10 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('F', Items.FLINT)
                 .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
                 .unlockedBy("has_clockwork_components", has(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
-                .save(fallback, id("crafting/excavation_modifier"));
+                .save(output, id("crafting/excavation_modifier"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, EXCAVATION_MODIFIER.get())
-                .pattern(" D ")
-                .pattern("DMD")
-                .pattern("FCF")
-                .define('D', AllBlocks.MECHANICAL_DRILL.get())
-                .define('M', ItemRegistry.BREACHING_SHELL.get())
-                .define('F', Items.FLINT)
-                .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
-                .unlockedBy("has_clockwork_components", has(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
-                .save(output.withConditions(createLoaded), id("compat/create/excavation_modifier"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MODIFIER_AUGMENTATION_KIT.get())
+        shaped(RecipeCategory.MISC, MODIFIER_AUGMENTATION_KIT.get())
                 .pattern("LPL")
                 .pattern("CCC")
                 .pattern("LNL")
@@ -122,7 +103,7 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_netherite_pickaxe", has(Items.NETHERITE_PICKAXE))
                 .save(output, id("crafting/modifier_augmentation_kit"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, PRECISION_FIRE_MODIFIER.get())
+        shaped(RecipeCategory.MISC, PRECISION_FIRE_MODIFIER.get())
                 .pattern(" RG")
                 .pattern("SMR")
                 .pattern("SS ")
@@ -131,9 +112,9 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('R', Items.REDSTONE)
                 .define('G', Items.SPYGLASS)
                 .unlockedBy("has_mechanical_components", has(ItemRegistry.MECHANICAL_COMPONENTS.get()))
-                .save(fallback, id("crafting/precision_fire_modifier"));
+                .save(output, id("crafting/precision_fire_modifier"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, GYROSCOPE_CALIBRATION_MODIFIER.get())
+        shaped(RecipeCategory.MISC, GYROSCOPE_CALIBRATION_MODIFIER.get())
                 .pattern(" Q ")
                 .pattern("CPC")
                 .pattern(" M ")
@@ -142,9 +123,9 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('P', Items.COMPASS)
                 .define('M', ItemRegistry.CLOCKWORK_COMPONENTS.get())
                 .unlockedBy("has_quartz", has(Items.QUARTZ))
-                .save(fallback, id("crafting/gyroscope_calibration_modifier"));
+                .save(output, id("crafting/gyroscope_calibration_modifier"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SHOCK_ABSORBER_MODIFIER.get())
+        shaped(RecipeCategory.MISC, SHOCK_ABSORBER_MODIFIER.get())
                 .pattern(" N ")
                 .pattern("SB ")
                 .pattern(" M ")
@@ -153,9 +134,9 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('B', ItemRegistry.BUFFER_SPRING.get())
                 .define('M', ItemRegistry.CLOCKWORK_COMPONENTS.get())
                 .unlockedBy("has_netherite_scrap", has(Items.NETHERITE_SCRAP))
-                .save(fallback, id("crafting/shock_absorber_modifier"));
+                .save(output, id("crafting/shock_absorber_modifier"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, FORTUNE_MEDAL_MODIFIER.get())
+        shaped(RecipeCategory.MISC, FORTUNE_MEDAL_MODIFIER.get())
                 .pattern(" D ")
                 .pattern("GMG")
                 .pattern(" R ")
@@ -164,9 +145,9 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('M', ItemRegistry.MECHANICAL_COMPONENTS.get())
                 .define('R', Items.RABBIT_FOOT)
                 .unlockedBy("has_mechanical_components", has(ItemRegistry.MECHANICAL_COMPONENTS.get()))
-                .save(fallback, id("crafting/fortune_medal_modifier"));
+                .save(output, id("crafting/fortune_medal_modifier"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ITEM_TRANSFER_MODIFIER.get())
+        shaped(RecipeCategory.MISC, ITEM_TRANSFER_MODIFIER.get())
                 .pattern("MI ")
                 .pattern("ECE")
                 .pattern(" GM")
@@ -178,7 +159,7 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_clockwork_components", has(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
                 .save(output, id("crafting/item_transfer_modifier"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, GRIP_HOLD_STABILIZATION_MODIFIER.get())
+        shaped(RecipeCategory.MISC, GRIP_HOLD_STABILIZATION_MODIFIER.get())
                 .pattern(" V ")
                 .pattern("HMH")
                 .pattern("LIL")
@@ -188,23 +169,10 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('L', Items.LEATHER)
                 .define('I', Items.IRON_BLOCK)
                 .unlockedBy("has_mechanical_components", has(ItemRegistry.MECHANICAL_COMPONENTS.get()))
-                .save(fallback, id("crafting/grip_hold_stabilization_modifier"));
+                .save(output, id("crafting/grip_hold_stabilization_modifier"));
 
-        // Create 用でも通常の作業台で作れるよう、バニラ形式として生成する。
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, GRIP_HOLD_STABILIZATION_MODIFIER.get())
-                .pattern(" V ")
-                .pattern("HMH")
-                .pattern("CIC")
-                .define('V', ItemRegistry.GAS_VENT.get())
-                .define('H', ItemRegistry.HAIR_TRIGGER.get())
-                .define('M', ItemRegistry.MECHANICAL_COMPONENTS.get())
-                .define('C', AllItems.CARDBOARD.get())
-                .define('I', Items.IRON_BLOCK)
-                .unlockedBy("has_mechanical_components", has(ItemRegistry.MECHANICAL_COMPONENTS.get()))
-                .save(output.withConditions(createLoaded), id("compat/create/grip_hold_stabilization_modifier"));
 
-        // 入手時期がMODに左右されないようにCreate 導入時でもレシピを変更しない.
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, STANDING_SNIPE_MODIFIER.get())
+        shaped(RecipeCategory.MISC, STANDING_SNIPE_MODIFIER.get())
                 .pattern(" A ")
                 .pattern("RCG")
                 .pattern("ADA")
@@ -216,7 +184,7 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_mechanical_components", has(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
                 .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MOVING_FIRE_MODIFIER.get())
+        shaped(RecipeCategory.MISC, MOVING_FIRE_MODIFIER.get())
                 .pattern(" A ")
                 .pattern("RCG")
                 .pattern("ASA")
@@ -229,12 +197,9 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .save(output);
 
 
-        // RecipeProvider の名前は固定のため、一つの Provider から形式別の生成処理へ委譲する。
-        CreateRecipes.buildRecipes(output);
-        SpellbooksRecipes.buildRecipes(output);
     }
 
-    private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, path);
+    private static ResourceKey<Recipe<?>> id(String path) {
+        return ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, path));
     }
 }

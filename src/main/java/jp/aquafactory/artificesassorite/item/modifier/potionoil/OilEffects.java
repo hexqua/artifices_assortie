@@ -7,12 +7,13 @@ import io.redspace.irons_artifice.gun.ShotProfile;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 
 public final class OilEffects {
     public static final ResourceKey<DamageType> BULLET = type("oil_bullet");
@@ -21,7 +22,7 @@ public final class OilEffects {
     private OilEffects() {}
 
     private static ResourceKey<DamageType> type(String name) {
-        return ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, name));
+        return ResourceKey.create(Registries.DAMAGE_TYPE, Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, name));
     }
 
     public static boolean enabled(ShotProfile profile) {
@@ -44,17 +45,18 @@ public final class OilEffects {
     }
 
     public static boolean affect(Bullet bullet, Entity target, float amount, boolean blast) {
+        if (!(bullet.level() instanceof ServerLevel level)) return false;
         if (heals(bullet, target)) {
             var living = livingTarget(target);
             // 回復本体は耐性計算を通さないが、コイン由来の別系統の追加 damage は維持する。
             if (living == null || !living.isAlive()) return false;
             double soul = bullet.getProfile().value(ShotComponents.SOUL_DAMAGE);
-            if (soul > 0) living.hurt(DamageSources.soul(bullet.level(), bullet, bullet.getOwner()), (float) (amount * soul));
+            if (soul > 0) living.hurtServer(level, DamageSources.soul(bullet.level(), bullet, bullet.getOwner()), (float) (amount * soul));
             living.heal(amount);
             if (amount > 0 && living.isAlive()) OilHealingParticles.emit(living);
             return true;
         }
-        var holder = bullet.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(blast ? BLAST : BULLET);
-        return target.hurt(new DamageSource(holder, bullet, bullet.getOwner()), amount);
+        var holder = bullet.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(blast ? BLAST : BULLET);
+        return target.hurtServer(level, new DamageSource(holder, bullet, bullet.getOwner()), amount);
     }
 }

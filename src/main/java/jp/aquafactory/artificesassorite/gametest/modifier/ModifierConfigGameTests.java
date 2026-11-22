@@ -1,7 +1,6 @@
 package jp.aquafactory.artificesassorite.gametest.modifier;
 
 import io.netty.buffer.Unpooled;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.fortunemedal.FortuneMedalModifier;
@@ -12,25 +11,17 @@ import jp.aquafactory.artificesassorite.item.modifier.movementfire.MovementFireM
 import jp.aquafactory.artificesassorite.item.modifier.precisionfire.PrecisionFireModifier;
 import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementModifier;
 import jp.aquafactory.artificesassorite.network.SyncModifierConfigPayload;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.Objects;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 public final class ModifierConfigGameTests {
     private ModifierConfigGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void synchronizedConfigUpdatesTooltipAndResets(GameTestHelper h) {
         var previous = ServerConfig.clientValues();
         var buffer = new FriendlyByteBuf(Unpooled.buffer());
@@ -109,8 +100,6 @@ public final class ModifierConfigGameTests {
         } finally { buffer.release(); ServerConfig.updateClient(previous); }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void gyroscopeTooltipOmitsDisabledEffects(GameTestHelper h) {
         var previous = ServerConfig.clientValues();
         var defaults = ModifierValues.DEFAULTS;

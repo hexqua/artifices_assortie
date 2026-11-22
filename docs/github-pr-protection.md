@@ -19,10 +19,12 @@
 - Actions は有効。GitHub 所有 action と `gradle/actions/wrapper-validation@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e` を許可し、verified creator の一括許可は無効とする。
 - action は完全 SHA 固定を必須とする。wrapper 検証 action の SHA を更新するときは、workflow と GitHub 側の許可リストを同時に更新する。
 - 既定 workflow 権限は read。Actions による PR 作成・承認は許可しない。
-- `.github/workflows/pr-ci.yml` は `main` 向けの `pull_request` で `build` と `gametest` を独立実行する。`pull_request_target` は使用しない。
-- Java 21、secrets 不使用、`contents: read`、checkout 認証情報の非永続化、Gradle wrapper 検証を維持する。
-- `gametest` は通常構成の `runGameTestServer` のみ実行する。Irons / Create はローカル検証用、Graphic は client 専用とする。
+- `.github/workflows/pr-ci.yml` はこのブランチでは `26.1.2-main` 向けの `pull_request` で `build` と `gametest` を独立実行する。`pull_request_target` は使用しない。
+- Java 25、secrets 不使用、`contents: read`、checkout 認証情報の非永続化、Gradle wrapper 検証を維持する。
+- `gametest` は通常構成の `runGameTestServer` のみ実行する。
 - `gametest.runtime` のロード・混入確認と、機能・連携の挙動テストは保証範囲を区別する。
+
+26.1.2用の保護ルールは、最初のPRで両checkの起動を確認してから同等の条件を設定する。ローカルの移植作業ではGitHub側の設定を変更しない。
 
 ## main の保護ルール
 

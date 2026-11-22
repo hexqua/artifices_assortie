@@ -7,26 +7,17 @@ import io.redspace.irons_artifice.item.GunplayManager;
 import io.redspace.irons_artifice.item.MagazineContents;
 import io.redspace.irons_artifice.menu.GunContainer;
 import io.redspace.irons_artifice.utils.RecoilHelper;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 public final class ShockAbsorberGameTests {
     private static final Vec3 DIRECTION = new Vec3(0, 0, 1);
 
     private ShockAbsorberGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void sustainedFireReducesSpreadAndAddedRecoil(GameTestHelper helper) {
         var fixture = new ModifierTestFixture(helper);
         try {
@@ -61,8 +52,6 @@ public final class ShockAbsorberGameTests {
             }
         });
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void zeroRecoilTimeStillAppliesTheFirstImpulse(GameTestHelper helper) throws Exception {
         var defaults = ModifierValues.DEFAULTS;
         var config = new ModifierValues(defaults.precisionFire(), defaults.gripHoldStabilization(), defaults.fortuneMedal(),

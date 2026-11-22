@@ -11,7 +11,7 @@ import jp.aquafactory.artificesassorite.item.modifier.potionoil.OilEffects;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -46,11 +46,11 @@ public abstract class OilBlastMixin {
     }
 
     @WrapOperation(method = "onHit", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
-    private boolean convertOilBlast(Entity target, DamageSource source, float amount, Operation<Boolean> original,
+            target = "Lnet/minecraft/world/entity/Entity;hurtServer(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
+    private boolean convertOilBlast(Entity target, ServerLevel level, DamageSource source, float amount, Operation<Boolean> original,
                                    @Local(argsOnly = true) HitEntityAccumulator accumulator) {
         var bullet = ARTIFICESASSORTIE_BLAST.get();
-        if (bullet == null || !OilEffects.enabled(bullet.getProfile())) return original.call(target, source, amount);
+        if (bullet == null || !OilEffects.enabled(bullet.getProfile())) return original.call(target, level, source, amount);
         if (OilEffects.livingTarget(target) instanceof EnderDragon dragon && !accumulator.add(dragon)) return false;
         return OilEffects.affect(bullet, target, amount, true);
     }

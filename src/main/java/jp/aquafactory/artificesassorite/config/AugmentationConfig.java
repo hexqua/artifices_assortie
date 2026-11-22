@@ -3,7 +3,7 @@ package jp.aquafactory.artificesassorite.config;
 import com.mojang.logging.LogUtils;
 import jp.aquafactory.artificesassorite.item.augmentation.AugmentationClientBridge;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -31,8 +31,8 @@ public final class AugmentationConfig {
     }
 
     public static Material resolve(String raw) {
-        ResourceLocation id = ResourceLocation.tryParse(raw);
-        boolean valid = id != null && BuiltInRegistries.ITEM.containsKey(id) && BuiltInRegistries.ITEM.get(id) != Items.AIR;
+        Identifier id = Identifier.tryParse(raw);
+        boolean valid = id != null && BuiltInRegistries.ITEM.containsKey(id) && BuiltInRegistries.ITEM.getValue(id) != Items.AIR;
         return new Material(raw, valid);
     }
 
@@ -47,8 +47,8 @@ public final class AugmentationConfig {
 
     public record Material(String itemId, boolean valid) {
         public Item item() {
-            ResourceLocation id = ResourceLocation.tryParse(itemId);
-            return valid && id != null ? BuiltInRegistries.ITEM.get(id) : Items.AIR;
+            Identifier id = Identifier.tryParse(itemId);
+            return valid && id != null ? BuiltInRegistries.ITEM.getValue(id) : Items.AIR;
         }
     }
 }

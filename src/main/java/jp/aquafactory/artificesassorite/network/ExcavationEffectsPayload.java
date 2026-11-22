@@ -5,7 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public record ExcavationEffectsPayload(int offset, List<DestroyedBlock> blocks) implements CustomPacketPayload {
     public static final int MAX_BLOCKS_PER_PACKET = 256;
-    public static final Type<ExcavationEffectsPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "excavation_effects"));
+    public static final Type<ExcavationEffectsPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "excavation_effects"));
     public static final StreamCodec<FriendlyByteBuf, ExcavationEffectsPayload> STREAM_CODEC = StreamCodec.of(
             (buffer, payload) -> {
                 buffer.writeVarInt(payload.offset);

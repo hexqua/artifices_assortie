@@ -16,7 +16,7 @@ import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.network.Networks;
 import jp.aquafactory.artificesassorite.network.SyncGripHoldRecoilPayload;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -34,7 +34,7 @@ import java.util.WeakHashMap;
 
 @EventBusSubscriber(modid = ArtificesAssortie.MODID)
 public final class GripHoldStabilizationEvents {
-    private static final ResourceLocation MOVEMENT = ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "grip_hold_ads_movement");
+    private static final Identifier MOVEMENT = Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "grip_hold_ads_movement");
     private static final Map<ServerPlayer, State> STATES = new WeakHashMap<>();
     private static final class State {
         ItemStack stack;
@@ -117,10 +117,10 @@ public final class GripHoldStabilizationEvents {
     public static void onCompose(ComposeShotEvent event) {
         LivingEntity shooter = event.getEntity();
         boolean aiming = shooter instanceof ServerPlayer player ? active(player)
-                : shooter.level().isClientSide && GripHoldClientBridge.aiming(shooter);
+                : shooter.level().isClientSide() && GripHoldClientBridge.aiming(shooter);
         if (!aiming) return;
         int count = event.getShotProfile().peek(GripHoldStabilizationModifier.COUNT);
-        var values = shooter.level().isClientSide ? ServerConfig.clientValues().gripHoldStabilization() : ServerConfig.serverValues().gripHoldStabilization();
+        var values = shooter.level().isClientSide() ? ServerConfig.clientValues().gripHoldStabilization() : ServerConfig.serverValues().gripHoldStabilization();
         event.getShotProfile().modifyValue(ShotComponents.CAMERA_RECOIL_MULTIPLIER,
                 new ValueModifier(Math.pow(values.adsRecoilMultiplier(), count) - 1, ValueModifier.Operation.MULTIPLY_TOTAL, ValueModifier.Type.HARMFUL));
         event.getShotProfile().modifyValue(ShotComponents.SPREAD,

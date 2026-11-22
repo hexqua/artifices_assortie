@@ -1,5 +1,7 @@
 package jp.aquafactory.artificesassorite.gametest.modifier;
 
+import net.minecraft.world.entity.EntitySpawnReason;
+
 import io.redspace.irons_artifice.data.ShotComponents;
 import io.redspace.irons_artifice.data.Value;
 import io.redspace.irons_artifice.data.SoulToken;
@@ -8,7 +10,6 @@ import io.redspace.irons_artifice.entity.SoulfireCoin;
 import io.redspace.irons_artifice.gun.ShotProfile;
 import io.redspace.irons_artifice.item.MagazineContents;
 import io.redspace.irons_artifice.menu.GunContainer;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.potionoil.OilModifier;
@@ -16,12 +17,11 @@ import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.registry.SoundRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -31,27 +31,26 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownSplashPotion;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.PlayLevelSoundEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 @SuppressWarnings("unused")
 public final class OilGameTests {
     private OilGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.oil")
     public static void directDamageHealingAndCombinedModes(GameTestHelper h) throws Exception {
         try (var f = new ModifierTestFixture(h); var ignored = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS)) {
             var cow = f.target();
@@ -76,8 +75,6 @@ public final class OilGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.oil")
     public static void witchResistanceDoesNotStackWithOilCount(GameTestHelper h) throws Exception {
         try (var f = new ModifierTestFixture(h); var ignored = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS)) {
             var witch = mob(h, EntityType.WITCH, new Vec3(3, 2, 4));
@@ -96,8 +93,6 @@ public final class OilGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.oil")
     public static void healingTargetsPetsAndOwnerOnlyAfterLeaving(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var wolf = mob(h, EntityType.WOLF, new Vec3(3, 2, 4));
@@ -126,8 +121,6 @@ public final class OilGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.oil")
     public static void blastHealsOwnerAndDoesNotDoubleHealDirectTarget(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var cow = f.target();
@@ -152,8 +145,6 @@ public final class OilGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.oil")
     public static void precisionFireIsInertForDamageHealingAndFeedback(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var cow = f.target();
@@ -181,11 +172,9 @@ public final class OilGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.oil")
     public static void dragonPartsHealOrDamageWithoutDuplicateHits(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
-            var dragon = Objects.requireNonNull(EntityType.ENDER_DRAGON.create(h.getLevel()));
+            var dragon = Objects.requireNonNull(EntityType.ENDER_DRAGON.create(h.getLevel(), EntitySpawnReason.TRIGGERED));
             dragon.setPos(h.absoluteVec(new Vec3(2, 3, 3)));
             dragon.setNoAi(true);
             dragon.setHealth(100);
@@ -208,8 +197,6 @@ public final class OilGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.oil")
     public static void oilDamageBypassesBlockingShield(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var defender = mob(h, EntityType.HUSK, new Vec3(1, 2, 4));
@@ -223,8 +210,16 @@ public final class OilGameTests {
                 h.assertTrue(defender.isBlocking(), "Shield fixture must actually be blocking");
                 try (var shot = new Shot(f, profile(f, null, null))) {
                     shot.bullet.setPos(defender.position().add(0, 0, -1));
-                    h.assertTrue(defender.isDamageSourceBlocked(DamageSources.bullet(h.getLevel(), shot.bullet, f.player)),
+                    h.assertTrue(defender.applyItemBlocking(h.getLevel(), DamageSources.bullet(h.getLevel(), shot.bullet, f.player), 1) > 0,
                             "Control bullet must face the raised shield");
+                    var stack = PotionContents.createItemStack(Items.SPLASH_POTION, Potions.HEALING);
+                    var potion = new ThrownSplashPotion(h.getLevel(), f.player, stack);
+                    potion.setPos(shot.bullet.position());
+                    float before = defender.getHealth();
+                    potion.onHitAsPotion(h.getLevel(), stack, new EntityHitResult(defender));
+                    h.assertTrue(defender.getHealth() < before, "Vanilla splash healing must damage a shielding undead target");
+                    defender.setHealth(before);
+                    defender.invulnerableTime = 0;
                 }
                 try (var shot = new Shot(f, profile(f, ItemRegistry.HEALING_OIL_MODIFIER.get(), null))) {
                     shot.bullet.setPos(defender.position().add(0, 0, -1));
@@ -233,12 +228,53 @@ public final class OilGameTests {
                     f.close(before - defender.getHealth(), shot.bullet.resolveDamage(), "Oil damage must bypass a raised shield");
                     h.assertTrue(defender.getOffhandItem().getDamageValue() == 0, "Bypassed shield must not lose durability");
                 }
+                var harming = PotionContents.createItemStack(Items.SPLASH_POTION, Potions.HARMING);
+                var splash = new ThrownSplashPotion(h.getLevel(), f.player, harming);
+                splash.setPos(defender.position().add(0, 0, -0.5));
+                float injured = defender.getHealth();
+                splash.onHitAsPotion(h.getLevel(), harming, new EntityHitResult(defender));
+                h.assertTrue(defender.getHealth() > injured, "Vanilla splash harming must heal a shielding undead target");
+                defender.invulnerableTime = 0;
+                try (var shot = new Shot(f, profile(f, ItemRegistry.HEALING_OIL_MODIFIER.get(), upstream("blackpowder_charge_modifier")))) {
+                    var impact = defender.position().add(0, 0, -0.5);
+                    shot.bullet.setPos(impact);
+                    float before = defender.getHealth();
+                    shot.bullet.hit(new BlockHitResult(impact, Direction.UP, defender.blockPosition().below(), false));
+                    h.assertTrue(defender.getHealth() < before, "Oil blast must reach the shielding undead target");
+                }
             } finally { defender.discard(); }
+
+            var living = mob(h, EntityType.PILLAGER, new Vec3(1, 2, 4));
+            try {
+                living.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.SHIELD));
+                living.startUsingItem(InteractionHand.OFF_HAND);
+                for (int tick = 0; tick < 6; tick++) living.tick();
+                living.setYRot(180);
+                living.setYHeadRot(180);
+                living.setHealth(100);
+                for (var potionType : List.of(Potions.HARMING, Potions.HEALING)) {
+                    var stack = PotionContents.createItemStack(Items.SPLASH_POTION, potionType);
+                    var potion = new ThrownSplashPotion(h.getLevel(), f.player, stack);
+                    potion.setPos(living.position().add(0, 0, -0.5));
+                    float before = living.getHealth();
+                    potion.onHitAsPotion(h.getLevel(), stack, new EntityHitResult(living));
+                    boolean heals = potionType.equals(Potions.HEALING);
+                    h.assertTrue(living.isBlocking() && (heals ? living.getHealth() > before : living.getHealth() < before),
+                            "Vanilla splash effect must reach a shielding living target: " + potionType);
+                    var oil = heals ? ItemRegistry.HEALING_OIL_MODIFIER.get() : ItemRegistry.HARMING_OIL_MODIFIER.get();
+                    living.invulnerableTime = 0;
+                    try (var shot = new Shot(f, profile(f, oil, null))) {
+                        shot.bullet.setPos(potion.position());
+                        before = living.getHealth();
+                        shot.hit(living, false);
+                        h.assertTrue(heals ? living.getHealth() > before : living.getHealth() < before,
+                                "Oil impact must follow the vanilla shield result: " + potionType);
+                    }
+                }
+            } finally { living.discard(); }
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.oil")
     public static void cowboyHatReloadsOnlyOnOilBulletKills(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var cow = f.target();
@@ -255,8 +291,6 @@ public final class OilGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.oil")
     public static void independentConfigStacksAndTooltipColors(GameTestHelper h) throws Exception {
         var defaults = ModifierValues.DEFAULTS;
         var previous = ServerConfig.clientValues();
@@ -285,8 +319,6 @@ public final class OilGameTests {
         } finally { ServerConfig.updateClient(previous); }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.oil")
     public static void burningAndChainLightningRemainOffensive(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var target = f.target();
@@ -308,8 +340,6 @@ public final class OilGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.oil")
     public static void coinGenerationAndSoulDamageSurviveHealingConversion(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var target = f.target();
@@ -358,11 +388,11 @@ public final class OilGameTests {
     }
 
     private static Item upstream(String path) {
-        return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("irons_artifice", path));
+        return BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("irons_artifice", path));
     }
 
     private static <T extends Mob> T mob(GameTestHelper h, EntityType<T> type, Vec3 position) {
-        var mob = Objects.requireNonNull(type.create(h.getLevel()));
+        var mob = Objects.requireNonNull(type.create(h.getLevel(), EntitySpawnReason.TRIGGERED));
         mob.setNoAi(true);
         mob.setNoGravity(true);
         mob.setPos(h.absoluteVec(position));

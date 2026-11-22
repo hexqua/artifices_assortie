@@ -12,7 +12,7 @@ import jp.aquafactory.artificesassorite.item.modifier.ModifierText;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -28,7 +28,7 @@ public final class OilModifier implements GunModifier {
     public OilModifier(boolean healing) { this.healing = healing; }
 
     private static ComponentType<Integer> count(String name) {
-        return new ComponentType<>(ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, name), () -> 0);
+        return new ComponentType<>(Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, name), () -> 0);
     }
 
     @Override
@@ -40,7 +40,7 @@ public final class OilModifier implements GunModifier {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onCompose(ComposeShotEvent event) {
         var profile = event.getShotProfile();
-        var values = event.getEntity().level().isClientSide ? ServerConfig.clientValues() : ServerConfig.serverValues();
+        var values = event.getEntity().level().isClientSide() ? ServerConfig.clientValues() : ServerConfig.serverValues();
         if (profile.peek(HEALING) > 0) profile.modifyValue(ShotComponents.DAMAGE, new ValueModifier(
                 Math.pow(values.healingOil().damageMultiplier(), profile.peek(HEALING)) - 1,
                 ValueModifier.Operation.MULTIPLY_TOTAL, ValueModifier.Type.BENEFICIAL));
@@ -64,7 +64,7 @@ public final class OilModifier implements GunModifier {
         for (int index = 0; index < colors.length; index++) {
             int line = index + 2;
             var text = line == 5 ? Component.translatable(key + line,
-                    (healing ? ItemRegistry.HARMING_OIL_MODIFIER : ItemRegistry.HEALING_OIL_MODIFIER).get().getDescription())
+                    (healing ? ItemRegistry.HARMING_OIL_MODIFIER : ItemRegistry.HEALING_OIL_MODIFIER).get().getDefaultInstance().getHoverName())
                     : Component.translatable(key + line);
             builder.accept(text.withStyle(colors[index]));
         }

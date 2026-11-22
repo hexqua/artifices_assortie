@@ -1,5 +1,7 @@
 package jp.aquafactory.artificesassorite.gametest.modifier;
 
+import net.minecraft.world.entity.EntitySpawnReason;
+
 import com.mojang.authlib.GameProfile;
 import io.redspace.irons_artifice.entity.Bullet;
 import io.redspace.irons_artifice.gun.ShotProfile;
@@ -11,13 +13,13 @@ import io.redspace.irons_artifice.registry.EntityRegistry;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldStabilizationEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.animal.Cow;
+import net.minecraft.world.entity.animal.cow.Cow;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
@@ -46,7 +48,7 @@ final class ModifierTestFixture implements AutoCloseable {
     }
 
     ItemStack equip(String gunId, Item modifier, int count) {
-        ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("irons_artifice", gunId)));
+        ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("irons_artifice", gunId)));
         helper.assertTrue(stack.getItem() instanceof GunItem, "Required test gun must resolve: " + gunId);
         var slots = new GunContainer(stack);
         for (int index = 0; index < count; index++) slots.setItem(index, new ItemStack(modifier));
@@ -62,7 +64,7 @@ final class ModifierTestFixture implements AutoCloseable {
     }
 
     Cow target() {
-        var cow = Objects.requireNonNull(EntityType.COW.create(helper.getLevel()));
+        var cow = Objects.requireNonNull(EntityType.COW.create(helper.getLevel(), EntitySpawnReason.TRIGGERED));
         cow.setNoAi(true);
         cow.setNoGravity(true);
         cow.setPos(helper.absoluteVec(new Vec3(1, 2, 4)));

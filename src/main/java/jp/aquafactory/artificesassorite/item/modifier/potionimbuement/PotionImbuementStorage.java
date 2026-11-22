@@ -1,6 +1,8 @@
 package jp.aquafactory.artificesassorite.item.modifier.potionimbuement;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.world.effect.MobEffectInstance;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.core.component.DataComponentType;
@@ -17,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
+import java.util.Optional;
+import net.minecraft.util.ExtraCodecs;
 
 public final class PotionImbuementStorage {
     public static final int CAPACITY = 64;
@@ -44,40 +48,59 @@ public final class PotionImbuementStorage {
         }
     }
 
-    public record Contents(Bottle bottle, PotionContents potion, int doses) {
+    public record Contents(Bottle bottle, PotionContents potion, int doses, Optional<Float> durationOverride) {
         public static final Codec<Contents> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Bottle.CODEC.fieldOf("bottle").forGetter(Contents::bottle),
                 PotionContents.CODEC.fieldOf("potion").forGetter(Contents::potion),
-                Codec.intRange(1, CAPACITY).fieldOf("doses").forGetter(Contents::doses)
+                Codec.intRange(1, CAPACITY).fieldOf("doses").forGetter(Contents::doses),
+                ExtraCodecs.NON_NEGATIVE_FLOAT.optionalFieldOf("duration_scale").forGetter(Contents::durationOverride)
         ).apply(instance, Contents::new));
 
-        public ItemStack potionStack() { return bottle.stack(potion); }
+        public Contents(Bottle bottle, PotionContents potion, int doses) {
+            this(bottle, potion, doses, Optional.empty());
+        }
+
+        public float durationScale() {
+            return durationOverride.orElseGet(() -> bottle.item.components().getOrDefault(DataComponents.POTION_DURATION_SCALE, 1.0F));
+        }
+
+        public ItemStack potionStack() {
+            var stack = bottle.stack(potion);
+            durationOverride.ifPresent(scale -> stack.set(DataComponents.POTION_DURATION_SCALE, scale));
+            return stack;
+        }
 
         public boolean samePotionAs(Contents other) {
-            return bottle == other.bottle && samePotion(potion, other.potion);
+            return bottle == other.bottle && durationScale() == other.durationScale() && samePotion(potion, other.potion);
         }
     }
 
-    public static int space(ItemStack modifier, Bottle bottle, PotionContents potion) {
+    private static int space(ItemStack modifier, Contents incoming) {
         var contents = modifier.get(CONTENTS);
         if (contents == null) return CAPACITY;
-        return contents.bottle() == bottle && samePotion(contents.potion(), potion) ? CAPACITY - contents.doses() : 0;
+        return contents.samePotionAs(incoming) ? CAPACITY - contents.doses() : 0;
     }
 
     private static boolean samePotion(PotionContents first, PotionContents second) {
         if (!first.equals(second)) return false;
-        // MobEffectInstance.equals は NeoForge の治療条件を比較しないため、保存内容まで一致させる。
+        // 非表示効果なども含め、保存内容が異なる薬液を同じ弾倉に混ぜない。
         for (int index = 0; index < first.customEffects().size(); index++) {
-            if (!first.customEffects().get(index).save().equals(second.customEffects().get(index).save())) return false;
+            var left = MobEffectInstance.CODEC.encodeStart(NbtOps.INSTANCE, first.customEffects().get(index));
+            var right = MobEffectInstance.CODEC.encodeStart(NbtOps.INSTANCE, second.customEffects().get(index));
+            if (left.isError() || right.isError() || !left.getOrThrow().equals(right.getOrThrow())) return false;
         }
         return true;
     }
 
     public static int fill(ItemStack modifier, Bottle bottle, PotionContents potion, int doses, boolean simulate) {
-        int accepted = Math.clamp(doses, 0, space(modifier, bottle, potion));
+        return fill(modifier, new Contents(bottle, potion, doses), simulate);
+    }
+
+    public static int fill(ItemStack modifier, Contents incoming, boolean simulate) {
+        int accepted = Math.clamp(incoming.doses(), 0, space(modifier, incoming));
         if (accepted > 0 && !simulate) {
             var previous = modifier.get(CONTENTS);
-            modifier.set(CONTENTS, new Contents(bottle, potion, accepted + (previous == null ? 0 : previous.doses())));
+            modifier.set(CONTENTS, new Contents(incoming.bottle(), incoming.potion(), accepted + (previous == null ? 0 : previous.doses()), incoming.durationOverride()));
         }
         return accepted;
     }
@@ -86,6 +109,6 @@ public final class PotionImbuementStorage {
         var contents = modifier.get(CONTENTS);
         if (contents == null) return;
         if (contents.doses() == 1) modifier.remove(CONTENTS);
-        else modifier.set(CONTENTS, new Contents(contents.bottle(), contents.potion(), contents.doses() - 1));
+        else modifier.set(CONTENTS, new Contents(contents.bottle(), contents.potion(), contents.doses() - 1, contents.durationOverride()));
     }
 }

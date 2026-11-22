@@ -5,6 +5,7 @@ import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.config.AugmentationConfig;
 import net.minecraft.world.inventory.SmithingMenu;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
@@ -76,6 +77,7 @@ public final class ModifierConfigSync {
 
     @SubscribeEvent
     public static void datapackSync(OnDatapackSyncEvent event) {
+        event.sendRecipes(RecipeType.SMITHING);
         if (event.getPlayer() != null) return;
         event.getPlayerList().getPlayers().forEach(player -> {
             if (player.containerMenu instanceof SmithingMenu smithing) {
