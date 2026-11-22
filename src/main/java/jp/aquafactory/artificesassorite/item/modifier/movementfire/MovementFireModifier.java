@@ -11,7 +11,7 @@ import jp.aquafactory.artificesassorite.item.modifier.ModifierText;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ public enum MovementFireModifier implements GunModifier {
     private final String translationKey;
 
     MovementFireModifier(String id) {
-        count = new ComponentType<>(ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, id + "_count"), () -> 0);
+        count = new ComponentType<>(Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, id + "_count"), () -> 0);
         translationKey = "item." + ArtificesAssortie.MODID + "." + id + "_modifier";
     }
 

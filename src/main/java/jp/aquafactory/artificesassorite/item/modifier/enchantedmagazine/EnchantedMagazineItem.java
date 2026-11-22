@@ -1,5 +1,7 @@
 package jp.aquafactory.artificesassorite.item.modifier.enchantedmagazine;
 
+import net.minecraft.world.item.component.TooltipDisplay;
+
 import io.redspace.irons_artifice.data.ShotComponentMap;
 import io.redspace.irons_artifice.modifier.GunModifier;
 import io.redspace.irons_artifice.modifier.ModifierItem;
@@ -11,7 +13,6 @@ import net.minecraft.world.item.TooltipFlag;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.function.Consumer;
 
 public final class EnchantedMagazineItem extends ModifierItem {
@@ -23,9 +24,9 @@ public final class EnchantedMagazineItem extends ModifierItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context,
-                                @NotNull List<Component> lines, @NotNull TooltipFlag flag) {
-        lines.add(Component.translatable(KEY + "tooltip_1", EnchantedMagazine.stored(stack)));
-        super.appendHoverText(stack, context, lines, flag);
+                                @NotNull TooltipDisplay display, @NotNull Consumer<Component> lines, @NotNull TooltipFlag flag) {
+        lines.accept(Component.translatable(KEY + "tooltip_1", EnchantedMagazine.stored(stack)));
+        super.appendHoverText(stack, context, display, lines, flag);
     }
 
     private static final class Description implements GunModifier {

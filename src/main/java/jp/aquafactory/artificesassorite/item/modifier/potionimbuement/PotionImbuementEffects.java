@@ -8,10 +8,9 @@ import io.redspace.irons_artifice.menu.GunContainer;
 import io.redspace.irons_artifice.modifier.OnHitEffect;
 import io.redspace.irons_artifice.modifier.OnShotEffect;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.phys.HitResult;
 
 public final class PotionImbuementEffects {
@@ -25,13 +24,13 @@ public final class PotionImbuementEffects {
     public static boolean applyRegular(Bullet bullet, Entity target) {
         var payload = bullet.getProfile().peek(PotionImbuementModifier.PAYLOAD);
         LivingEntity living = target instanceof EnderDragonPart part ? part.parentMob : target instanceof LivingEntity entity ? entity : null;
-        if (payload == null || living == null || !living.isAffectedByPotions()) return false;
+        if (payload == null || living == null || !(bullet.level() instanceof ServerLevel level) || !living.isAffectedByPotions()) return false;
         // 即時効果の発生源も銃弾から分け、Soulfire Coin の銃弾由来追加 damage を発火させない。
         var source = new ImbuedPotion(bullet, payload);
         for (var effect : payload.contents().potion().getAllEffects()) {
             if (effect.getEffect().value().isInstantenous()) effect.getEffect().value().applyInstantenousEffect(
-                    source, bullet.getOwner(), living, effect.getAmplifier(), 1);
-            else living.addEffect(new MobEffectInstance(effect), source);
+                    level, source, bullet.getOwner(), living, effect.getAmplifier(), 1);
+            else living.addEffect(effect.withScaledDuration(payload.contents().durationScale()), source);
         }
         return true;
     }

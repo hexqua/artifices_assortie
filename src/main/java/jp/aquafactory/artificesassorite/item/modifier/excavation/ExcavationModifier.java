@@ -10,7 +10,7 @@ import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 public final class ExcavationModifier implements GunModifier {
     public static final String KEY = "item.artificesassortie.excavation_modifier";
     public static final ComponentType<Integer> COUNT = new ComponentType<>(
-            ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "excavation_count"), () -> 0);
+            Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "excavation_count"), () -> 0);
 
     @Override
     public void apply(ShotComponentMap components) {
@@ -42,11 +42,11 @@ public final class ExcavationModifier implements GunModifier {
         add(builder, ChatFormatting.GREEN, KEY + ".desc_3");
         add(builder, ChatFormatting.YELLOW, KEY + ".desc_4");
         add(builder, ChatFormatting.GREEN, KEY + ".desc_5");
-        Component medal = ItemRegistry.FORTUNE_MEDAL_MODIFIER.get().getDescription();
+        Component medal = ItemRegistry.FORTUNE_MEDAL_MODIFIER.get().getDefaultInstance().getHoverName();
         Component fortune = Component.translatable("enchantment.minecraft.fortune");
         if (fortuneLimit == 0) add(builder, ChatFormatting.GREEN, KEY + ".desc_6.no_limit", medal, fortune);
         else add(builder, ChatFormatting.GREEN, KEY + ".desc_6", medal, fortune, fortuneLimit);
-        add(builder, ChatFormatting.AQUA, KEY + ".desc_7", ItemRegistry.ITEM_TRANSFER_MODIFIER.get().getDescription());
+        add(builder, ChatFormatting.AQUA, KEY + ".desc_7", ItemRegistry.ITEM_TRANSFER_MODIFIER.get().getDefaultInstance().getHoverName());
         add(builder, ChatFormatting.DARK_GRAY, KEY + ".desc_8");
     }
 

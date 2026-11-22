@@ -8,7 +8,7 @@ import io.redspace.irons_artifice.item.ReloadState;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -21,7 +21,7 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.GeckoLibConstants;
+import com.geckolib.GeckoLibConstants;
 
 import java.util.function.Supplier;
 
@@ -33,7 +33,7 @@ public final class ShockAbsorberEvents {
     private static final Supplier<AttachmentType<Burst>> BURST =
             ATTACHMENTS.register("shock_absorber_burst", () -> AttachmentType.builder(() -> Burst.EMPTY).build());
     private static final ComponentType<Float> RECOIL_FACTOR = new ComponentType<>(
-            ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "shock_absorber_recoil_factor"), () -> 1.0F);
+            Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "shock_absorber_recoil_factor"), () -> 1.0F);
     private static final int SHOT_GRACE_TICKS = 2;
     private static final double TICKS_PER_SECOND = 20.0;
 
@@ -131,7 +131,7 @@ public final class ShockAbsorberEvents {
     }
 
     private static int selectedSlot(Entity shooter) {
-        return shooter instanceof Player player ? player.getInventory().selected : -1;
+        return shooter instanceof Player player ? player.getInventory().getSelectedSlot() : -1;
     }
 
     private static long gameTick(Entity shooter) {

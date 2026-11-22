@@ -5,7 +5,7 @@ import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbu
 import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementTooltips;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.neoforged.api.distmarker.Dist;
@@ -22,7 +22,7 @@ public final class PotionImbuementClientEvents {
         if (!event.getItemStack().is(ItemRegistry.POTION_IMBUEMENT_MODIFIER)) return;
         var lines = event.getToolTip();
         lines.removeIf(PotionImbuementClientEvents::isDescription);
-        boolean details = Screen.hasShiftDown();
+        boolean details = Minecraft.getInstance().hasShiftDown();
         if (details) for (int line = 1; line <= 3; line++) lines.add(Component.translatable(
                 PotionImbuementModifier.KEY + ".detail.tooltip_" + line).withStyle(ChatFormatting.GRAY));
         PotionImbuementModifier.describe(line -> lines.add(Component.literal(" ").append(line)), details);

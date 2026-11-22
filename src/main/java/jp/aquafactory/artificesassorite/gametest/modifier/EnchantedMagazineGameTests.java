@@ -1,5 +1,8 @@
 package jp.aquafactory.artificesassorite.gametest.modifier;
 
+import net.minecraft.world.item.component.TooltipDisplay;
+import jp.aquafactory.artificesassorite.gametest.TestSnapshots;
+
 import io.redspace.irons_artifice.api.AmmoEvent;
 import io.redspace.irons_artifice.api.GunAboutToShootEvent;
 import io.redspace.irons_artifice.api.GunShootEvent;
@@ -15,13 +18,11 @@ import io.redspace.irons_artifice.item.MagazineContents;
 import io.redspace.irons_artifice.menu.GunContainer;
 import io.redspace.irons_artifice.menu.GunModifierMenu;
 import io.redspace.irons_artifice.registry.ItemRegistry;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.client.EnchantedMagazineClientTooltips;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.enchantedmagazine.EnchantedMagazine;
 import net.minecraft.ChatFormatting;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
@@ -34,8 +35,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,16 +42,11 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 public final class EnchantedMagazineGameTests {
     private static final Vec3 DIRECTION = new Vec3(0, 0, 1);
     private static final String KEY = "item.artificesassortie.enchanted_magazine_modifier.";
 
     private EnchantedMagazineGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void ammoBoxRefillPaysOnlyForMissingRounds(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var gun = equip(f, "clockwork_rifle", 2, 9);
@@ -85,8 +79,6 @@ public final class EnchantedMagazineGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void reserveFiresOnlyAfterNormalAmmoAndSurvivesCancellation(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var gun = equip(f, "musket", 1, 0);
@@ -135,8 +127,6 @@ public final class EnchantedMagazineGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void capacityLimitAndZeroRefillPreservePaidRounds(GameTestHelper h) throws Exception {
         try (var f = new ModifierTestFixture(h)) {
             var gun = equip(f, "musket", 5, 0);
@@ -155,7 +145,7 @@ public final class EnchantedMagazineGameTests {
             }
             h.assertTrue(EnchantedMagazine.reserveDisplay(f.player, gun).rounds() == 1 && stored(gun, 4) == 1,
                     "Re-enabling the limit must exclude the extra slots without deleting their paid rounds");
-            var restored = ItemStack.parse(h.getLevel().registryAccess(), gun.save(h.getLevel().registryAccess())).orElseThrow();
+            var restored = TestSnapshots.load(TestSnapshots.save(gun, h.getLevel().registryAccess()), h.getLevel().registryAccess());
             h.assertTrue(stored(restored, 4) == 1, "Paid rounds in an inactive slot must survive saving and loading");
             ItemStack module = new GunContainer(restored).getItem(4);
             var otherGun = equip(f, "flintlock", 0, 0);
@@ -171,8 +161,6 @@ public final class EnchantedMagazineGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void tooltipUsesSynchronizedSettingsAndStoredRounds(GameTestHelper h) {
         var previous = ServerConfig.clientValues();
         var lines = new ArrayList<Component>();
@@ -180,7 +168,7 @@ public final class EnchantedMagazineGameTests {
         stack.set(EnchantedMagazine.RESERVE_AMMO, 2);
         try {
             ServerConfig.updateClient(settings(0, false));
-            stack.getItem().appendHoverText(stack, Item.TooltipContext.of(h.getLevel()), lines, TooltipFlag.NORMAL);
+            stack.getItem().appendHoverText(stack, Item.TooltipContext.of(h.getLevel()), TooltipDisplay.DEFAULT, lines::add, TooltipFlag.NORMAL);
             h.assertTrue(line(lines, "tooltip_1") == lines.getFirst() && lines.getFirst().getStyle().getColor() == null
                             && ((TranslatableContents) lines.getFirst().getContents()).getArgs()[0].equals(2),
                     "Paid reserve ammo must appear in the item tooltip in the default color");
@@ -191,7 +179,7 @@ public final class EnchantedMagazineGameTests {
             h.assertTrue(line(lines, "desc_4") == null, "The capacity warning must be hidden when the limit is disabled");
             ServerConfig.updateClient(settings(0.175, true));
             lines.clear();
-            stack.getItem().appendHoverText(stack, Item.TooltipContext.of(h.getLevel()), lines, TooltipFlag.NORMAL);
+            stack.getItem().appendHoverText(stack, Item.TooltipContext.of(h.getLevel()), TooltipDisplay.DEFAULT, lines::add, TooltipFlag.NORMAL);
             var limit = line(lines, "desc_4");
             h.assertTrue(limit != null && limit.getStyle().getColor().equals(TextColor.fromLegacyFormat(ChatFormatting.YELLOW)),
                     "The enabled capacity warning must appear in yellow");
@@ -202,8 +190,6 @@ public final class EnchantedMagazineGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void gunTooltipShowsOnlyEffectiveReserveAmmo(GameTestHelper h) {
         var previous = ServerConfig.clientValues();
         try (var f = new ModifierTestFixture(h)) {
@@ -233,7 +219,7 @@ public final class EnchantedMagazineGameTests {
     private static void assertReserveTooltip(GameTestHelper h, ItemStack gun, String expected) {
         var lines = new ArrayList<Component>();
         var context = Item.TooltipContext.of(h.getLevel());
-        gun.getItem().appendHoverText(gun, context, lines, TooltipFlag.NORMAL);
+        gun.getItem().appendHoverText(gun, context, TooltipDisplay.DEFAULT, lines::add, TooltipFlag.NORMAL);
         EnchantedMagazineClientTooltips.onTooltip(new ItemTooltipEvent(gun, null, lines, TooltipFlag.NORMAL, context));
         String reserveKey = "item.artificesassortie.common.tooltip.spare_aamo";
         int capacity = -1;

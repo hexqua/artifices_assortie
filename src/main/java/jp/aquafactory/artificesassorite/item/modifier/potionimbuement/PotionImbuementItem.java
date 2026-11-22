@@ -1,5 +1,9 @@
 package jp.aquafactory.artificesassorite.item.modifier.potionimbuement;
 
+import java.util.ArrayList;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
+
 import io.redspace.irons_artifice.modifier.ModifierItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -13,7 +17,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.alchemy.PotionContents;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.Optional;
 
 public final class PotionImbuementItem extends ModifierItem {
     public PotionImbuementItem(Properties properties) { super(properties, new PotionImbuementModifier()); }
@@ -23,7 +27,11 @@ public final class PotionImbuementItem extends ModifierItem {
         var bottle = PotionImbuementStorage.Bottle.from(other);
         if (action != ClickAction.SECONDARY || bottle == null || !slot.allowModification(player)) return false;
         var potion = other.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-        if (PotionImbuementStorage.fill(stack, bottle, potion, 1, false) > 0) {
+        float scale = other.getOrDefault(DataComponents.POTION_DURATION_SCALE, 1.0F);
+        float defaultScale = other.getItem().components().getOrDefault(DataComponents.POTION_DURATION_SCALE, 1.0F);
+        var incoming = new PotionImbuementStorage.Contents(bottle, potion, 1,
+                scale == defaultScale ? Optional.empty() : Optional.of(scale));
+        if (PotionImbuementStorage.fill(stack, incoming, false) > 0) {
             other.shrink(1);
             var empty = new ItemStack(Items.GLASS_BOTTLE);
             if (other.isEmpty()) access.set(empty);
@@ -34,8 +42,10 @@ public final class PotionImbuementItem extends ModifierItem {
     }
 
     @Override public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context,
-                                        @NotNull List<Component> lines, @NotNull TooltipFlag flag) {
-        PotionImbuementTooltips.stored(stack, lines, context.tickRate());
-        super.appendHoverText(stack, context, lines, flag);
+                                        @NotNull TooltipDisplay display, @NotNull Consumer<Component> lines, @NotNull TooltipFlag flag) {
+        var storedLines = new ArrayList<Component>();
+        PotionImbuementTooltips.stored(stack, storedLines, context.tickRate());
+        storedLines.forEach(lines);
+        super.appendHoverText(stack, context, display, lines, flag);
     }
 }

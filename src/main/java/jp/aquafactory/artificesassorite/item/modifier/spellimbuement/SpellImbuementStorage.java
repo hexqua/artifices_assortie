@@ -13,7 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
@@ -29,12 +29,12 @@ public final class SpellImbuementStorage {
 
     private SpellImbuementStorage() {}
 
-    public record Binding(ResourceLocation schoolId, List<CustomData> rune, DynamicOps<Tag> readOps) {
+    public record Binding(Identifier schoolId, List<CustomData> rune, DynamicOps<Tag> readOps) {
         // 残余アイテムの取得 API には registry 引数がないため、読込時の文脈を返却まで保持する。
         private static final MapCodec<DynamicOps<Tag>> READ_OPS = ExtraCodecs.retrieveContext(ops ->
                 DataResult.success(ops instanceof RegistryOps<?> registries ? registries.withParent(NbtOps.INSTANCE) : NbtOps.INSTANCE));
         public static final Codec<Binding> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                ResourceLocation.CODEC.fieldOf("school").forGetter(Binding::schoolId),
+                Identifier.CODEC.fieldOf("school").forGetter(Binding::schoolId),
                 CustomData.CODEC.sizeLimitedListOf(256).fieldOf("rune").forGetter(Binding::rune),
                 READ_OPS.forGetter(Binding::readOps)
         ).apply(instance, Binding::new));
@@ -46,9 +46,9 @@ public final class SpellImbuementStorage {
         public ItemStack returnedRune() {
             for (var entry : rune) {
                 var slot = entry.copyTag();
-                if (slot.getInt("slot") == 0) {
+                if (slot.getIntOr("slot", -1) == 0) {
                     // 未解決の item や Component は保存中には触らず、実際の返却時だけ復元を試みる。
-                    return ItemStack.CODEC.parse(readOps, slot.getCompound("item")).result()
+                    return ItemStack.CODEC.parse(readOps, slot.getCompoundOrEmpty("item")).result()
                             .map(stack -> stack.copyWithCount(1)).orElse(ItemStack.EMPTY);
                 }
             }
@@ -65,11 +65,11 @@ public final class SpellImbuementStorage {
         public int hashCode() { return 31 * schoolId.hashCode() + rune.hashCode(); }
     }
 
-    public static void bind(ItemStack modifier, ResourceLocation school, ItemStack rune, HolderLookup.Provider registries) {
+    public static void bind(ItemStack modifier, Identifier school, ItemStack rune, HolderLookup.Provider registries) {
         // 旧 ItemContainerContents と同じ形式を生データで保持し、任意 MOD 不在でも再保存できるようにする。
         var slot = new CompoundTag();
         slot.putInt("slot", 0);
-        slot.put("item", rune.copyWithCount(1).save(registries));
+        slot.put("item", ItemStack.CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), rune.copyWithCount(1)).getOrThrow());
         modifier.set(SCHOOL, new Binding(school, List.of(CustomData.of(slot)), registries.createSerializationContext(NbtOps.INSTANCE)));
     }
 }

@@ -8,13 +8,13 @@ import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.ModifierText;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 
 public final class GripHoldStabilizationModifier implements GunModifier {
     public static final ComponentType<Integer> COUNT = new ComponentType<>(
-            ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "grip_hold_stabilization_count"), () -> 0);
+            Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "grip_hold_stabilization_count"), () -> 0);
 
     @Override
     public void apply(ShotComponentMap components) {

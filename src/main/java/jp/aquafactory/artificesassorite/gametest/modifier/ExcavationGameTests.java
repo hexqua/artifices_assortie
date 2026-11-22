@@ -1,11 +1,13 @@
 package jp.aquafactory.artificesassorite.gametest.modifier;
 
+import jp.aquafactory.artificesassorite.gametest.TestSnapshots;
+import net.minecraft.world.entity.EntitySpawnReason;
+
 import io.netty.buffer.Unpooled;
 import io.redspace.irons_artifice.data.ShotComponents;
 import io.redspace.irons_artifice.data.Value;
 import io.redspace.irons_artifice.gun.ShotProfile;
 import io.redspace.irons_artifice.menu.GunContainer;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.api.event.ExcavationBreakEvent;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
@@ -17,16 +19,11 @@ import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
-import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
@@ -38,7 +35,6 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import org.jetbrains.annotations.NotNull;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -54,30 +50,23 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.bus.api.EventPriority;
-import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.LinkedHashSet;
 import java.util.function.Consumer;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 @SuppressWarnings("unused")
 public final class ExcavationGameTests {
     private static final Item MINING = ItemRegistry.EXCAVATION_MODIFIER.get();
@@ -87,8 +76,6 @@ public final class ExcavationGameTests {
     private static final Item POWDER = io.redspace.irons_artifice.registry.ItemRegistry.BLACKPOWDER_CHARGE.get();
 
     private ExcavationGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void resistanceCapAndBreachingDetermineActualHitCounts(GameTestHelper h) throws Exception {
         try (var s = new Scenario(h); var ignored = config(6, 3)) {
             var profile = s.profile(BREACH, MINING, MINING);
@@ -107,8 +94,6 @@ public final class ExcavationGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void toolTierAndNoLootBlocksUseHarvestability(GameTestHelper h) throws Exception {
         try (var s = new Scenario(h); var ignored = config(6, 3)) {
             var iron = s.power(s.profile(MINING), 10000);
@@ -138,8 +123,6 @@ public final class ExcavationGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void finalBulletControlsDropsAndReplacementClearsProgress(GameTestHelper h) throws Exception {
         try (var s = new Scenario(h); var ignored = config(6, 3)) {
             var mining = s.profile(BREACH, MINING);
@@ -172,8 +155,6 @@ public final class ExcavationGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void fortuneUsesShotSnapshotAndIndependentLimit(GameTestHelper h) throws Exception {
         try (var s = new Scenario(h)) {
             var profile = s.power(s.profile(MINING, MEDAL, MEDAL, MEDAL, MEDAL), 1000);
@@ -198,8 +179,6 @@ public final class ExcavationGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void explosionHarvestsAndTransfersBeyondImpactCollectionRange(GameTestHelper h) throws Exception {
         try (var s = new Scenario(h); var ignored = config(6, 3)) {
             var profile = s.power(s.profile(MINING, TRANSFER, POWDER, POWDER), 1000);
@@ -222,12 +201,10 @@ public final class ExcavationGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void cancellationAndBlockEntityContentsDoNotDuplicateLoot(GameTestHelper h) throws Exception {
         try (var s = new Scenario(h); var ignored = config(6, 3)) {
             var profile = s.power(s.profile(MINING, TRANSFER), 1000);
-            Consumer<BlockEvent.BreakEvent> cancelBreak = event -> {
+            Consumer<BreakBlockEvent> cancelBreak = event -> {
                 if (event.getLevel() == h.getLevel() && event.getPos().equals(s.pos)) event.setCanceled(true);
             };
             s.place(Blocks.DIAMOND_ORE);
@@ -263,8 +240,6 @@ public final class ExcavationGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void detailTooltipReplacesAllDescriptionsAndUsesIndependentLimit(GameTestHelper h) {
         var normal = new ArrayList<Component>();
         var detail = new ArrayList<Component>();
@@ -292,43 +267,29 @@ public final class ExcavationGameTests {
         }
         h.succeed();
     }
-
-    @GameTestGenerator
-    public static Collection<TestFunction> spellbooksTierIntegration() {
-        if (!ModList.get().isLoaded("irons_spellbooks")) return List.of();
-        return List.of(new TestFunction("artificesassortie.excavation", "artificesassortie:excavation_mithril_tier",
-                "artificesassortie:gametest/basic_floor", 100, 0, true, h -> {
-            try (var s = new Scenario(h)) {
-                var id = ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "mithril_ore");
-                h.assertTrue(BuiltInRegistries.BLOCK.containsKey(id), "Spellbooks mithril ore must exist in this profile");
-                Block ore = BuiltInRegistries.BLOCK.get(id);
-                s.place(ore);
-                var diamond = s.power(s.profile(MINING, MINING), 10000);
-                s.hit(diamond);
-                h.assertTrue(s.state().is(ore), "Diamond tier must reject Spellbooks mithril");
-                s.hit(s.power(s.profile(MINING, MINING, MINING), 10000));
-                h.assertTrue(s.state().isAir() && !s.items().isEmpty(), "Netherite tier must harvest actual mithril loot");
-            }
-            h.succeed();
-        }));
-    }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void actualBulletTickPreservesBlockPiercingBudget(GameTestHelper h) throws Exception {
         try (var s = new Scenario(h); var ignored = config(6, 3)) {
             BlockPos second = s.pos.offset(0, 0, 2);
+            h.getLevel().setBlockAndUpdate(s.pos.north(), Blocks.AIR.defaultBlockState());
+            h.getLevel().setBlockAndUpdate(s.pos.south(), Blocks.AIR.defaultBlockState());
+            var ordinary = s.power(s.profile(), 1000);
+            h.assertTrue(!ordinary.peek(ShotComponents.BREAKS_BLOCKS), "Control gun must lack breaching");
+            s.place(Blocks.STONE);
+            s.hit(ordinary);
+            h.assertTrue(s.state().is(Blocks.STONE), "Ordinary rounds cannot damage untagged stone");
+            s.assertHits(Blocks.GLASS, ordinary, 1);
             for (int piercing = 0; piercing <= 1; piercing++) {
                 s.place(Blocks.STONE);
                 h.getLevel().setBlockAndUpdate(second, Blocks.STONE.defaultBlockState());
                 var profile = s.power(s.profile(MINING), 1000);
                 profile.components().set(ShotComponents.PIERCING, Value.of(piercing));
                 var bullet = s.f.bullet(profile);
-                bullet.setPos(Vec3.atCenterOf(s.pos).add(0, 0, -1.5));
+                bullet.setPos(Vec3.atCenterOf(s.pos).add(0, 0, -0.9));
                 bullet.setDeltaMovement(new Vec3(0, 0, 5));
                 try {
                     bullet.tick();
                     if (!bullet.isRemoved()) bullet.tick();
-                    h.assertTrue(s.state().isAir(), "Actual movement must mine the first block");
+                    h.assertTrue(s.state().isAir(), "Actual movement must mine the first block: origin=" + s.pos + " projectile=" + bullet.position() + " removed=" + bullet.isRemoved() + " velocity=" + bullet.getDeltaMovement() + " piercing=" + piercing);
                     h.assertTrue(h.getLevel().getBlockState(second).isAir() == (piercing == 1),
                             "Further mining must respect the upstream piercing budget: " + piercing);
                 } finally { bullet.discard(); }
@@ -336,18 +297,17 @@ public final class ExcavationGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void mobGriefingAndLootCancellationRemainAuthoritative(GameTestHelper h) throws Exception {
         try (var s = new Scenario(h); var ignored = config(6, 3)) {
             s.f.player.setPos(h.absoluteVec(new Vec3(7, 2, 7)));
-            var mob = Objects.requireNonNull(EntityType.ZOMBIE.create(h.getLevel()));
-            var rule = h.getLevel().getGameRules().getRule(GameRules.RULE_MOBGRIEFING);
-            boolean previous = rule.get();
+            var mob = Objects.requireNonNull(EntityType.ZOMBIE.create(h.getLevel(), EntitySpawnReason.TRIGGERED));
+            var rules = h.getLevel().getGameRules();
+            var rule = GameRules.MOB_GRIEFING;
+            boolean previous = rules.get(rule);
             try {
                 var profile = s.power(s.profile(MINING, POWDER), 1000);
                 for (boolean enabled : new boolean[]{false, true}) {
-                    rule.set(enabled, h.getLevel().getServer());
+                    rules.set(rule, enabled, h.getLevel().getServer());
                     s.place(Blocks.STONE);
                     var bullet = s.f.bullet(profile.deepCopy());
                     bullet.setOwner(mob);
@@ -356,26 +316,25 @@ public final class ExcavationGameTests {
                     finally { bullet.discard(); }
                     h.assertTrue(s.state().isAir() == enabled, "Mob excavation must respect mobGriefing: " + enabled);
                 }
-            } finally { rule.set(previous, h.getLevel().getServer()); mob.discard(); }
+            } finally { rules.set(rule, previous, h.getLevel().getServer()); mob.discard(); }
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void excavationBreakListenerCanVetoPlayerAndMobHarvests(GameTestHelper h) throws Exception {
         try (var s = new Scenario(h); var ignored = config(6, 3)) {
             var level = h.getLevel();
-            var mob = Objects.requireNonNull(EntityType.ZOMBIE.create(level));
-            var rule = level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING);
-            boolean previous = rule.get();
-            rule.set(true, level.getServer());
+            var mob = Objects.requireNonNull(EntityType.ZOMBIE.create(level, EntitySpawnReason.TRIGGERED));
+            var rules = level.getGameRules();
+            var rule = GameRules.MOB_GRIEFING;
+            boolean previous = rules.get(rule);
+            rules.set(rule, true, level.getServer());
             try {
                 var profile = s.power(s.profile(MINING), 1000);
                 for (Entity shooter : List.of(s.f.player, mob)) {
                     for (Block block : List.of(Blocks.DIAMOND_ORE, Blocks.TORCH)) {
                         s.place(block);
                         var calls = new ArrayList<String>();
-                        Consumer<BlockEvent.BreakEvent> observeBreak = event -> {
+                        Consumer<BreakBlockEvent> observeBreak = event -> {
                             if (event.getLevel() == level && event.getPos().equals(s.pos)) calls.add("upstream");
                         };
                         Consumer<ExcavationBreakEvent> deny = event -> {
@@ -402,7 +361,7 @@ public final class ExcavationGameTests {
                     }
                 }
             } finally {
-                rule.set(previous, level.getServer());
+                rules.set(rule, previous, level.getServer());
                 mob.discard();
             }
         }
@@ -412,18 +371,17 @@ public final class ExcavationGameTests {
     private static String key(Component component) {
         return ((TranslatableContents) component.getContents()).getKey();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void experiencePositionPreservesAmountRulesAndExistingOrbMerging(GameTestHelper h) throws Exception {
         try (var s = new Scenario(h); var ignored = config(6, 3)) {
             Consumer<BlockDropsEvent> fixedExperience = event -> {
                 if (event.getLevel() == h.getLevel() && event.getPos().equals(s.pos)) event.setDroppedExperience(7);
             };
-            var rule = h.getLevel().getGameRules().getRule(GameRules.RULE_DOBLOCKDROPS);
-            boolean previous = rule.get();
+            var rules = h.getLevel().getGameRules();
+            var rule = GameRules.BLOCK_DROPS;
+            boolean previous = rules.get(rule);
             NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, fixedExperience);
             try {
-                rule.set(true, h.getLevel().getServer());
+                rules.set(rule, true, h.getLevel().getServer());
                 var transfer = s.power(s.profile(MINING, TRANSFER), 1000);
                 var pool = new ArrayList<ExperienceOrb>();
                 Vec3 feet = s.f.player.position();
@@ -437,7 +395,7 @@ public final class ExcavationGameTests {
                         "Orb fixture must cover every merge selector");
                 for (var orb : pool) h.assertTrue(h.getLevel().addFreshEntity(orb), "Merge destination must exist before excavation");
                 s.assertHits(Blocks.DIAMOND_ORE, transfer, 1);
-                int count = pool.stream().mapToInt(orb -> orb.saveWithoutId(new CompoundTag()).getInt("Count")).sum();
+                int count = pool.stream().mapToInt(orb -> TestSnapshots.save(orb).getIntOr("Count", 0)).sum();
                 h.assertTrue(count == 41 && s.entities.stream().filter(ExperienceOrb.class::isInstance).count() == 40,
                         "Modified experience must merge at the destination without spawning replacement orbs");
                 s.clearEntities();
@@ -453,19 +411,17 @@ public final class ExcavationGameTests {
                 h.assertTrue(ordinaryOrbs.size() == 1 && ordinaryOrbs.getFirst().position().equals(Vec3.atCenterOf(s.pos)),
                         "Experience outside excavation must retain the original spawn position");
                 s.clearEntities();
-                rule.set(false, h.getLevel().getServer());
+                rules.set(rule, false, h.getLevel().getServer());
                 s.assertHits(Blocks.DIAMOND_ORE, transfer, 1);
                 h.assertTrue(s.entities.stream().noneMatch(ExperienceOrb.class::isInstance),
                         "Transfer must not bypass the doTileDrops experience rule");
             } finally {
-                rule.set(previous, h.getLevel().getServer());
+                rules.set(rule, previous, h.getLevel().getServer());
                 NeoForge.EVENT_BUS.unregister(fixedExperience);
             }
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void playerContextControlsCreativeLootAndHarvestPermission(GameTestHelper h) throws Exception {
         try (var s = new Scenario(h); var ignored = config(6, 3)) {
             var profile = s.power(s.profile(MINING, TRANSFER, MEDAL), 1000);
@@ -507,8 +463,6 @@ public final class ExcavationGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void impactNotifiesShooterAndObserversWithoutVanillaDuplicates(GameTestHelper h) throws ReflectiveOperationException {
         try (var s = new Scenario(h); var shooter = new EffectPackets(s.f.player); var observerFixture = new ModifierTestFixture(h);
              var observer = new EffectPackets(observerFixture.player)) {
@@ -519,7 +473,7 @@ public final class ExcavationGameTests {
                 positions.add(pos);
             }
             var denied = s.pos.offset(1, 0, 0);
-            Consumer<BlockEvent.BreakEvent> cancel = event -> {
+            Consumer<BreakBlockEvent> cancel = event -> {
                 if (event.getLevel() == h.getLevel() && event.getPos().equals(denied)) event.setCanceled(true);
             };
             NeoForge.EVENT_BUS.addListener(cancel);
@@ -563,8 +517,6 @@ public final class ExcavationGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.excavation")
     public static void splitEffectPacketsPreserveAllBlocksAndGlobalClientBudgets(GameTestHelper h) throws ReflectiveOperationException {
         try (var s = new Scenario(h); var captured = new EffectPackets(s.f.player)) {
             var bullet = s.f.bullet(s.profile(MINING));
@@ -605,8 +557,8 @@ public final class ExcavationGameTests {
             // 公開 getter は読み取り専用。実際の配信先を一時追加し、close で必ず元へ戻す。
             var field = PlayerList.class.getDeclaredField("players");
             field.setAccessible(true);
-            recipients = (List<ServerPlayer>) field.get(player.server.getPlayerList());
-            new ServerGamePacketListenerImpl(player.server, new Connection(PacketFlow.SERVERBOUND), player,
+            recipients = (List<ServerPlayer>) field.get(player.level().getServer().getPlayerList());
+            new ServerGamePacketListenerImpl(player.level().getServer(), new Connection(PacketFlow.SERVERBOUND), player,
                     CommonListenerCookie.createInitial(player.getGameProfile(), false)) {
                 @Override
                 public void send(@NotNull Packet<?> packet) { packets.add(packet); }

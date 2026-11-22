@@ -1,15 +1,17 @@
 package jp.aquafactory.artificesassorite.gametest.modifier;
 
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.storage.TagValueInput;
+import jp.aquafactory.artificesassorite.gametest.TestSnapshots;
+
 import io.redspace.irons_artifice.api.BulletImpactEvent;
 import io.redspace.irons_artifice.data.ShotComponents;
 import io.redspace.irons_artifice.data.Value;
 import io.redspace.irons_artifice.modifier.on_hit_handlers.BlackpowderChargeOnHit;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.modifier.itemtransfer.ItemTransferEvents;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
@@ -29,35 +31,31 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 public final class ItemTransferGameTests {
     private ItemTransferGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void cubeRangeStacksAndTransfersThroughWalls(GameTestHelper h) {
         for (int count = 0; count <= 2; count++) {
             try (var s = new Scenario(h, count)) {
-                var corner = s.item(s.center.add(1.8, 1.8, 1.8));
-                var extended = s.item(s.center.add(2.8, 0, 0));
-                var intersecting = s.item(s.center.add(2.05, 0, 0));
-                var outside = s.item(s.center.add(3.3, 0, 0));
+                // GameTestの配置座標は実行ごとに変わる。未ロードの隣接チャンクには検体を置かない。
+                int dx = (BlockPos.containing(s.center).getX() & 15) < 8 ? 1 : -1;
+                int dz = (BlockPos.containing(s.center).getZ() & 15) < 8 ? 1 : -1;
+                var corner = s.item(s.center.add(dx * 1.8, 1.8, dz * 1.8));
+                var extended = s.item(s.center.add(dx * 2.8, 0, 0));
+                var intersecting = s.item(s.center.add(dx * 2.05, 0, 0));
+                var outside = s.item(s.center.add(dx * 3.3, 0, 0));
                 // 球形なら除外される角と、遮蔽物の向こう側を実際の検索で確認する。
-                h.getLevel().setBlockAndUpdate(BlockPos.containing(s.center.add(1, 0, 0)), Blocks.BEDROCK.defaultBlockState());
+                h.getLevel().setBlockAndUpdate(BlockPos.containing(s.center.add(dx, 0, 0)), Blocks.BEDROCK.defaultBlockState());
                 s.hit(s.blockHit());
                 s.flush();
-                s.assertPosition(corner, count > 0 ? s.f.player.position() : s.center.add(1.8, 1.8, 1.8), "Cube corner, count=" + count);
-                s.assertPosition(extended, count == 2 ? s.f.player.position() : s.center.add(2.8, 0, 0), "Additional range through wall, count=" + count);
-                s.assertPosition(intersecting, count > 0 ? s.f.player.position() : s.center.add(2.05, 0, 0), "Item bounding box intersecting cube boundary, count=" + count);
-                s.assertPosition(outside, s.center.add(3.3, 0, 0), "Outside cube must remain in place");
+                s.assertPosition(corner, count > 0 ? s.f.player.position() : s.center.add(dx * 1.8, 1.8, dz * 1.8), "Cube corner, count=" + count);
+                s.assertPosition(extended, count == 2 ? s.f.player.position() : s.center.add(dx * 2.8, 0, 0), "Additional range through wall, count=" + count);
+                s.assertPosition(intersecting, count > 0 ? s.f.player.position() : s.center.add(dx * 2.05, 0, 0), "Item bounding box intersecting cube boundary, count=" + count);
+                s.assertPosition(outside, s.center.add(dx * 3.3, 0, 0), "Outside cube must remain in place");
                 if (count > 0) {
                     var late = s.item(s.center);
                     s.flush();
@@ -67,12 +65,10 @@ public final class ItemTransferGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void itemDelayAndOrbStateSurviveNormalTransfer(GameTestHelper h) {
         try (var s = new Scenario(h, 1)) {
-            for (int slot = 0; slot < s.f.player.getInventory().items.size(); slot++) {
-                s.f.player.getInventory().items.set(slot, new ItemStack(Items.COBBLESTONE, 64));
+            for (int slot = 0; slot < s.f.player.getInventory().getNonEquipmentItems().size(); slot++) {
+                s.f.player.getInventory().setItem(slot, new ItemStack(Items.COBBLESTONE, 64));
             }
             var item = s.item(s.center);
             item.setThrower(s.f.player);
@@ -81,10 +77,10 @@ public final class ItemTransferGameTests {
             item.setTarget(target);
             item.getPersistentData().putString("transfer_test", "preserved");
             var orb = new ExperienceOrb(h.getLevel(), s.center.x, s.center.y, s.center.z, 7);
-            CompoundTag orbData = orb.saveWithoutId(new CompoundTag());
+            CompoundTag orbData = TestSnapshots.save(orb);
             orbData.putInt("Count", 5);
             orbData.putShort("Age", (short) 123);
-            orb.readAdditionalSaveData(orbData);
+            orb.load(TagValueInput.create(ProblemReporter.DISCARDING, orb.registryAccess(), orbData));
             s.add(orb);
             s.f.player.takeXpDelay = 11;
             s.hit(s.blockHit());
@@ -92,11 +88,11 @@ public final class ItemTransferGameTests {
             s.assertPosition(item, s.f.player.position(), "Full inventory must not prevent item transfer");
             h.assertTrue(!item.hasPickUpDelay(), "Recent self-thrown item must become immediately pickable");
             h.assertTrue(item.getTarget().equals(target) && item.getOwner() == s.f.player
-                    && item.getPersistentData().getString("transfer_test").equals("preserved") && item.getItem().getCount() == 3,
+                    && item.getPersistentData().getStringOr("transfer_test", "").equals("preserved") && item.getItem().getCount() == 3,
                     "Transfer must preserve ownership, custom data and stack count");
             s.assertPosition(orb, s.f.player.position(), "Experience orb must move to the same feet position");
-            CompoundTag after = orb.saveWithoutId(new CompoundTag());
-            h.assertTrue(after.getInt("Count") == 5 && after.getShort("Age") == 123 && orb.getValue() == 7
+            CompoundTag after = TestSnapshots.save(orb);
+            h.assertTrue(after.getIntOr("Count", 0) == 5 && after.getShortOr("Age", (short)0) == 123 && orb.getValue() == 7
                     && s.f.player.takeXpDelay == 11 && s.f.player.totalExperience == 0,
                     "Transfer must preserve orb grouping, age, value and player pickup delay without granting XP");
             h.assertTrue(item.getDeltaMovement().equals(Vec3.ZERO) && orb.getDeltaMovement().equals(Vec3.ZERO),
@@ -104,8 +100,6 @@ public final class ItemTransferGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void nonlethalHitsTransferButCanceledImpactsDoNot(GameTestHelper h) {
         try (var s = new Scenario(h, 1)) {
             var cow = s.f.target();
@@ -127,26 +121,18 @@ public final class ItemTransferGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void killedMobDropsTransferOutsideImpactRangeAfterSwitchingHands(GameTestHelper h) {
         assertDeathDrops(h, false, false, false);
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void immediateExplosionKillsAlsoTransferDrops(GameTestHelper h) {
         assertDeathDrops(h, true, false, false);
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void canceledDeathDropsAreNeverSpawned(GameTestHelper h) {
         assertDeathDrops(h, false, true, false);
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void fireKillCreditDoesNotTransferDeathDrops(GameTestHelper h) {
         assertDeathDrops(h, false, false, true);
         h.succeed();
@@ -212,8 +198,6 @@ public final class ItemTransferGameTests {
             }
         }
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void discardedShooterAndUnloadedLevelDropPendingWork(GameTestHelper h) {
         try (var s = new Scenario(h, 1)) {
             var item = s.item(s.center);
@@ -231,7 +215,6 @@ public final class ItemTransferGameTests {
     }
 
     // 他ケースの明示的な tick 終了や unload 操作から分離し、自然な tick だけで予約を処理させる。
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.item_transfer_tick")
     public static void actualLevelTickCollectsDropsCreatedAfterImpact(GameTestHelper h) {
         var s = new Scenario(h, 1);
         try {

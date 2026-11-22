@@ -5,32 +5,23 @@ import io.redspace.irons_artifice.entity.Bullet;
 import io.redspace.irons_artifice.item.GunItem;
 import io.redspace.irons_artifice.item.GunplayManager;
 import io.redspace.irons_artifice.menu.GunContainer;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.gyroscope.GyroscopeCalibrationEvents;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 public final class GyroscopeCalibrationGameTests {
     private static final double SPRINT_SPEED = 0.2806;
 
     private GyroscopeCalibrationGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void speedPenaltyIsCancelledAndStackedReductionIsCapped(GameTestHelper helper) throws Exception {
         try (var settings = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS);
              var fixture = new ModifierTestFixture(helper)) {
@@ -59,8 +50,6 @@ public final class GyroscopeCalibrationGameTests {
         }
         helper.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void movementBeforeFirstShotDecaysOverFiveTicks(GameTestHelper helper) throws Exception {
         try (var settings = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS);
              var fixture = new ModifierTestFixture(helper)) {
@@ -88,8 +77,6 @@ public final class GyroscopeCalibrationGameTests {
         }
         helper.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void gyroscopeCapsAirbornePenaltyAndPreservesWindChamberBonus(GameTestHelper helper) {
         try (var fixture = new ModifierTestFixture(helper)) {
             var modifier = ItemRegistry.GYROSCOPE_CALIBRATION_MODIFIER.get();
@@ -108,8 +95,6 @@ public final class GyroscopeCalibrationGameTests {
         }
         helper.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void gyroscopeCancelsSpreadOnlyDuringBayonetCharge(GameTestHelper helper) {
         try (var fixture = new ModifierTestFixture(helper)) {
             var player = fixture.player;
@@ -142,7 +127,7 @@ public final class GyroscopeCalibrationGameTests {
     }
 
     private static void attach(GunContainer slots, int slot, String id) {
-        slots.setItem(slot, new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("irons_artifice", id))));
+        slots.setItem(slot, new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("irons_artifice", id))));
         slots.setChanged();
     }
 

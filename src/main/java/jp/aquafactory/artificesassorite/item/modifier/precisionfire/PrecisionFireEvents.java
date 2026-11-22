@@ -11,7 +11,7 @@ import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.registry.SoundRegistry;
 import jp.aquafactory.artificesassorite.item.modifier.potionoil.OilEffects;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,7 +26,7 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 @EventBusSubscriber(modid = ArtificesAssortie.MODID)
 public final class PrecisionFireEvents {
     private static final ComponentType<Impact> IMPACT = new ComponentType<>(
-            ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "precision_fire_impact"), () -> null);
+            Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "precision_fire_impact"), () -> null);
 
     private PrecisionFireEvents() {}
 
@@ -41,7 +41,7 @@ public final class PrecisionFireEvents {
         var profile = event.getShotProfile();
         int count = profile.peek(PrecisionFireModifier.COUNT);
         if (count == 0) return;
-        var values = (event.getEntity().level().isClientSide ? ServerConfig.clientValues() : ServerConfig.serverValues()).precisionFire();
+        var values = (event.getEntity().level().isClientSide() ? ServerConfig.clientValues() : ServerConfig.serverValues()).precisionFire();
         profile.components().set(PrecisionFireModifier.HEADSHOT_MULTIPLIER, values.headshotMultiplier(count));
         profile.components().set(PrecisionFireModifier.BODYSHOT_MULTIPLIER, values.bodyshotMultiplier(count));
     }
@@ -49,7 +49,7 @@ public final class PrecisionFireEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public static void onImpact(BulletImpactEvent event) {
         var bullet = event.getBullet();
-        if (bullet.level().isClientSide) return;
+        if (bullet.level().isClientSide()) return;
         // 貫通・跳弾・キャンセル時も前の対象の判定を持ち越さない。
         bullet.getProfile().components().remove(IMPACT);
         if (event.isCanceled() || bullet.getProfile().peek(PrecisionFireModifier.COUNT) == 0
@@ -61,7 +61,7 @@ public final class PrecisionFireEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onDamage(LivingIncomingDamageEvent event) {
-        if (event.getEntity().level().isClientSide || !event.getSource().is(DamageSources.BULLET_DAMAGE_TYPE)
+        if (event.getEntity().level().isClientSide() || !event.getSource().is(DamageSources.BULLET_DAMAGE_TYPE)
                 || !(event.getSource().getDirectEntity() instanceof Bullet bullet)) return;
         var impact = bullet.getProfile().peek(IMPACT);
         if (impact == null || impact.target() != event.getEntity() || impact.consumed()) return;
@@ -82,7 +82,7 @@ public final class PrecisionFireEvents {
                 // 移植元と同じく、無敵時間中も頭部命中を通知する。音源はバニラの金床音。
                 var position = impact.position();
                 level.playSound(null, position.x, position.y, position.z, SoundRegistry.PRECISION_FIRE_HEADSHOT.get(), SoundSource.PLAYERS,
-                        1, 2 + 0.2f * level.random.nextFloat() - 0.1f);
+                        1, 2 + 0.2f * level.getRandom().nextFloat() - 0.1f);
             }
         }
     }

@@ -1,9 +1,11 @@
 package jp.aquafactory.artificesassorite.gametest.modifier;
 
+import net.minecraft.world.item.component.TooltipDisplay;
+import jp.aquafactory.artificesassorite.gametest.TestSnapshots;
+
 import io.redspace.irons_artifice.menu.GunContainer;
 import io.redspace.irons_artifice.entity.Bullet;
 import io.redspace.irons_artifice.item.GunplayManager;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementModifier;
 import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementSelection;
 import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementStorage;
@@ -11,7 +13,6 @@ import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbu
 import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementStorage.Contents;
 import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementTooltips;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -25,23 +26,16 @@ import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 @SuppressWarnings("unused")
 public final class PotionImbuementDisplayGameTests {
     private static final String KEY = PotionImbuementModifier.KEY + ".tooltip.";
 
     private PotionImbuementDisplayGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.potion")
     public static void consecutiveDosesAndDisplayedPotionFollowConsumption(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var gun = f.equip("flintlock", ItemRegistry.POTION_IMBUEMENT_MODIFIER.get(), 0);
@@ -52,11 +46,11 @@ public final class PotionImbuementDisplayGameTests {
             slots.setItem(3, modifier(Bottle.LINGERING, new PotionContents(Potions.POISON), 1));
             slots.setItem(4, modifier(Bottle.REGULAR, new PotionContents(Potions.SWIFTNESS), 4));
             slots.setChanged();
-            var saved = gun.save(h.getLevel().registryAccess());
+            var saved = TestSnapshots.save(gun, h.getLevel().registryAccess());
             h.assertTrue(Objects.requireNonNull(PotionImbuementSelection.next(new GunContainer(gun))).doses() == 3,
                     "Empty modifiers must be skipped, but a different potion must stop aggregation");
-            assertGun(h, gun, 3, MobEffects.MOVEMENT_SPEED.value().getDescriptionId());
-            h.assertTrue(saved.equals(gun.save(h.getLevel().registryAccess())), "Reading selection and tooltips must not change saved gun data");
+            assertGun(h, gun, 3, MobEffects.SPEED.value().getDescriptionId());
+            h.assertTrue(saved.equals(TestSnapshots.save(gun, h.getLevel().registryAccess())), "Reading selection and tooltips must not change saved gun data");
             for (int shot = 0; shot < 3; shot++) {
                 var payload = fire(h, f);
                 h.assertTrue(payload.contents().bottle() == Bottle.REGULAR,
@@ -65,11 +59,11 @@ public final class PotionImbuementDisplayGameTests {
                 h.assertTrue(Objects.requireNonNull(after.getItem(3).get(PotionImbuementStorage.CONTENTS)).doses() == 1
                         && Objects.requireNonNull(after.getItem(4).get(PotionImbuementStorage.CONTENTS)).doses() == 4,
                         "Later potion groups must retain all doses");
-                if (shot < 2) assertGun(h, gun, 2 - shot, MobEffects.MOVEMENT_SPEED.value().getDescriptionId());
+                if (shot < 2) assertGun(h, gun, 2 - shot, MobEffects.SPEED.value().getDescriptionId());
             }
             assertGun(h, gun, 1, MobEffects.POISON.value().getDescriptionId());
             h.assertTrue(fire(h, f).contents().bottle() == Bottle.LINGERING, "The next real shot must use the displayed lingering potion");
-            assertGun(h, gun, 4, MobEffects.MOVEMENT_SPEED.value().getDescriptionId());
+            assertGun(h, gun, 4, MobEffects.SPEED.value().getDescriptionId());
             h.assertTrue(!new GunContainer(gun).getItem(3).has(PotionImbuementStorage.CONTENTS),
                     "The last lingering dose must clear its storage and expose the following potion");
 
@@ -88,29 +82,27 @@ public final class PotionImbuementDisplayGameTests {
             slots.setItem(2, ItemStack.EMPTY);
             slots.setItem(3, ItemStack.EMPTY);
             slots.setChanged();
-            assertGun(h, gun, 5, MobEffects.MOVEMENT_SPEED.value().getDescriptionId());
+            assertGun(h, gun, 5, MobEffects.SPEED.value().getDescriptionId());
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.potion")
     public static void storedAndEmptyTooltipsPreserveDataAndDescribeEffectTimes(GameTestHelper h) {
         try (var f = new ModifierTestFixture(h)) {
             var potion = new PotionContents(Potions.SWIFTNESS).withEffectAdded(new MobEffectInstance(MobEffects.REGENERATION, 200));
             for (var bottle : Bottle.values()) {
                 var stack = modifier(bottle, potion, 12);
-                var saved = stack.save(h.getLevel().registryAccess());
+                var saved = TestSnapshots.save(stack, h.getLevel().registryAccess());
                 var lines = new ArrayList<Component>();
-                stack.getItem().appendHoverText(stack, Item.TooltipContext.of(h.getLevel()), lines, TooltipFlag.NORMAL);
+                stack.getItem().appendHoverText(stack, Item.TooltipContext.of(h.getLevel()), TooltipDisplay.DEFAULT, lines::add, TooltipFlag.NORMAL);
                 h.assertTrue(stack.getHoverName().equals(new ItemStack(ItemRegistry.POTION_IMBUEMENT_MODIFIER.get()).getHoverName()),
                         "Stored potion contents must not lengthen the modifier name");
                 h.assertTrue(Objects.requireNonNull(find(lines, KEY + "capacity")).getArgs()[0].equals(12), "Stored tooltip must show its own capacity");
                 var stored = Objects.requireNonNull(stack.get(PotionImbuementStorage.CONTENTS));
-                assertDisplayedDuration(h, stored, new MobEffectInstance(MobEffects.MOVEMENT_SPEED, bottle == Bottle.LINGERING ? 900 : 3600));
-                assertDisplayedDuration(h, stored, new MobEffectInstance(MobEffects.REGENERATION, 200));
+                assertDisplayedDuration(h, stored, new MobEffectInstance(MobEffects.SPEED, bottle == Bottle.LINGERING ? 900 : 3600));
+                assertDisplayedDuration(h, stored, new MobEffectInstance(MobEffects.REGENERATION, bottle == Bottle.LINGERING ? 50 : 200));
                 h.assertTrue(find(lines, KEY + "splash_duration") != null == (bottle == Bottle.SPLASH), "Only splash duration needs the maximum-duration note");
                 h.assertTrue(find(lines, "potion.withDuration") != null, "Timed effects must include formatted duration components");
-                h.assertTrue(saved.equals(stack.save(h.getLevel().registryAccess())), "Tooltip generation must preserve stored effects and doses");
+                h.assertTrue(saved.equals(TestSnapshots.save(stack, h.getLevel().registryAccess())), "Tooltip generation must preserve stored effects and doses");
             }
             var empty = new ItemStack(ItemRegistry.POTION_IMBUEMENT_MODIFIER.get());
             var lines = new ArrayList<Component>();
@@ -178,7 +170,7 @@ public final class PotionImbuementDisplayGameTests {
         h.assertTrue(find(List.of(lines.get(1)), KEY + "active") != null, "Potion status must follow ammo capacity");
         h.assertTrue(Objects.requireNonNull(find(lines, KEY + "doses")).getArgs()[0].equals(doses), "Gun tooltip must show consecutive doses: expected=" + doses);
         h.assertTrue(find(lines, effect) != null, "Gun tooltip must show the next fired effect: expected=" + effect);
-        String other = effect.equals(MobEffects.POISON.value().getDescriptionId()) ? MobEffects.MOVEMENT_SPEED.value().getDescriptionId() : MobEffects.POISON.value().getDescriptionId();
+        String other = effect.equals(MobEffects.POISON.value().getDescriptionId()) ? MobEffects.SPEED.value().getDescriptionId() : MobEffects.POISON.value().getDescriptionId();
         h.assertTrue(find(lines, other) == null, "Gun tooltip must hide later potion groups");
     }
 

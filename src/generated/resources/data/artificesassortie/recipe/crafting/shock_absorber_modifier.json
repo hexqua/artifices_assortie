@@ -1,28 +1,11 @@
 {
-  "neoforge:conditions": [
-    {
-      "type": "neoforge:not",
-      "value": {
-        "type": "neoforge:mod_loaded",
-        "modid": "create"
-      }
-    }
-  ],
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "irons_artifice:buffer_spring_modifier"
-    },
-    "M": {
-      "item": "irons_artifice:clockwork_components"
-    },
-    "N": {
-      "item": "minecraft:netherite_scrap"
-    },
-    "S": {
-      "item": "minecraft:slime_ball"
-    }
+    "B": "irons_artifice:buffer_spring_modifier",
+    "M": "irons_artifice:clockwork_components",
+    "N": "minecraft:netherite_scrap",
+    "S": "minecraft:slime_ball"
   },
   "pattern": [
     " N ",
@@ -30,7 +13,6 @@
     " M "
   ],
   "result": {
-    "count": 1,
     "id": "artificesassortie:shock_absorber_modifier"
   }
 }

@@ -6,7 +6,7 @@ import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -18,7 +18,7 @@ import java.util.List;
 
 public final class GunAugmentation {
     public static final TagKey<Item> AUGMENTABLE_GUNS = TagKey.create(Registries.ITEM,
-            ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "augmentable_guns"));
+            Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "augmentable_guns"));
     public static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, ArtificesAssortie.MODID);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> AUGMENTED = COMPONENTS.registerComponentType(
             "augmented_slot", builder -> builder.persistent(Codec.BOOL));

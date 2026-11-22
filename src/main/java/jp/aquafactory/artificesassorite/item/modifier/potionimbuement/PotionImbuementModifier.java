@@ -7,16 +7,16 @@ import io.redspace.irons_artifice.modifier.GunModifier;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 
 public final class PotionImbuementModifier implements GunModifier {
     public static final String KEY = "item.artificesassortie.potion_imbuement_modifier";
     public static final ComponentType<Boolean> INSTALLED = new ComponentType<>(
-            ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "potion_imbuement_installed"), () -> false);
+            Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "potion_imbuement_installed"), () -> false);
     public static final ComponentType<Payload> PAYLOAD = new ComponentType<>(
-            ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "potion_imbuement_payload"), () -> null);
+            Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "potion_imbuement_payload"), () -> null);
 
     public record Payload(PotionImbuementStorage.Contents contents, int projectileCount) {}
 

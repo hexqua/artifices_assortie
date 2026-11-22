@@ -25,7 +25,7 @@ final class OilHealingParticles {
         double height = Math.min(0.6, target.getBbHeight() * 0.25);
         for (var player : level.players()) {
             // 通常の32ブロック制限では遠距離回復の射手に見えないため、長距離配信を使う。
-            level.sendParticles(player, ParticleTypes.HAPPY_VILLAGER, true, target.getX(),
+            level.sendParticles(player, ParticleTypes.HAPPY_VILLAGER, true, false, target.getX(),
                     target.getY() + target.getBbHeight() * 0.5, target.getZ(), 6, spread, height, spread, 0);
         }
     }

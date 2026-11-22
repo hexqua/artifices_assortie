@@ -11,7 +11,6 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageScaling;
 import net.minecraft.world.damagesource.DamageType;
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,21 +20,21 @@ import java.util.concurrent.CompletableFuture;
 public final class OilDamageProvider {
     private OilDamageProvider() {}
 
-    public static void gatherData(GatherDataEvent event) {
+    public static void gatherData(GatherDataEvent.Client event) {
         var builder = new RegistrySetBuilder().add(Registries.DAMAGE_TYPE, context -> {
             context.register(OilEffects.BULLET, new DamageType("artificesassortie.oil_bullet", DamageScaling.NEVER, 0.1f));
             context.register(OilEffects.BLAST, new DamageType("artificesassortie.oil_blast", DamageScaling.NEVER, 0.1f));
         });
         var entries = new DatapackBuiltinEntriesProvider(event.getGenerator().getPackOutput(), event.getLookupProvider(),
                 builder, Set.of(ArtificesAssortie.MODID));
-        event.getGenerator().addProvider(event.includeServer(), entries);
-        event.getGenerator().addProvider(event.includeServer(), new Tags(event.getGenerator().getPackOutput(),
-                entries.getRegistryProvider(), event.getExistingFileHelper()));
+        event.addProvider(entries);
+        event.addProvider(new Tags(event.getGenerator().getPackOutput(),
+                entries.getRegistryProvider()));
     }
 
     private static final class Tags extends DamageTypeTagsProvider {
-        private Tags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookup, ExistingFileHelper helper) {
-            super(output, lookup, ArtificesAssortie.MODID, helper);
+        private Tags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookup) {
+            super(output, lookup, ArtificesAssortie.MODID);
         }
 
         @Override

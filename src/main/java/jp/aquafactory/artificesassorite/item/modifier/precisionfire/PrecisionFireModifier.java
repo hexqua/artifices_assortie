@@ -9,17 +9,17 @@ import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.ModifierText;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 
 public final class PrecisionFireModifier implements GunModifier {
     public static final ComponentType<Integer> COUNT = new ComponentType<>(
-            ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "precision_fire_count"), () -> 0);
+            Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "precision_fire_count"), () -> 0);
     public static final ComponentType<Double> HEADSHOT_MULTIPLIER = new ComponentType<>(
-            ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "precision_fire_headshot_multiplier"), () -> 1.0);
+            Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "precision_fire_headshot_multiplier"), () -> 1.0);
     public static final ComponentType<Double> BODYSHOT_MULTIPLIER = new ComponentType<>(
-            ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "precision_fire_bodyshot_multiplier"), () -> 1.0);
+            Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "precision_fire_bodyshot_multiplier"), () -> 1.0);
 
     @Override
     public void apply(ShotComponentMap components) {

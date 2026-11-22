@@ -7,13 +7,11 @@ import io.redspace.irons_artifice.data.Value;
 import io.redspace.irons_artifice.data.ValueModifier;
 import io.redspace.irons_artifice.entity.Bullet;
 import io.redspace.irons_artifice.item.GunplayManager;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.item.modifier.precisionfire.PrecisionFireEvents;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.registry.SoundRegistry;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
@@ -21,18 +19,11 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.PlayLevelSoundEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 public final class PrecisionFireGameTests {
     private PrecisionFireGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void headshotEmitsDedicatedSoundEvent(GameTestHelper h) throws Exception {
         try (var f = new ModifierTestFixture(h); var ignored = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS)) {
             f.equip("flintlock", ItemRegistry.PRECISION_FIRE_MODIFIER.get(), 1);
@@ -58,8 +49,6 @@ public final class PrecisionFireGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void headAndBodyDamageStackIndependently(GameTestHelper h) throws Exception {
         try (var fixture = new ModifierTestFixture(h); var ignored = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS)) {
             double[] head = {1, 1.5, 1.75, 2};
@@ -85,8 +74,6 @@ public final class PrecisionFireGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void piercingAndCanceledHitsDoNotLeakState(GameTestHelper h) throws Exception {
         try (var fixture = new ModifierTestFixture(h); var ignored = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS)) {
             fixture.equip("flintlock", ItemRegistry.PRECISION_FIRE_MODIFIER.get(), 1);
@@ -119,8 +106,6 @@ public final class PrecisionFireGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.modifier")
     public static void firedProfileSurvivesConfigAndEquipmentChanges(GameTestHelper h) throws Exception {
         try (var fixture = new ModifierTestFixture(h); var ignored = ServerConfig.overrideForGameTest(ModifierValues.DEFAULTS)) {
             fixture.equip("flintlock", ItemRegistry.PRECISION_FIRE_MODIFIER.get(), 2);

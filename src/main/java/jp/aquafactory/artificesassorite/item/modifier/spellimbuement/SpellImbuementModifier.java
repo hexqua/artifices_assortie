@@ -8,7 +8,7 @@ import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -17,11 +17,11 @@ import java.util.function.Consumer;
 public final class SpellImbuementModifier implements GunModifier {
     public static final String KEY = "item.artificesassortie.spell_imbuement_modifier";
     public static final ComponentType<Integer> COUNT = new ComponentType<>(
-            ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "spell_imbuement_count"), () -> 0);
+            Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "spell_imbuement_count"), () -> 0);
 
     @Override
     public void apply(ShotComponentMap components) {
-        if (SpellImbuementCompat.isAvailable()) components.set(COUNT, components.getOrDefault(COUNT) + 1);
+        // 保存済みの装着品は読み込めるが、この版では射撃効果を追加しない。
     }
 
     @Override

@@ -15,14 +15,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.GameMasterBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 public final class ExcavationMining {
@@ -51,7 +51,7 @@ public final class ExcavationMining {
     public static boolean canMine(ServerLevel level, BlockPos pos, BlockState state, Bullet bullet) {
         float hardness = state.getDestroySpeed(level, pos);
         if (state.isAir() || !Float.isFinite(hardness) || hardness < 0 || state.is(IronsArtificeTags.NEVER_BREAK)) return false;
-        if (bullet.getOwner() instanceof Mob && !level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) return false;
+        if (bullet.getOwner() instanceof Mob && !level.getGameRules().get(GameRules.MOB_GRIEFING)) return false;
         if (bullet.getOwner() instanceof Player player) {
             GameType mode = player instanceof ServerPlayer serverPlayer ? serverPlayer.gameMode.getGameModeForPlayer() : GameType.SURVIVAL;
             if (player.isSpectator() || player.blockActionRestricted(level, pos, mode)
@@ -77,7 +77,7 @@ public final class ExcavationMining {
 
     public static boolean breakZeroHealth(ServerLevel level, BlockPos pos, BlockState state, Bullet bullet) {
         if (bullet.getOwner() instanceof Player player
-                && NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(level, pos, state, player)).isCanceled()) return false;
+                && NeoForge.EVENT_BUS.post(new BreakBlockEvent(level, pos, state, player)).isCanceled()) return false;
         return harvest(level, pos, state, bullet);
     }
 
@@ -98,7 +98,7 @@ public final class ExcavationMining {
             if (bullet.getOwner() instanceof Player player) {
                 BlockState destroyedState = block.playerWillDestroy(level, pos, state, player);
                 boolean canHarvest = !player.isCreative();
-                if (!destroyedState.onDestroyedByPlayer(level, pos, player, canHarvest, level.getFluidState(pos))) return false;
+                if (!destroyedState.onDestroyedByPlayer(level, pos, player, tool, canHarvest, level.getFluidState(pos))) return false;
                 destroyedState.getBlock().destroy(level, pos, destroyedState);
                 // 通常採掘と同様にクリエイティブではドロップ生成へ進まず、ブロック固有の撤去処理は維持する。
                 if (canHarvest) destroyedState.getBlock().playerDestroy(level, player, pos, destroyedState, blockEntity, tool);

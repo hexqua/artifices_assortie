@@ -72,15 +72,7 @@ public final class PotionImbuementTooltips {
 
     private static List<MobEffectInstance> appliedEffects(PotionImbuementStorage.Contents contents) {
         var effects = new ArrayList<MobEffectInstance>();
-        contents.potion().potion().ifPresent(potion -> {
-            for (var effect : potion.value().getEffects()) {
-                // 残留雲は基本効果だけを1/4にし、customEffectsは元の時間で付与する。
-                effects.add(contents.bottle() == PotionImbuementStorage.Bottle.LINGERING
-                        ? new MobEffectInstance(effect.getEffect(), effect.mapDuration(ticks -> ticks / 4), effect.getAmplifier(),
-                                effect.isAmbient(), effect.isVisible(), effect.showIcon()) : new MobEffectInstance(effect));
-            }
-        });
-        for (var effect : contents.potion().customEffects()) effects.add(new MobEffectInstance(effect));
+        contents.potion().forEachEffect(effects::add, contents.durationScale());
         return effects;
     }
 

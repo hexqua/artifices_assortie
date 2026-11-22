@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "minecraft:amethyst_shard"
-    },
-    "C": {
-      "item": "irons_artifice:clockwork_components"
-    },
-    "D": {
-      "item": "minecraft:polished_deepslate"
-    },
-    "G": {
-      "item": "minecraft:diamond"
-    },
-    "R": {
-      "item": "minecraft:redstone"
-    }
+    "A": "minecraft:amethyst_shard",
+    "C": "irons_artifice:clockwork_components",
+    "D": "minecraft:polished_deepslate",
+    "G": "minecraft:diamond",
+    "R": "minecraft:redstone"
   },
   "pattern": [
     " A ",
@@ -24,7 +14,6 @@
     "ADA"
   ],
   "result": {
-    "count": 1,
     "id": "artificesassortie:standing_snipe_modifier"
   }
 }

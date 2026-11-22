@@ -9,9 +9,10 @@ import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbu
 import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementModifier;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,15 +46,15 @@ public abstract class OilBulletMixin extends Projectile {
     }
 
     @WrapOperation(method = "onHitEntity", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
-    private boolean convertOilImpact(Entity target, DamageSource source, float amount, Operation<Boolean> original) {
+            target = "Lnet/minecraft/world/entity/Entity;hurtServer(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
+    private boolean convertOilImpact(Entity target, ServerLevel level, DamageSource source, float amount, Operation<Boolean> original) {
         var bullet = (Bullet) (Object) this;
         // コインの hurt は生物への damage ではなく、跳弾イベント後のコイン消費を担う。
         if (PotionImbuementEffects.regular(bullet) && !(target instanceof SoulfireCoin)) {
             if (target instanceof EnderDragonPart part && !artificesassortie$hitDragons.add(part.parentMob.getId())) return false;
             return PotionImbuementEffects.applyRegular(bullet, target);
         }
-        if (!OilEffects.enabled(bullet.getProfile())) return original.call(target, source, amount);
+        if (!OilEffects.enabled(bullet.getProfile())) return original.call(target, level, source, amount);
         if (target instanceof EnderDragonPart part && !artificesassortie$hitDragons.add(part.parentMob.getId())) return false;
         return OilEffects.affect(bullet, target, amount, false);
     }

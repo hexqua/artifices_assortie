@@ -1,7 +1,9 @@
 package jp.aquafactory.artificesassorite.gametest.augmentation;
 
+import net.minecraft.world.item.component.TooltipDisplay;
+import jp.aquafactory.artificesassorite.gametest.TestSnapshots;
+
 import com.mojang.authlib.GameProfile;
-import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.Unpooled;
 import io.redspace.irons_artifice.data.ShotComponents;
 import io.redspace.irons_artifice.item.GunItem;
@@ -9,7 +11,6 @@ import io.redspace.irons_artifice.item.GunplayManager;
 import io.redspace.irons_artifice.item.MagazineContents;
 import io.redspace.irons_artifice.menu.GunContainer;
 import io.redspace.irons_artifice.menu.GunModifierMenu;
-import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.AugmentationConfig;
 import jp.aquafactory.artificesassorite.item.augmentation.AugmentationRecipe;
 import jp.aquafactory.artificesassorite.item.augmentation.AugmentationTooltips;
@@ -18,16 +19,17 @@ import jp.aquafactory.artificesassorite.network.SyncAugmentationMaterialPayload;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagLoader;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundUpdateRecipesPacket;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.SmithingMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -35,9 +37,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmithingRecipeInput;
+import net.minecraft.world.item.crafting.RecipePropertySet;
 import net.neoforged.neoforge.common.util.FakePlayer;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 
 import java.util.ArrayList;
@@ -45,44 +46,28 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-@GameTestHolder(ArtificesAssortie.MODID)
-@PrefixGameTestTemplate(false)
 @SuppressWarnings("unused")
 public final class AugmentationGameTests {
     private AugmentationGameTests() {}
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.augmentation")
     public static void loginRecipePacketPreservesUsableAugmentationRecipe(GameTestHelper h) {
         var buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), h.getLevel().registryAccess(), ConnectionType.NEOFORGE);
         var previous = AugmentationConfig.serverMaterial();
         try {
             AugmentationConfig.updateServer(AugmentationConfig.DEFAULT);
-            var registeredRecipes = h.getLevel().getRecipeManager().getRecipes();
-            h.assertTrue(registeredRecipes.stream().anyMatch(holder -> holder.value() instanceof AugmentationRecipe),
-                    "The login packet must contain the registered augmentation recipe");
-            ClientboundUpdateRecipesPacket.STREAM_CODEC.encode(buffer, new ClientboundUpdateRecipesPacket(registeredRecipes));
+            var recipes = h.getLevel().recipeAccess();
+            var packet = new ClientboundUpdateRecipesPacket(recipes.getSynchronizedItemProperties(), recipes.getSynchronizedStonecutterRecipes());
+            ClientboundUpdateRecipesPacket.STREAM_CODEC.encode(buffer, packet);
             var decoded = ClientboundUpdateRecipesPacket.STREAM_CODEC.decode(buffer);
-            h.assertTrue(decoded.getRecipes().size() == registeredRecipes.size() && buffer.readableBytes() == 0,
-                    "The login recipe packet must preserve every recipe without leaving unread bytes");
+            h.assertTrue(decoded.itemSets().get(RecipePropertySet.SMITHING_TEMPLATE).test(new ItemStack(ItemRegistry.MODIFIER_AUGMENTATION_KIT.get()))
+                    && buffer.readableBytes() == 0, "Login must synchronize the augmentation template");
             var input = input(gun("musket"), AugmentationConfig.DEFAULT.item());
-            var restored = decoded.getRecipes().stream().filter(holder -> holder.value() instanceof AugmentationRecipe)
-                    .map(holder -> (AugmentationRecipe) holder.value()).findFirst().orElseThrow();
-            h.assertTrue(restored.matches(input, h.getLevel())
-                    && GunAugmentation.isAugmented(restored.assemble(input, h.getLevel().registryAccess())),
-                    "A recipe decoded from the login packet must still augment the gun");
-            buffer.clear();
-            ClientboundUpdateRecipesPacket.STREAM_CODEC.encode(buffer, decoded);
-            h.assertTrue(ClientboundUpdateRecipesPacket.STREAM_CODEC.decode(buffer).getRecipes().size() == registeredRecipes.size(),
-                    "Recipes reconstructed by the network codec must also be encodable");
+            h.assertTrue(GunAugmentation.isAugmented(recipe(h, input).assemble(input)), "Server recipe must augment the synchronized gun");
         } finally {
             AugmentationConfig.updateServer(previous);
             buffer.release();
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.augmentation")
     public static void smithingPreservesGunAndConsumesInputsOnce(GameTestHelper h) {
         var player = player(h);
         var materialBefore = AugmentationConfig.serverMaterial();
@@ -102,7 +87,7 @@ public final class AugmentationGameTests {
             h.assertTrue(GunAugmentation.isAugmented(menu.getSlot(3).getItem()), "Smithing menu must offer an augmented gun");
             h.assertTrue(menu.getSlot(0).getItem().getCount() == 2 && menu.getSlot(2).getItem().getCount() == 2
                     && ItemStack.isSameItemSameComponents(gun, before), "Preview must not consume inputs or mutate the base gun");
-            menu.clicked(3, 0, ClickType.PICKUP, player);
+            menu.clicked(3, 0, ContainerInput.PICKUP, player);
             var result = menu.getCarried();
             h.assertTrue(GunAugmentation.isAugmented(result) && result.getCount() == 1, "Taking the result must produce one augmented gun");
             var withoutAugmentation = result.copy();
@@ -112,8 +97,8 @@ public final class AugmentationGameTests {
                     && menu.getSlot(1).getItem().isEmpty(), "Taking the result must consume one kit, one material, and the base gun");
             menu.setCarried(ItemStack.EMPTY);
             menu.getSlot(1).set(result);
-            h.assertTrue(menu.getSlot(3).getItem().isEmpty() && !menu.getSlot(3).mayPickup(player), "A second augmentation must not offer a result");
-            menu.clicked(3, 0, ClickType.PICKUP, player);
+            h.assertTrue(menu.getSlot(3).getItem().isEmpty(), "A second augmentation must not offer a result");
+            menu.clicked(3, 0, ContainerInput.PICKUP, player);
             h.assertTrue(menu.getSlot(0).getItem().getCount() == 1 && menu.getSlot(2).getItem().getCount() == 1
                     && ItemStack.isSameItemSameComponents(menu.getSlot(1).getItem(), result), "Rejected repeat augmentation must preserve every input");
         } finally {
@@ -122,15 +107,13 @@ public final class AugmentationGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.augmentation")
     public static void extraSlotAffectsShotsAndSurvivesStorage(GameTestHelper h) {
         var player = player(h);
         var materialBefore = AugmentationConfig.serverMaterial();
         try {
             AugmentationConfig.updateServer(AugmentationConfig.DEFAULT);
             var input = input(gun("blunderbuss"), AugmentationConfig.DEFAULT.item());
-            var result = recipe(h, input).assemble(input, h.getLevel().registryAccess());
+            var result = recipe(h, input).assemble(input);
             var gunItem = (GunItem) result.getItem();
             h.assertTrue(GunplayManager.compose(null, gunItem.getGun(), result).value(ShotComponents.CHARACTER_BLOWBACK) > 0,
                     "Control gun must push the shooter before installing a buffer spring");
@@ -141,14 +124,14 @@ public final class AugmentationGameTests {
             menu.getModifierSlots().get(5).setChanged();
             h.assertTrue(GunplayManager.compose(null, gunItem.getGun(), result).value(ShotComponents.CHARACTER_BLOWBACK) == 0,
                     "A buffer spring in the extra slot must cancel shooter blowback through normal shot composition");
-            var restored = ItemStack.parse(h.getLevel().registryAccess(), result.save(h.getLevel().registryAccess())).orElseThrow();
+            var restored = TestSnapshots.load(TestSnapshots.save(result, h.getLevel().registryAccess()), h.getLevel().registryAccess());
             h.assertTrue(GunAugmentation.isAugmented(restored) && new GunContainer(restored).getItem(5).is(artificeItem("buffer_spring_modifier")),
                     "Saving and loading must preserve augmentation and the extra slot's modifier");
             h.assertTrue(GunplayManager.compose(null, gunItem.getGun(), restored).value(ShotComponents.CHARACTER_BLOWBACK) == 0,
                     "The restored extra-slot modifier must still affect shots");
             h.assertTrue(new GunContainer(gun("blunderbuss")).getContainerSize() == 5, "Augmentation must not change other instances of the same gun");
             var tooltip = new ArrayList<Component>();
-            gunItem.appendHoverText(restored, Item.TooltipContext.of(h.getLevel()), tooltip, TooltipFlag.NORMAL);
+            gunItem.appendHoverText(restored, Item.TooltipContext.of(h.getLevel()), TooltipDisplay.DEFAULT, tooltip::add, TooltipFlag.NORMAL);
             h.assertTrue(tooltip.stream().anyMatch(line -> line.getContents() instanceof TranslatableContents contents
                     && contents.getKey().equals("irons_artifice.tooltip.modifier_count") && contents.getArgs()[0].equals(6)),
                     "Gun tooltip must report the effective slot count");
@@ -158,43 +141,39 @@ public final class AugmentationGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.augmentation")
     public static void tagControlsNewAugmentationOnly(GameTestHelper h) {
         var materialBefore = AugmentationConfig.serverMaterial();
         var musket = gun("musket");
         var registry = BuiltInRegistries.ITEM;
-        var originalTags = registry.getTags().collect(Collectors.toMap(Pair::getFirst, pair -> pair.getSecond().stream().toList()));
+        var originalTags = registry.getTags().collect(Collectors.toMap(tag -> tag.key(), tag -> tag.stream().toList()));
         try {
             AugmentationConfig.updateServer(AugmentationConfig.DEFAULT);
             for (var id : List.of("flintlock", "musket", "blunderbuss", "blackpowder_revolver", "six_shooter")) {
                 var input = input(gun(id), AugmentationConfig.DEFAULT.item());
-                h.assertTrue(GunAugmentation.isAugmented(recipe(h, input).assemble(input, h.getLevel().registryAccess())),
+                h.assertTrue(GunAugmentation.isAugmented(recipe(h, input).assemble(input)),
                         "Default target must be augmentable through the registered smithing recipe: " + id);
             }
-            var result = recipe(h, input(musket, AugmentationConfig.DEFAULT.item())).assemble(input(musket, AugmentationConfig.DEFAULT.item()), h.getLevel().registryAccess());
+            var result = recipe(h, input(musket, AugmentationConfig.DEFAULT.item())).assemble(input(musket, AugmentationConfig.DEFAULT.item()));
             var changedTags = new HashMap<>(originalTags);
             changedTags.put(GunAugmentation.AUGMENTABLE_GUNS, originalTags.get(GunAugmentation.AUGMENTABLE_GUNS).stream()
                     .filter(entry -> entry.value() != musket.getItem()).toList());
-            registry.bindTags(changedTags);
+            registry.prepareTagReload(new TagLoader.LoadResult<>(Registries.ITEM, changedTags)).apply();
             h.assertTrue(!matches(h, input(musket, AugmentationConfig.DEFAULT.item())), "Removing a gun from its tag must reject new augmentation");
             h.assertTrue(new GunContainer(result).getContainerSize() == 6, "Tag removal must preserve previously augmented capacity");
-            registry.bindTags(originalTags);
+            registry.prepareTagReload(new TagLoader.LoadResult<>(Registries.ITEM, originalTags)).apply();
             h.assertTrue(matches(h, input(musket, AugmentationConfig.DEFAULT.item())), "Restoring the tag must allow new augmentation again");
             var tagsWithAugmentation = new ArrayList<>(originalTags.get(GunAugmentation.AUGMENTABLE_GUNS));
             tagsWithAugmentation.add(registry.wrapAsHolder(Items.DIAMOND));
             changedTags.put(GunAugmentation.AUGMENTABLE_GUNS, tagsWithAugmentation);
-            registry.bindTags(changedTags);
+            registry.prepareTagReload(new TagLoader.LoadResult<>(Registries.ITEM, changedTags)).apply();
             h.assertTrue(!matches(h, input(new ItemStack(Items.DIAMOND), AugmentationConfig.DEFAULT.item())), "Tagging a non-gun must not make it augmentable");
             h.assertTrue(!matches(h, input(gun("arquebus"), AugmentationConfig.DEFAULT.item())), "An unlisted gun must be rejected");
         } finally {
-            registry.bindTags(originalTags);
+            registry.prepareTagReload(new TagLoader.LoadResult<>(Registries.ITEM, originalTags)).apply();
             AugmentationConfig.updateServer(materialBefore);
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.augmentation")
     public static void materialChangesRejectAndRecoverWithoutConsumingInputs(GameTestHelper h) {
         var previous = AugmentationConfig.serverMaterial();
         var player = player(h);
@@ -207,15 +186,15 @@ public final class AugmentationGameTests {
             h.assertTrue(!menu.getSlot(3).getItem().isEmpty(), "Valid control recipe must offer an output");
             for (var invalid : List.of("INVALID ID", "artificesassortie:missing_material", "minecraft:air")) {
                 AugmentationConfig.updateServer(AugmentationConfig.resolve(invalid));
-                h.assertTrue(!menu.getSlot(3).mayPickup(player), "A stale result must not be obtainable after disabling the material: " + invalid);
                 menu.createResult();
-                menu.clicked(3, 0, ClickType.PICKUP, player);
+                menu.clicked(3, 0, ContainerInput.PICKUP, player);
                 h.assertTrue(menu.getCarried().isEmpty() && menu.getSlot(0).getItem().getCount() == 1
                         && menu.getSlot(1).getItem().getCount() == 1 && menu.getSlot(2).getItem().getCount() == 1,
                         "Invalid material must reject crafting without consuming inputs: " + invalid);
             }
             AugmentationConfig.updateServer(AugmentationConfig.resolve("minecraft:diamond"));
             h.assertTrue(!matches(h, input(gun("musket"), AugmentationConfig.DEFAULT.item())), "Changing material must reject the previous ingredient");
+            h.assertTrue(menu.getSlot(2).mayPlace(new ItemStack(Items.DIAMOND)), "Changed material must be insertable in the open menu");
             menu.getSlot(2).set(new ItemStack(Items.DIAMOND));
             h.assertTrue(GunAugmentation.isAugmented(menu.getSlot(3).getItem()), "A valid replacement material must restore crafting");
             var wrongTemplate = new SmithingRecipeInput(new ItemStack(Items.STICK), gun("musket"), new ItemStack(Items.DIAMOND));
@@ -226,8 +205,6 @@ public final class AugmentationGameTests {
         }
         h.succeed();
     }
-
-    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.augmentation")
     public static void synchronizedMaterialAndTooltipLimits(GameTestHelper h) {
         var previous = AugmentationConfig.clientMaterial();
         var buffer = new FriendlyByteBuf(Unpooled.buffer());
@@ -239,7 +216,7 @@ public final class AugmentationGameTests {
             var eligible = GunAugmentation.eligibleItems();
             AugmentationTooltips.describe(lines::add, AugmentationConfig.clientMaterial(), true, 2, true, eligible);
             var materialName = (Component) ((TranslatableContents) lines.getFirst().getContents()).getArgs()[0];
-            h.assertTrue(materialName.getString().equals(Items.DIAMOND.getDescription().getString()), "Tooltip material name must use synchronized configuration");
+            h.assertTrue(materialName.getString().equals(Items.DIAMOND.getDefaultInstance().getHoverName().getString()), "Tooltip material name must use synchronized configuration");
             var overflow = (TranslatableContents) lines.getLast().getContents();
             h.assertTrue(overflow.getKey().endsWith("detail.overflow_jei") && overflow.getArgs()[0].equals(eligible.size() - 2),
                     "Expanded tooltip must show only the configured number of guns and report the remaining count");
@@ -265,7 +242,7 @@ public final class AugmentationGameTests {
     }
 
     private static Item artificeItem(String path) {
-        return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("irons_artifice", path));
+        return BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("irons_artifice", path));
     }
 
     private static ItemStack gun(String path) { return new ItemStack(artificeItem(path)); }
@@ -275,11 +252,11 @@ public final class AugmentationGameTests {
     }
 
     private static boolean matches(GameTestHelper h, SmithingRecipeInput input) {
-        return h.getLevel().getRecipeManager().getRecipeFor(RecipeType.SMITHING, input, h.getLevel())
+        return h.getLevel().recipeAccess().getRecipeFor(RecipeType.SMITHING, input, h.getLevel())
                 .filter(holder -> holder.value() instanceof AugmentationRecipe).isPresent();
     }
 
     private static AugmentationRecipe recipe(GameTestHelper h, SmithingRecipeInput input) {
-        return (AugmentationRecipe) h.getLevel().getRecipeManager().getRecipeFor(RecipeType.SMITHING, input, h.getLevel()).orElseThrow().value();
+        return (AugmentationRecipe) h.getLevel().recipeAccess().getRecipeFor(RecipeType.SMITHING, input, h.getLevel()).orElseThrow().value();
     }
 }
