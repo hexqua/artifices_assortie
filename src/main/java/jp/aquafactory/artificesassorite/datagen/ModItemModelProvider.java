@@ -7,13 +7,18 @@ import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.model.ModelTemplates;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
+@EventBusSubscriber(modid = ArtificesAssortie.MODID, value = Dist.CLIENT)
 public final class ModItemModelProvider extends ModelProvider {
     public ModItemModelProvider(PackOutput output) {
         super(output, ArtificesAssortie.MODID);
     }
 
+    @SubscribeEvent
     public static void gatherData(GatherDataEvent.Client event) {
         event.addProvider(new ModItemModelProvider(event.getGenerator().getPackOutput()));
     }

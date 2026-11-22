@@ -10,7 +10,6 @@ import jp.aquafactory.artificesassorite.item.modifier.shockabsorber.ShockAbsorbe
 import jp.aquafactory.artificesassorite.datagen.ModItemTagsProvider;
 import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuementStorage;
 import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbuementStorage;
-import jp.aquafactory.artificesassorite.datagen.ModItemModelProvider;
 import jp.aquafactory.artificesassorite.datagen.RecipeDataProviders;
 import jp.aquafactory.artificesassorite.datagen.SoundDataProvider;
 import jp.aquafactory.artificesassorite.datagen.OilDamageProvider;
@@ -43,7 +42,6 @@ public class ArtificesAssortie {
         CreativeTabRegistry.TABS.register(bus);
         ModifierConfigSync.register(bus);
         bus.addListener(Networks::register);
-        bus.addListener(ModItemModelProvider::gatherData);
         bus.addListener(ModItemTagsProvider::gatherData);
         bus.addListener(SoundDataProvider::gatherData);
         bus.addListener(OilDamageProvider::gatherData);
