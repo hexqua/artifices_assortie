@@ -38,6 +38,7 @@ body:
     attributes:
       label: Minecraft version
       options:
+        - "26.1.2"
         - "1.21.1"
     validations:
       required: true
@@ -68,7 +69,7 @@ body:
     id: forge-version
     attributes:
       label: NeoForge version
-      placeholder: "Example: NeoForge 21.1.265"
+      placeholder: "Example: NeoForge 26.1.2.127"
     validations:
       required: true
 
