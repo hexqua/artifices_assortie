@@ -9,7 +9,7 @@ Iron's Arms 'n Artifice用の小さなアドオンMODです.
 - 開発ブランチ `main` では Java 21 を使用します。
 - `main` は Minecraft 1.21.1 / NeoForge の主要開発ブランチです。
 - 現在、Minecraft 1.20.1 / Forge の保守・backport 運用は設けていません。
-- Minecraft 26.1.2 / NeoForge の対応予定はありません。
+- Minecraft 26.1.2 / NeoForge / Java 25 へは `26.1.2-main` でforward-portします。機能・依存・検証方法は対象ブランチのREADMEを参照してください。
 - `build.gradle` では Java toolchain を 21 に固定していますが、`gradlew.bat` 自体が使う JVM は `JAVA_HOME` または `PATH` に依存します。
 
 ## 導入方法

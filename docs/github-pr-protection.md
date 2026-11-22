@@ -10,7 +10,7 @@
 
 ## リポジトリ設定
 
-- 開発基準・既定ブランチは `main`。
+- 開発基準・既定ブランチは `main`。26.1.2の取り込み先は `26.1.2-main` とし、対応ブランチのworkflowで同名のbuild・gametestを検証する。26.1.2用rulesetの適用は初回PRのcheck確認後に個別に行う。
 - merge commit のみ許可する。バージョン更新を含め rebase merge と squash merge は使用しない。
 - マージ後の作業ブランチ自動削除は有効、auto merge は無効。
 

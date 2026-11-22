@@ -12,7 +12,7 @@
 
 - Artifices Assortie: Minecraft 1.21.1 / NeoForge / Java 21。バージョンの正は `gradle.properties`。
 - MOD ID は `artificesassortie`、package は `jp.aquafactory.artificesassorite`。
-- `main` が開発基準。1.20.1 / Forge の保守・backport 運用は設けない。
+- 1.21.1の `main` が開発基準。共通機能・修正の設計では `forward-port-ready-development` Skill を参照する。実際の移植は `26.1.2-main` から分岐し、移植先の `forward-port-26-1-2` Skill と `docs/forward-port-26.1.2.md` に従う。1.20.1 / Forge の保守・backport 運用は設けない。
 - Iron's Arms 'n Artifice / GeckoLib / Iron's Lib が必須依存。Create / Iron's Spells 'n Spellbooks / Malum / JEI は任意依存。JEI は client のレシピ表示連携。Spellbooks は Irons / Magic、Malum は Magic 構成で連携を確認する。Iron's Gems 'n Jewelry は開発用 Irons / Magic 構成にのみ追加し、本 MOD の依存宣言には含めない。
 - Magic 構成は Irons 構成一式に Malum / Lodestone を加える。Malum の前提 Curios は Irons 構成で導入し、本 MOD の必須・任意依存には追加しない。
 - client / GameTest の共通構成は必須依存に JEI / Jade / Target Dummy と前提の MezzConfig / Moonlight Lib を加える。追加構成とバージョンは `build.gradle`、`gradle.properties`、README を確認する。開発用 MOD を配布 jar へ同梱しない。

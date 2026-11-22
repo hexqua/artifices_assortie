@@ -39,6 +39,7 @@ body:
       label: Minecraft version
       options:
         - "1.21.1"
+        - "26.1.2"
     validations:
       required: true
 
