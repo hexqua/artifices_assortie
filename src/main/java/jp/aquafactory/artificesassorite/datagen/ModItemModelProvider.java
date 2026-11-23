@@ -1,5 +1,7 @@
 package jp.aquafactory.artificesassorite.datagen;
 
+import com.geckolib.renderer.internal.GeckolibItemSpecialRenderer;
+import io.redspace.irons_artifice.item.GunItem;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.data.PackOutput;
@@ -7,10 +9,14 @@ import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.client.renderer.item.SpecialModelWrapper;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+
+import java.util.Optional;
 
 @EventBusSubscriber(modid = ArtificesAssortie.MODID, value = Dist.CLIENT)
 public final class ModItemModelProvider extends ModelProvider {
@@ -25,6 +31,10 @@ public final class ModItemModelProvider extends ModelProvider {
 
     @Override
     protected void registerModels(BlockModelGenerators blocks, ItemModelGenerators items) {
+        // 親 MOD と表示変換を共有し、GeckoLib に銃の描画を委ねる。
+        items.itemModelOutput.accept(ItemRegistry.GEARWORK_REPEATER.get(), new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("irons_artifice", "item/gun_display"),
+                Optional.empty(), new GeckolibItemSpecialRenderer.Unbaked<GunItem>()));
         items.generateFlatItem(ItemRegistry.MODIFIER_AUGMENTATION_KIT.get(), ModelTemplates.FLAT_ITEM);
         items.generateFlatItem(ItemRegistry.PRECISION_FIRE_MODIFIER.get(), ModelTemplates.FLAT_ITEM);
         items.generateFlatItem(ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER.get(), ModelTemplates.FLAT_ITEM);
