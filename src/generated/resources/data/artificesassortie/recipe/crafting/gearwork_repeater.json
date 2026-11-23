@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": "irons_artifice:bullet_box",
+    "C": "irons_artifice:clockwork_components",
+    "N": "minecraft:netherite_ingot",
+    "R": "irons_artifice:mechanical_repeater_modifier",
+    "W": "#minecraft:logs"
+  },
+  "pattern": [
+    "N  ",
+    " RB",
+    " WC"
+  ],
+  "result": {
+    "id": "artificesassortie:gearwork_repeater"
+  }
+}

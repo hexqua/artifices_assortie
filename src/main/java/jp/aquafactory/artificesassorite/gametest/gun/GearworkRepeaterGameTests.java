@@ -14,7 +14,7 @@ import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.AABB;
@@ -86,7 +86,7 @@ public final class GearworkRepeaterGameTests {
             helper.assertTrue(menu.getModifierSlots().size() == 6, "The unaugmented repeater must expose six modifier slots");
             var slot = menu.getModifierSlots().get(5);
             menu.setCarried(new ItemStack(ItemRegistry.SHOCK_ABSORBER_MODIFIER.get()));
-            menu.clicked(slot.index, 0, ClickType.PICKUP, player);
+            menu.clicked(slot.index, 0, ContainerInput.PICKUP, player);
             helper.assertTrue(new GunContainer(gun).getItem(5).is(ItemRegistry.SHOCK_ABSORBER_MODIFIER.get())
                             && menu.getCarried().isEmpty(),
                     "Placing a modifier through the menu must store it in the repeater's sixth slot");
