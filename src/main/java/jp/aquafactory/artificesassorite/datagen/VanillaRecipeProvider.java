@@ -2,6 +2,7 @@ package jp.aquafactory.artificesassorite.datagen;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
+import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import io.redspace.irons_artifice.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.augmentation.AugmentationRecipe;
@@ -15,6 +16,7 @@ import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.SpecialRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
@@ -190,6 +192,18 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_mechanical_components", has(ItemRegistry.MECHANICAL_COMPONENTS.get()))
                 .save(fallback, id("crafting/grip_hold_stabilization_modifier"));
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, GEARWORK_REPEATER.get())
+                .pattern("N  ")
+                .pattern(" RB")
+                .pattern(" WC")
+                .define('N', Items.NETHERITE_INGOT)
+                .define('W', ItemTags.LOGS)
+                .define('C', IronsArtificeItems.CLOCKWORK_COMPONENTS.get())
+                .define('B', IronsArtificeItems.BULLET_BOX.get())
+                .define('R', IronsArtificeItems.MECHANICAL_REPEATER.get())
+                .unlockedBy("has_clockwork_components", has(IronsArtificeItems.CLOCKWORK_COMPONENTS.get()))
+                .save(fallback, id("crafting/gearwork_repeater"));
+
         // Create 用でも通常の作業台で作れるよう、バニラ形式として生成する。
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, GRIP_HOLD_STABILIZATION_MODIFIER.get())
                 .pattern(" V ")
@@ -202,6 +216,18 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('I', Items.IRON_BLOCK)
                 .unlockedBy("has_mechanical_components", has(ItemRegistry.MECHANICAL_COMPONENTS.get()))
                 .save(output.withConditions(createLoaded), id("compat/create/grip_hold_stabilization_modifier"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, GEARWORK_REPEATER.get())
+                .pattern("N  ")
+                .pattern(" RB")
+                .pattern(" WC")
+                .define('N', Items.NETHERITE_INGOT)
+                .define('W', ItemTags.LOGS)
+                .define('C', AllItems.PRECISION_MECHANISM)
+                .define('B', IronsArtificeItems.BULLET_BOX.get())
+                .define('R', IronsArtificeItems.MECHANICAL_REPEATER.get())
+                .unlockedBy("has_precision_mechanism", has(AllItems.PRECISION_MECHANISM.get()))
+                .save(output.withConditions(createLoaded), id("compat/create/gearwork_repeater"));
 
         // 入手時期がMODに左右されないようにCreate 導入時でもレシピを変更しない.
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, STANDING_SNIPE_MODIFIER.get())
