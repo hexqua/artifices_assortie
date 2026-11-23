@@ -21,8 +21,13 @@ public final class CreativeTabRegistry {
     private CreativeTabRegistry() {}
 
     private static void displayItems(CreativeModeTab.ItemDisplayParameters parameters, CreativeModeTab.Output output) {
+        addGuns(output);
         addModifiers(output);
         addSpecialItem(output);
+    }
+
+    private static void addGuns(CreativeModeTab.Output output) {
+        output.accept(ItemRegistry.GEARWORK_REPEATER.get());
     }
 
     private static void addModifiers(CreativeModeTab.Output output) {

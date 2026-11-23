@@ -260,6 +260,22 @@ public final class AugmentationGameTests {
         h.succeed();
     }
 
+    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.augmentation")
+    public static void gearworkRepeaterRejectsAugmentation(GameTestHelper h) {
+        var material = AugmentationConfig.DEFAULT.item();
+        var previous = AugmentationConfig.serverMaterial();
+        try {
+            AugmentationConfig.updateServer(AugmentationConfig.DEFAULT);
+            h.assertTrue(matches(h, input(gun("musket"), material)),
+                    "The augmentation recipe must accept the musket with the configured material");
+            h.assertTrue(!matches(h, input(new ItemStack(ItemRegistry.GEARWORK_REPEATER.get()), material)),
+                    "The augmentation recipe must reject the Gearwork Repeater with the same material");
+        } finally {
+            AugmentationConfig.updateServer(previous);
+        }
+        h.succeed();
+    }
+
     private static FakePlayer player(GameTestHelper h) {
         return new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "augmentation_test"));
     }

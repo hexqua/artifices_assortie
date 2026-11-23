@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "item": "irons_artifice:bullet_box"
+    },
+    "C": {
+      "item": "create:precision_mechanism"
+    },
+    "N": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "R": {
+      "item": "irons_artifice:mechanical_repeater_modifier"
+    },
+    "W": {
+      "tag": "minecraft:logs"
+    }
+  },
+  "pattern": [
+    "N  ",
+    " RB",
+    " WC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:gearwork_repeater"
+  }
+}
