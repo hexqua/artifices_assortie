@@ -4,6 +4,7 @@ import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
@@ -18,6 +19,9 @@ public final class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
+        // 親モデルは必須依存 MOD の jar にあり、この Provider の既存リソース検査には含まれない。
+        getBuilder(ItemRegistry.GEARWORK_REPEATER.getId().getPath())
+                .parent(new ModelFile.UncheckedModelFile("irons_artifice:item/gun_display"));
         basicItem(ItemRegistry.MODIFIER_AUGMENTATION_KIT.get());
         basicItem(ItemRegistry.PRECISION_FIRE_MODIFIER.get());
         basicItem(ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER.get());
