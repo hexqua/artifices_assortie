@@ -1,5 +1,6 @@
 package jp.aquafactory.artificesassorite.gametest.recipe;
 
+import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import io.redspace.irons_artifice.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.gametest.framework.GameTest;
@@ -17,6 +18,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import java.util.Arrays;
 
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.JUGGLING_RELOAD_COIN;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.EXCAVATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
@@ -54,6 +56,30 @@ public final class ModifierRecipeGameTests {
                 Items.GOLD_INGOT, Items.QUARTZ_BLOCK, Items.AIR,
                 bullet, bullet, Items.QUARTZ_BLOCK,
                 Items.GOLD_INGOT, Items.EXPERIENCE_BOTTLE, secondBottle);
+    }
+
+    // GameTest がアノテーションから探索して呼び出す。
+    @SuppressWarnings("unused")
+    @GameTest(template = "gametest/basic_floor")
+    public static void jugglingReloadCoinRecipeSwitchesWithCreate(GameTestHelper helper) {
+        boolean createLoaded = ModList.get().isLoaded("create");
+        assertRecipeVariants(helper, "juggling_reload_coin", "sequenced_assembly/juggling_reload_coin", createLoaded);
+        var fallback = reloadCoinInput(IronsArtificeItems.GUN_OIL.get());
+        if (createLoaded) {
+            assertNoCraftingRecipe(helper, fallback, "Create must disable the crafting table reload coin recipe");
+            CreateModifierRecipeScenarios.jugglingReloadCoin(helper);
+        } else {
+            assertCrafts(helper, fallback, JUGGLING_RELOAD_COIN.get());
+            assertNoCraftingRecipe(helper, reloadCoinInput(Items.AIR), "Reload coin crafting must require both gun oils");
+        }
+        helper.succeed();
+    }
+
+    private static CraftingInput reloadCoinInput(ItemLike secondOil) {
+        return input(3, 3,
+                Items.AIR, IronsArtificeItems.ENCHANTED_BULLET_MODIFIER.get(), Items.AIR,
+                IronsArtificeItems.GUN_OIL.get(), IronsArtificeItems.SOULFIRE_COIN.get(), secondOil,
+                Items.AIR, ENCHANTED_MAGAZINE_MODIFIER.get(), Items.AIR);
     }
 
     @GameTest(template = "gametest/basic_floor")

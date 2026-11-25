@@ -1,5 +1,6 @@
 package jp.aquafactory.artificesassorite.datagen;
 
+import com.simibubi.create.AllFluids;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.api.data.recipe.MechanicalCraftingRecipeBuilder;
 import com.simibubi.create.content.kinetics.deployer.DeployerApplicationRecipe;
@@ -7,6 +8,7 @@ import com.simibubi.create.content.kinetics.press.PressingRecipe;
 import com.simibubi.create.content.fluids.potion.PotionFluidHandler;
 import com.simibubi.create.content.fluids.transfer.FillingRecipe;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipeBuilder;
+import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import io.redspace.irons_artifice.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -17,6 +19,8 @@ import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.JUGGLING_RELOAD_COIN;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_JUGGLING_RELOAD_COIN;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_ENCHANTED_MAGAZINE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.FORTUNE_MEDAL_MODIFIER;
@@ -51,6 +55,17 @@ final class CreateRecipes {
                 .addStep(PressingRecipe::new, step -> step)
                 .loops(1)
                 .addOutput(ENCHANTED_MAGAZINE_MODIFIER.get(), 1)
+                .build(createOutput);
+
+        new SequencedAssemblyRecipeBuilder(id("juggling_reload_coin"))
+                .require(IronsArtificeItems.SOULFIRE_COIN.get())
+                .transitionTo(INCOMPLETE_JUGGLING_RELOAD_COIN.get())
+                .addStep(FillingRecipe::new, step -> step.require(AllFluids.HONEY.get(), 250))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(ENCHANTED_MAGAZINE_MODIFIER.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(IronsArtificeItems.ENCHANTED_BULLET_MODIFIER.get()))
+                .addStep(PressingRecipe::new, step -> step)
+                .loops(1)
+                .addOutput(JUGGLING_RELOAD_COIN.get(), 1)
                 .build(createOutput);
 
         new SequencedAssemblyRecipeBuilder(id("healing_oil_modifier"))

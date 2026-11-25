@@ -1,6 +1,7 @@
 package jp.aquafactory.artificesassorite.gametest.recipe;
 
 import com.simibubi.create.AllBlocks;
+import com.simibubi.create.AllFluids;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.AllDataComponents;
@@ -10,6 +11,7 @@ import com.simibubi.create.content.kinetics.deployer.DeployerApplicationRecipe;
 import com.simibubi.create.content.kinetics.press.PressingRecipe;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import com.simibubi.create.content.kinetics.crafter.RecipeGridHandler;
+import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import io.redspace.irons_artifice.registry.ItemRegistry;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.core.Holder;
@@ -23,12 +25,16 @@ import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.RecipeWrapper;
 
 import java.util.ArrayList;
 
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.JUGGLING_RELOAD_COIN;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_JUGGLING_RELOAD_COIN;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_ENCHANTED_MAGAZINE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.EXCAVATION_MODIFIER;
@@ -187,6 +193,29 @@ final class CreateModifierRecipeScenarios {
         assertIntermediate(helper, current, incomplete, 4);
         ModifierRecipeGameTests.assertResult(helper, press(helper, current), ENCHANTED_MAGAZINE_MODIFIER.get(),
                 "Enchanted magazine assembly");
+    }
+
+    static void jugglingReloadCoin(GameTestHelper helper) {
+        var incomplete = INCOMPLETE_JUGGLING_RELOAD_COIN.get();
+        var level = helper.getLevel();
+        var input = new ItemStack(IronsArtificeItems.SOULFIRE_COIN.get());
+        var honeySource = AllFluids.HONEY.get().getSource();
+        helper.assertTrue(FillingBySpout.getRequiredAmountForItem(level, input, new FluidStack(honeySource, 249)) == -1
+                        && FillingBySpout.getRequiredAmountForItem(level, input, new FluidStack(Fluids.WATER, 250)) == -1,
+                "Reload coin assembly must reject insufficient honey and the wrong fluid");
+        var honey = new FluidStack(honeySource, 500);
+        int required = FillingBySpout.getRequiredAmountForItem(level, input, honey);
+        helper.assertTrue(required == 250, "Reload coin assembly must require 250 mB of honey");
+        var current = FillingBySpout.fillItem(level, required, input, honey);
+        helper.assertTrue(input.isEmpty() && honey.getAmount() == 250,
+                "The spout must consume one Soulfire Coin and exactly 250 mB of honey");
+        assertIntermediate(helper, current, incomplete, 1);
+        current = deploy(helper, current, ENCHANTED_MAGAZINE_MODIFIER.get());
+        assertIntermediate(helper, current, incomplete, 2);
+        current = deploy(helper, current, IronsArtificeItems.ENCHANTED_BULLET_MODIFIER.get());
+        assertIntermediate(helper, current, incomplete, 3);
+        ModifierRecipeGameTests.assertResult(helper, press(helper, current), JUGGLING_RELOAD_COIN.get(),
+                "Juggling reload coin assembly");
     }
 
     static void fortuneMedal(GameTestHelper helper) {
