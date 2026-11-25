@@ -15,6 +15,7 @@
   "item.artificesassortie.gyroscope_calibration_modifier": "Gyroscope Calibration Modifier",
   "item.artificesassortie.shock_absorber_modifier": "Shock Absorber Modifier",
   "item.artificesassortie.enchanted_magazine_modifier": "Enchanted Magazine Modifier",
+  "item.artificesassortie.juggling_reload_coin": "Juggling Reload Coin",
   "item.artificesassortie.spell_imbuement_modifier": "Spell Imbuement Modifier",
   "item.artificesassortie.modifier_augmentation_kit": "Modifier Augmentation Kit",
 
@@ -27,6 +28,7 @@
   "item.artificesassortie.incomplete_gyroscope_calibration_modifier": "Incomplete Gyroscope Calibration Modifier",
   "item.artificesassortie.incomplete_shock_absorber_modifier": "Incomplete Shock Absorber Modifier",
   "item.artificesassortie.incomplete_enchanted_magazine_modifier": "Incomplete Enchanted Magazine Modifier",
+  "item.artificesassortie.incomplete_juggling_reload_coin": "Incomplete Juggling Reload Coin",
 
   "item.artificesassortie.common.tooltip.spare_aamo": "Reserve Ammo: %s",
   "item.artificesassortie.common.tooltip.tool_tier": "Tool Tier: %s",
@@ -121,6 +123,11 @@
   "item.artificesassortie.enchanted_magazine_modifier.desc_2": "When reloading, refill reserve ammo up to %s%% of the gun's ammo capacity per modifier (rounded up)",
   "item.artificesassortie.enchanted_magazine_modifier.desc_3": "Refilling the reserve also consumes ammo",
   "item.artificesassortie.enchanted_magazine_modifier.desc_4": "The number of effective modifiers is capped at the gun's ammo capacity",
+  "item.artificesassortie.juggling_reload_coin.desc_1": "Hit an enemy with the last round, including reserve ammo, to launch a coin",
+  "item.artificesassortie.juggling_reload_coin.desc_2": "When a coin appears, that gun can fire one extra shot",
+  "item.artificesassortie.juggling_reload_coin.desc_3": "Shoot the coin to instantly reload your held gun, including reserve ammo",
+  "item.artificesassortie.juggling_reload_coin.desc_4": "This reload consumes ammo as usual",
+  "item.artificesassortie.juggling_reload_coin.desc_5": "Reload to earn another extra shot",
   "item.artificesassortie.spell_imbuement_modifier.tooltip": "Craft with a school rune to change its school",
   "item.artificesassortie.spell_imbuement_modifier.desc_1": "%1$s%% Damage (+%2$s%% per additional modifier)",
   "item.artificesassortie.spell_imbuement_modifier.desc_2": "Affected by spell resistance as the %s school",
@@ -137,7 +144,11 @@
   "item.artificesassortie.modifier_augmentation_kit.detail.overflow": "%s more",
   "item.artificesassortie.modifier_augmentation_kit.detail.overflow_jei": "%s more (see JEI for recipes)",
 
+  "entity.artificesassortie.juggling_reload_coin": "Juggling Reload Coin",
+
   "ui.artificesassortie.insufficient_mana": "Not enough mana to fire!",
+  "ui.artificesassortie.juggling_reload_coin.empty": "You don't have any ammo!",
+  "ui.artificesassortie.juggling_reload_coin.partial": "Not enough ammo!",
 
   "subtitle.artificesassortie.sound.precision_fire_headshot": "Bullet hits critically",
   "subtitle.artificesassortie.sound.notify_standing_snipe": "Standing snipe ready",
