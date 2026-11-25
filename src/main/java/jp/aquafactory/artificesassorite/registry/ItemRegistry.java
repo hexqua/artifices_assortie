@@ -12,6 +12,7 @@ import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.Grip
 import jp.aquafactory.artificesassorite.item.modifier.gyroscope.GyroscopeCalibrationModifier;
 import jp.aquafactory.artificesassorite.item.modifier.shockabsorber.ShockAbsorberModifier;
 import jp.aquafactory.artificesassorite.item.modifier.itemtransfer.ItemTransferModifier;
+import jp.aquafactory.artificesassorite.item.modifier.jugglingreload.JugglingReloadModifier;
 import jp.aquafactory.artificesassorite.item.modifier.movementfire.MovementFireModifier;
 import jp.aquafactory.artificesassorite.item.modifier.precisionfire.PrecisionFireModifier;
 import jp.aquafactory.artificesassorite.item.modifier.potionoil.OilModifier;
@@ -55,6 +56,9 @@ public final class ItemRegistry {
             properties -> new ModifierItem(properties.stacksTo(1), new ShockAbsorberModifier()));
     public static final DeferredItem<EnchantedMagazineItem> ENCHANTED_MAGAZINE_MODIFIER = ITEMS.registerItem("enchanted_magazine_modifier",
             properties -> new EnchantedMagazineItem(properties.stacksTo(1)));
+    public static final DeferredItem<ModifierItem> JUGGLING_RELOAD_COIN = ITEMS.registerItem("juggling_reload_coin",
+            properties -> new ModifierItem(properties.stacksTo(1), new JugglingReloadModifier()));
+    public static final DeferredItem<Item> INCOMPLETE_JUGGLING_RELOAD_COIN = ITEMS.registerSimpleItem("incomplete_juggling_reload_coin");
     public static final DeferredItem<Item> INCOMPLETE_ENCHANTED_MAGAZINE_MODIFIER = ITEMS.registerSimpleItem("incomplete_enchanted_magazine_modifier");
     public static final DeferredItem<Item> INCOMPLETE_GYROSCOPE_CALIBRATION_MODIFIER = ITEMS.registerSimpleItem("incomplete_gyroscope_calibration_modifier");
     public static final DeferredItem<Item> INCOMPLETE_SHOCK_ABSORBER_MODIFIER = ITEMS.registerSimpleItem("incomplete_shock_absorber_modifier");

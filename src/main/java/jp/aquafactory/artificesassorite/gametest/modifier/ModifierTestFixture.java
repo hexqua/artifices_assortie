@@ -39,8 +39,12 @@ final class ModifierTestFixture implements AutoCloseable {
     final double baseMovementSpeed;
 
     ModifierTestFixture(GameTestHelper helper) {
+        this(helper, new FakePlayer(helper.getLevel(), new GameProfile(UUID.randomUUID(), "modifier_test")));
+    }
+
+    ModifierTestFixture(GameTestHelper helper, FakePlayer player) {
         this.helper = helper;
-        player = new FakePlayer(helper.getLevel(), new GameProfile(UUID.randomUUID(), "modifier_test"));
+        this.player = player;
         player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         baseMovementSpeed = Objects.requireNonNull(player.getAttribute(Attributes.MOVEMENT_SPEED)).getBaseValue();
         player.setPos(helper.absoluteVec(new Vec3(1, 2, 1)));

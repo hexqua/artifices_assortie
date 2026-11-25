@@ -21,7 +21,10 @@
     "GyroscopeSpreadMixin",
     "ShockAbsorberGunplayMixin",
     "ShockAbsorberRecoilMixin",
-    "EnchantedMagazineReloadMixin"
+    "EnchantedMagazineReloadMixin",
+    "GunplayManagerAmmoInvoker",
+    "ReloadCoinCowboyHatMixin",
+    "ReloadCoinHeldItemMixin"
   ],
   "client": [
     "GripHoldRecoilMixin",

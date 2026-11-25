@@ -50,6 +50,8 @@ public final class ModItemModelProvider extends ModelProvider {
         items.generateFlatItem(ItemRegistry.SHOCK_ABSORBER_MODIFIER.get(), ModelTemplates.FLAT_ITEM);
         items.generateFlatItem(ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER.get(), ModelTemplates.FLAT_ITEM);
         items.generateFlatItem(ItemRegistry.INCOMPLETE_ENCHANTED_MAGAZINE_MODIFIER.get(), ModelTemplates.FLAT_ITEM);
+        items.generateFlatItem(ItemRegistry.JUGGLING_RELOAD_COIN.get(), ModelTemplates.FLAT_ITEM);
+        items.generateFlatItem(ItemRegistry.INCOMPLETE_JUGGLING_RELOAD_COIN.get(), ModelTemplates.FLAT_ITEM);
         items.generateFlatItem(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get(), ModelTemplates.FLAT_ITEM);
         items.generateFlatItem(ItemRegistry.INCOMPLETE_PRECISION_FIRE_MODIFIER.get(), ModelTemplates.FLAT_ITEM);
         items.generateFlatItem(ItemRegistry.INCOMPLETE_GYROSCOPE_CALIBRATION_MODIFIER.get(), ModelTemplates.FLAT_ITEM);
