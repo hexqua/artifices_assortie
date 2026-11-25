@@ -4,13 +4,12 @@ import io.redspace.irons_artifice.api.AmmoEvent;
 import io.redspace.irons_artifice.api.GunShootEvent;
 import io.redspace.irons_artifice.data.ComponentType;
 import io.redspace.irons_artifice.item.GunItem;
-import io.redspace.irons_artifice.item.GunplayManager;
 import io.redspace.irons_artifice.menu.GunContainer;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
+import jp.aquafactory.artificesassorite.item.gun.GunAmmo;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -18,7 +17,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.function.ObjIntConsumer;
 
 @EventBusSubscriber(modid = ArtificesAssortie.MODID)
 public final class EnchantedMagazineEvents {
@@ -60,13 +58,15 @@ public final class EnchantedMagazineEvents {
         }
     }
 
-    public static void refill(LivingEntity shooter, ItemStack gun, ObjIntConsumer<Player> consumeBullets) {
+    public record ReserveRefill(long loaded, long missing) {}
+
+    public static ReserveRefill refill(LivingEntity shooter, ItemStack gun) {
         if (shooter.level().isClientSide() || !(gun.getItem() instanceof GunItem gunItem)) {
-            return;
+            return new ReserveRefill(0, 0);
         }
         var settings = EnchantedMagazine.settings(shooter);
         if (settings.reserveAmmoRatio() == 0) {
-            return;
+            return new ReserveRefill(0, 0);
         }
         int capacity = gunItem.magazineCapacity();
         // 設定値の十進小数で計算し、浮動小数点の誤差で余分に切り上がるのを避ける。
@@ -78,26 +78,15 @@ public final class EnchantedMagazineEvents {
         for (int slot : effective) {
             missing += Math.max(0, target - EnchantedMagazine.stored(slots.getItem(slot)));
         }
-        if (missing == 0) {
-            return;
+        long loaded = GunAmmo.takeForReload(shooter, missing);
+        if (loaded == 0) {
+            return new ReserveRefill(0, missing);
         }
-        long available = missing;
-        if (shooter instanceof Player player && !player.hasInfiniteMaterials()) {
-            int before = GunplayManager.countBullets(player);
-            int toConsume = (int) Math.min(missing, before);
-            if (toConsume <= 0) {
-                return;
-            }
-            consumeBullets.accept(player, toConsume);
-            available = Math.min(toConsume, before - GunplayManager.countBullets(player));
-            if (available <= 0) {
-                return;
-            }
-        }
+        long available = loaded;
         for (int slot : effective) {
             ItemStack modifier = slots.getItem(slot);
             int rounds = EnchantedMagazine.stored(modifier);
-            int toLoad = (int) Math.min(available, Math.max(0, target - rounds));
+            int toLoad = (int) Math.clamp((long) target - rounds, 0, available);
             if (toLoad > 0) {
                 EnchantedMagazine.setStored(modifier, rounds + toLoad);
                 available -= toLoad;
@@ -107,5 +96,6 @@ public final class EnchantedMagazineEvents {
             }
         }
         EnchantedMagazine.save(shooter, slots);
+        return new ReserveRefill(loaded, missing);
     }
 }

@@ -53,6 +53,17 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_enchanted_bullet_modifier", has(ItemRegistry.ENCHANTED_BULLET_MODIFIER.get()))
                 .save(fallback, id("crafting/enchanted_magazine_modifier"));
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, JUGGLING_RELOAD_COIN.get())
+                .pattern(" E ")
+                .pattern("OSO")
+                .pattern(" M ")
+                .define('S', IronsArtificeItems.SOULFIRE_COIN.get())
+                .define('O', IronsArtificeItems.GUN_OIL.get())
+                .define('E', IronsArtificeItems.ENCHANTED_BULLET_MODIFIER.get())
+                .define('M', ENCHANTED_MAGAZINE_MODIFIER.get())
+                .unlockedBy("has_soulfire_coin", has(IronsArtificeItems.SOULFIRE_COIN.get()))
+                .save(fallback, id("crafting/juggling_reload_coin"));
+
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, HEALING_OIL_MODIFIER.get())
                 .pattern(" M ")
                 .pattern("MPM")

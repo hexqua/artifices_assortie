@@ -44,6 +44,7 @@ public final class CreativeTabRegistry {
         output.accept(ItemRegistry.GYROSCOPE_CALIBRATION_MODIFIER.get());
         output.accept(ItemRegistry.SHOCK_ABSORBER_MODIFIER.get());
         output.accept(ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER.get());
+        output.accept(ItemRegistry.JUGGLING_RELOAD_COIN.get());
 
         if (SpellImbuementCompat.isAvailable()) {
             output.accept(ItemRegistry.SPELL_IMBUEMENT_MODIFIER.get());
