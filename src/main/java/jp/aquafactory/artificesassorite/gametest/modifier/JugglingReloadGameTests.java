@@ -67,10 +67,11 @@ public final class JugglingReloadGameTests {
     private JugglingReloadGameTests() {}
 
     @GameTest(template = TEMPLATE, batch = BATCH)
-    public static void lastReserveRoundCreatesOneCoinEvenWithoutDamage(GameTestHelper h) {
+    public static void lastReserveRoundCreatesOneCoinPerModifierEvenWithoutDamage(GameTestHelper h) {
         try (var arena = new Arena(h)) {
             var f = arena.fixture;
             var gun = equip(f, 1, 1);
+            new GunContainer(gun).setItem(2, new ItemStack(ItemRegistry.JUGGLING_RELOAD_COIN.get()));
             var target = f.target();
             var pierced = f.target();
             pierced.setPos(target.position().add(0, 0, 1));
@@ -110,11 +111,12 @@ public final class JugglingReloadGameTests {
                     NeoForge.EVENT_BUS.unregister(spread);
                 }
                 h.assertTrue(pellets.size() == 3, "The actual last reserve shot must create three pellets");
+                new GunContainer(gun).setItem(2, ItemStack.EMPTY);
                 for (var pellet : pellets) {
                     arena.hit(pellet, target, pierced);
                 }
-                h.assertTrue(target.getHealth() == health && reserve(gun) == 0 && arena.coins().size() == 1,
-                        "Invulnerable targets must still yield exactly one coin across pellets and piercing");
+                h.assertTrue(target.getHealth() == health && reserve(gun) == 0 && arena.coins().size() == 2,
+                        "Pellets and piercing must create only one group, using the modifier count at firing");
 
                 Consumer<GunAboutToShootEvent> cancel = event -> {
                     if (event.getEntity() == f.player) {
@@ -128,12 +130,55 @@ public final class JugglingReloadGameTests {
                     NeoForge.EVENT_BUS.unregister(cancel);
                 }
                 arena.hit(arena.fire().getFirst(), target);
-                h.assertTrue(arena.coins().size() == 1 && fire(f) == FireOutcome.EMPTY_MAGAZINE,
+                h.assertTrue(arena.coins().size() == 2 && fire(f) == FireOutcome.EMPTY_MAGAZINE,
                         "The extra shot must neither mint another coin nor be usable twice");
             } finally {
                 target.discard();
                 pierced.discard();
             }
+        }
+        h.succeed();
+    }
+
+    @GameTest(template = TEMPLATE, batch = BATCH)
+    public static void extraShotSurvivesUntilTheLastCoinDisappears(GameTestHelper h) {
+        try (var arena = new Arena(h); var ally = new ModifierTestFixture(h)) {
+            var f = arena.fixture;
+            var gun = f.equip(IronsArtificeItems.CLOCKWORK_RIFLE.getId().getPath(),
+                    ItemRegistry.JUGGLING_RELOAD_COIN.get(), 3);
+            GunItem.setMagazine(gun, new MagazineContents(1));
+            var coins = arena.makeCoins(gun, 3);
+
+            var collectorGun = ally.equip(IronsArtificeItems.CLOCKWORK_RIFLE.getId().getPath(),
+                    ItemRegistry.JUGGLING_RELOAD_COIN.get(), 0);
+            ally.player.getInventory().setItem(5, new ItemStack(IronsArtificeItems.BULLET.get()));
+            var collected = coins.getFirst();
+            arm(collected);
+            var bullet = ally.bullet(ally.compose());
+            try {
+                bullet.hit(new EntityHitResult(collected));
+            } finally {
+                bullet.discard();
+            }
+            h.assertTrue(collected.isRemoved() && rounds(collectorGun) == 6 && arena.coins().size() == 2,
+                    "The ally must collect and reload from just one of the three coins");
+            h.assertTrue(fire(f) == FireOutcome.FIRED && fire(f) == FireOutcome.EMPTY_MAGAZINE,
+                    "Collecting one coin must leave exactly one extra shot while others remain");
+            arena.coins().forEach(ReloadCoin::discard);
+
+            f.player.getInventory().setItem(5, new ItemStack(IronsArtificeItems.BULLET.get()));
+            h.assertTrue(GunplayManager.attemptStartReload(f.player, gun) == ReloadResult.STARTING_RELOAD,
+                    "The source gun must reload for the next group");
+            finishManualReload(f, gun);
+            var nextCoins = arena.makeCoins(gun, 3);
+            nextCoins.get(0).discard();
+            JugglingReloadEvents.heldItemChanged(f.player);
+            nextCoins.get(1).discard();
+            var ammo = NeoForge.EVENT_BUS.post(new AmmoEvent.Amount(f.player, f.compose(), 1));
+            h.assertTrue(ammo.getAmmoToConsume() == 0, "The last remaining coin must still allow the extra shot");
+            nextCoins.getLast().discard();
+            h.assertTrue(fire(f) == FireOutcome.EMPTY_MAGAZINE,
+                    "Losing the last coin must revoke the extra shot before the next fire attempt");
         }
         h.succeed();
     }
@@ -409,13 +454,19 @@ public final class JugglingReloadGameTests {
         }
 
         ReloadCoin makeCoin(ItemStack held) {
+            return makeCoins(held, 1).getFirst();
+        }
+
+        List<ReloadCoin> makeCoins(ItemStack held, int count) {
             fixture.helper.assertTrue(fixture.player.getMainHandItem() == held, "The test gun must be held");
             int before = observed.size();
             var target = fixture.target();
             try {
                 hit(fire().getFirst(), target);
-                fixture.helper.assertTrue(observed.size() == before + 1, "The last round must launch a coin");
-                return observed.getLast();
+                fixture.helper.assertTrue(observed.size() == before + count,
+                        "The last round must launch one coin per modifier: expected=" + count
+                                + " actual=" + (observed.size() - before));
+                return List.copyOf(observed.subList(before, observed.size()));
             } finally {
                 target.discard();
             }

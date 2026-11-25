@@ -26,17 +26,18 @@ import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
 @EventBusSubscriber(modid = ArtificesAssortie.MODID)
 public final class JugglingReloadEvents {
-    static final ComponentType<Boolean> INSTALLED = new ComponentType<>(id("juggling_reload_installed"), () -> false);
+    static final ComponentType<Integer> COIN_COUNT = new ComponentType<>(id("juggling_reload_coin_count"), () -> 0);
     private static final ComponentType<Boolean> EXTRA_SHOT = new ComponentType<>(id("juggling_reload_extra_shot"), () -> false);
     private static final ComponentType<Shot> LAST_ROUND = new ComponentType<>(id("juggling_reload_last_round"), () -> null);
     private static final Map<ServerPlayer, Session> SESSIONS = new WeakHashMap<>();
@@ -46,7 +47,7 @@ public final class JugglingReloadEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void selectExtraShot(AmmoEvent.Amount event) {
         var profile = event.getShotProfile();
-        if (event.getAmmoToConsume() != 1 || !profile.peek(INSTALLED) || !profile.magazineContents().isEmpty()
+        if (event.getAmmoToConsume() != 1 || profile.peek(COIN_COUNT) == 0 || !profile.magazineContents().isEmpty()
                 || !(event.getEntity() instanceof Player player) || rounds(player, profile.itemStack()) != 0) {
             return;
         }
@@ -58,7 +59,7 @@ public final class JugglingReloadEvents {
                 return;
             }
             session.refresh(serverPlayer);
-            allowed = session.coin != null && session.gun == profile.itemStack();
+            allowed = !session.coins.isEmpty() && session.gun == profile.itemStack();
         } else {
             allowed = ReloadCoinClientBridge.canFire.test(player, profile.itemStack());
         }
@@ -71,7 +72,8 @@ public final class JugglingReloadEvents {
     @SubscribeEvent
     public static void prepareLastRound(GunShootEvent.Pre event) {
         var profile = event.getShotProfile();
-        if (!(event.getEntity() instanceof ServerPlayer player) || !profile.peek(INSTALLED)
+        int coinCount = profile.peek(COIN_COUNT);
+        if (!(event.getEntity() instanceof ServerPlayer player) || coinCount == 0
                 || profile.peek(EXTRA_SHOT) || player.getMainHandItem() != profile.itemStack()) {
             return;
         }
@@ -83,7 +85,7 @@ public final class JugglingReloadEvents {
         var session = SESSIONS.computeIfAbsent(player, ignored -> new Session());
         session.refresh(player);
         // 散弾へは同じ値が浅くコピーされるため、確定と生成を射撃単位で一度だけ行える。
-        profile.components().set(LAST_ROUND, new Shot(session, session.revision));
+        profile.components().set(LAST_ROUND, new Shot(session, session.revision, coinCount));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -118,18 +120,24 @@ public final class JugglingReloadEvents {
             return;
         }
         shot.claimed = true;
-        var coin = ReloadCoin.launch(level, target, bullet.getDeltaMovement());
-        if (coin == null) {
+        var coins = new ArrayList<ReloadCoin>(shot.coinCount);
+        for (int index = 0; index < shot.coinCount; index++) {
+            var coin = ReloadCoin.launch(level, target, bullet.getDeltaMovement());
+            if (coin != null) {
+                coins.add(coin);
+            }
+        }
+        if (coins.isEmpty()) {
             return;
         }
 
         var session = shot.session;
         session.refresh(player);
         var gun = profile.itemStack();
-        if (session.revision == shot.revision && session.gun == gun && session.coin == null
+        if (session.revision == shot.revision && session.gun == gun && session.coins.isEmpty()
                 && !session.grantedSinceReload.contains(gun) && !GunItem.isReloading(gun) && rounds(player, gun) == 0) {
             session.grantedSinceReload.add(gun);
-            session.coin = coin;
+            session.coins.addAll(coins);
             sync(player, new SyncReloadCoinShotPayload(session.slot, GeoItem.getOrAssignId(gun, level)));
         }
     }
@@ -231,7 +239,7 @@ public final class JugglingReloadEvents {
         ItemStack gun = ItemStack.EMPTY;
         int slot = -1;
         long revision;
-        @Nullable ReloadCoin coin;
+        final List<ReloadCoin> coins = new ArrayList<>();
 
         void refresh(ServerPlayer player) {
             var held = player.getMainHandItem();
@@ -242,8 +250,14 @@ public final class JugglingReloadEvents {
                 revision++;
                 clearExtraShot(player);
             }
-            if (coin != null && (coin.isRemoved() || coin.level() != player.level() || player.isSpectator())) {
+            if (player.isSpectator()) {
                 clearExtraShot(player);
+            } else if (!coins.isEmpty()) {
+                var level = player.serverLevel();
+                coins.removeIf(coin -> coin.isRemoved() || coin.level() != level);
+                if (coins.isEmpty()) {
+                    sync(player, SyncReloadCoinShotPayload.CLEAR);
+                }
             }
         }
 
@@ -256,8 +270,8 @@ public final class JugglingReloadEvents {
         }
 
         void clearExtraShot(ServerPlayer player) {
-            if (coin != null) {
-                coin = null;
+            if (!coins.isEmpty()) {
+                coins.clear();
                 sync(player, SyncReloadCoinShotPayload.CLEAR);
             }
         }
@@ -266,12 +280,14 @@ public final class JugglingReloadEvents {
     private static final class Shot {
         final Session session;
         final long revision;
+        final int coinCount;
         boolean emptied;
         boolean claimed;
 
-        Shot(Session session, long revision) {
+        Shot(Session session, long revision, int coinCount) {
             this.session = session;
             this.revision = revision;
+            this.coinCount = coinCount;
         }
     }
 }
