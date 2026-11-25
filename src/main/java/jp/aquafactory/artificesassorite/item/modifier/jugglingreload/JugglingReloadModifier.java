@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 public final class JugglingReloadModifier implements GunModifier, OnHitEffect {
     @Override
     public void apply(ShotComponentMap components) {
-        components.set(JugglingReloadEvents.INSTALLED, true);
+        components.set(JugglingReloadEvents.COIN_COUNT, components.getOrDefault(JugglingReloadEvents.COIN_COUNT) + 1);
         components.getOrCreate(ShotComponents.ON_HIT)
                 .getOrCreate(JugglingReloadModifier.class, () -> this);
     }
