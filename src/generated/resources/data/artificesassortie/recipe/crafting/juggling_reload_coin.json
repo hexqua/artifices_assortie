@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "E": "irons_artifice:enchanted_bullet_modifier",
+    "M": "artificesassortie:enchanted_magazine_modifier",
+    "O": "irons_artifice:gun_oil_modifier",
+    "S": "irons_artifice:soulfire_coin_modifier"
+  },
+  "pattern": [
+    " E ",
+    "OSO",
+    " M "
+  ],
+  "result": {
+    "id": "artificesassortie:juggling_reload_coin"
+  }
+}

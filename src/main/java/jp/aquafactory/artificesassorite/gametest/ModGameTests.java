@@ -119,6 +119,7 @@ public final class ModGameTests {
             new Test("fortune_medal_recipe_switches_with_create", "default", 100, ModifierRecipeGameTests::fortuneMedalRecipeSwitchesWithCreate),
             new Test("grip_hold_recipe_switches_with_create", "default", 100, ModifierRecipeGameTests::gripHoldRecipeSwitchesWithCreate),
             new Test("gyroscope_calibration_recipe_switches_with_create", "default", 100, ModifierRecipeGameTests::gyroscopeCalibrationRecipeSwitchesWithCreate),
+            new Test("juggling_reload_coin_crafts_with_both_gun_oils", "default", 100, ModifierRecipeGameTests::jugglingReloadCoinCraftsWithBothGunOils),
             new Test("item_transfer_crafting_remains_available_with_create", "default", 100, ModifierRecipeGameTests::itemTransferCraftingRemainsAvailableWithCreate),
             new Test("precision_fire_recipe_switches_with_create", "default", 100, ModifierRecipeGameTests::precisionFireRecipeSwitchesWithCreate),
             new Test("shock_absorber_recipe_switches_with_create", "default", 100, ModifierRecipeGameTests::shockAbsorberRecipeSwitchesWithCreate),

@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GEARWORK_REPEATER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.JUGGLING_RELOAD_COIN;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.EXCAVATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
@@ -54,6 +55,21 @@ public final class ModifierRecipeGameTests {
                 bullet, bullet, Items.QUARTZ_BLOCK,
                 Items.GOLD_INGOT, Items.EXPERIENCE_BOTTLE, secondBottle);
     }
+
+    public static void jugglingReloadCoinCraftsWithBothGunOils(GameTestHelper helper) {
+        assertRecipeVariants(helper, "juggling_reload_coin", "sequenced_assembly/juggling_reload_coin");
+        assertCrafts(helper, reloadCoinInput(IronsArtificeItems.GUN_OIL.get()), JUGGLING_RELOAD_COIN.get());
+        assertNoCraftingRecipe(helper, reloadCoinInput(Items.AIR), "Reload coin crafting must require both gun oils");
+        helper.succeed();
+    }
+
+    private static CraftingInput reloadCoinInput(ItemLike secondOil) {
+        return input(3, 3,
+                Items.AIR, IronsArtificeItems.ENCHANTED_BULLET_MODIFIER.get(), Items.AIR,
+                IronsArtificeItems.GUN_OIL.get(), IronsArtificeItems.SOULFIRE_COIN.get(), secondOil,
+                Items.AIR, ENCHANTED_MAGAZINE_MODIFIER.get(), Items.AIR);
+    }
+
     public static void excavationRecipeSwitchesWithCreate(GameTestHelper helper) {
         assertRecipeVariants(helper, "excavation_modifier", "compat/create/excavation_modifier");
         var fallback = excavationInput(Items.DIAMOND_PICKAXE, Items.DIAMOND, Items.FLINT);
