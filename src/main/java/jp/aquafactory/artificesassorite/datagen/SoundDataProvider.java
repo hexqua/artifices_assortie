@@ -25,5 +25,8 @@ public final class SoundDataProvider extends SoundDefinitionsProvider {
         add(SoundRegistry.NOTIFY_STANDING_SNIPE.getId(), definition()
                 .subtitle("subtitle.artificesassortie.sound.notify_standing_snipe")
                 .with(sound(Identifier.withDefaultNamespace("random/orb")).volume(0.2F).pitch(0.85F)));
+        add(SoundRegistry.ECHO_FIRE.getId(), definition()
+                .subtitle("subtitle.artificesassortie.sound.echo_fire")
+                .with(sound(SoundRegistry.ECHO_FIRE.getId())));
     }
 }

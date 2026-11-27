@@ -2,6 +2,7 @@
   "itemGroup.artificesassortie": "Artifices Assortie",
 
   "item.artificesassortie.gearwork_repeater": "歯車仕掛けの連発銃",
+  "item.artificesassortie.echowork_long_gun": "残響仕掛けの長銃",
   "item.artificesassortie.precision_fire_modifier": "精密射撃モディファイア",
   "item.artificesassortie.grip_hold_stabilization_modifier": "グリップホールド安定モディファイア",
   "item.artificesassortie.fortune_medal_modifier": "幸運メダルモディファイア",
@@ -152,6 +153,7 @@
 
   "subtitle.artificesassortie.sound.precision_fire_headshot": "銃弾が鋭く当たる",
   "subtitle.artificesassortie.sound.notify_standing_snipe": "静止狙撃状態の通知音がなる",
+  "subtitle.artificesassortie.sound.echo_fire": "残響が放たれる",
 
   "death.attack.artificesassortie.oil_bullet": "%1$sはポーションオイルを塗った銃弾に撃たれた",
   "death.attack.artificesassortie.oil_bullet.player": "%1$sは%2$sのポーションオイルを塗った銃弾に撃たれた",

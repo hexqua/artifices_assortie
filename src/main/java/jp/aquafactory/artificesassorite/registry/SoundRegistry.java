@@ -13,6 +13,8 @@ public final class SoundRegistry {
             () -> SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "precision_fire_headshot")));
     public static final DeferredHolder<SoundEvent, SoundEvent> NOTIFY_STANDING_SNIPE = SOUNDS.register("notify_standing_snipe",
             () -> SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "notify_standing_snipe")));
+    public static final DeferredHolder<SoundEvent, SoundEvent> ECHO_FIRE = SOUNDS.register("echo_fire",
+            () -> SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(ArtificesAssortie.MODID, "echo_fire")));
 
     private SoundRegistry() {}
 }

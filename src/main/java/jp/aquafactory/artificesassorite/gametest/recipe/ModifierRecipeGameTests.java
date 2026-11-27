@@ -15,6 +15,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import java.util.Arrays;
 
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ECHOWORK_LONG_GUN;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GEARWORK_REPEATER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.JUGGLING_RELOAD_COIN;
@@ -28,6 +29,15 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GYROSCOPE_C
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.SHOCK_ABSORBER_MODIFIER;
 public final class ModifierRecipeGameTests {
     private ModifierRecipeGameTests() {}
+
+    public static void echoworkLongGunCraftsWithClockworkComponents(GameTestHelper helper) {
+        assertRecipeVariants(helper, "echowork_long_gun", "compat/create/echowork_long_gun");
+        assertCrafts(helper, input(3, 3,
+                Items.IRON_INGOT, Items.AIR, Items.AIR,
+                Items.AIR, Items.ECHO_SHARD, IronsArtificeItems.CLOCKWORK_COMPONENTS.get(),
+                Items.AIR, Items.OAK_LOG, IronsArtificeItems.ANTIGRAVITY_MODIFIER.get()), ECHOWORK_LONG_GUN.get());
+        helper.succeed();
+    }
 
     public static void gearworkRepeaterCraftsWithClockworkComponents(GameTestHelper helper) {
         assertRecipeVariants(helper, "gearwork_repeater", "compat/create/gearwork_repeater");

@@ -2,6 +2,7 @@ package jp.aquafactory.artificesassorite.gametest;
 
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.gametest.augmentation.AugmentationGameTests;
+import jp.aquafactory.artificesassorite.gametest.gun.EchoworkLongGunGameTests;
 import jp.aquafactory.artificesassorite.gametest.gun.GearworkRepeaterGameTests;
 import jp.aquafactory.artificesassorite.gametest.modifier.EnchantedMagazineGameTests;
 import jp.aquafactory.artificesassorite.gametest.modifier.ExcavationGameTests;
@@ -59,6 +60,12 @@ public final class ModGameTests {
             new Test("smithing_preserves_gun_and_consumes_inputs_once", "augmentation", 100, AugmentationGameTests::smithingPreservesGunAndConsumesInputsOnce),
             new Test("synchronized_material_and_tooltip_limits", "augmentation", 100, AugmentationGameTests::synchronizedMaterialAndTooltipLimits),
             new Test("tag_controls_new_augmentation_only", "augmentation", 100, AugmentationGameTests::tagControlsNewAugmentationOnly),
+            new Test("echowork_long_gun_crafts_with_clockwork_components", "default", 100, ModifierRecipeGameTests::echoworkLongGunCraftsWithClockworkComponents),
+            new Test("echowork_long_gun_exposes_six_slots_without_augmentation", "gun", 100, EchoworkLongGunGameTests::exposesSixSlotsWithoutAugmentation),
+            new Test("echowork_long_gun_fires_flat_and_cycles_after_fifteen_ticks", "gun", 100, EchoworkLongGunGameTests::firesFlatAndCyclesAfterFifteenTicks),
+            new Test("echowork_long_gun_reloads_empty_and_partial_magazines_in_thirty_ticks", "gun", 100, EchoworkLongGunGameTests::reloadsEmptyAndPartialMagazinesInThirtyTicks),
+            new Test("echowork_long_gun_scattershot_sends_smaller_trails_for_every_projectile", "gun", 100, EchoworkLongGunGameTests::scattershotSendsSmallerTrailsForEveryProjectile),
+            new Test("echowork_long_gun_spaces_ring_particles_and_stops_at_impact", "gun", 100, EchoworkLongGunGameTests::spacesSonicBoomParticlesAcrossTicksAndStopsAtImpact),
             new Test("gearwork_repeater_accepts_modifier_in_sixth_slot", "gun", 100, GearworkRepeaterGameTests::acceptsAModifierInTheSixthSlot),
             new Test("gearwork_repeater_crafts_with_clockwork_components", "default", 100, ModifierRecipeGameTests::gearworkRepeaterCraftsWithClockworkComponents),
             new Test("gearwork_repeater_fires_again_after_three_ticks", "gun", 100, GearworkRepeaterGameTests::firesAgainAfterThreeTicks),
