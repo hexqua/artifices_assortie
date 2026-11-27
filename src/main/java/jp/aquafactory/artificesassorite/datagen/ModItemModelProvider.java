@@ -22,6 +22,8 @@ public final class ModItemModelProvider extends ItemModelProvider {
         // 親モデルは必須依存 MOD の jar にあり、この Provider の既存リソース検査には含まれない。
         getBuilder(ItemRegistry.GEARWORK_REPEATER.getId().getPath())
                 .parent(new ModelFile.UncheckedModelFile("irons_artifice:item/gun_display"));
+        getBuilder(ItemRegistry.ECHOWORK_LONG_GUN.getId().getPath())
+                .parent(new ModelFile.UncheckedModelFile("irons_artifice:item/gun_display"));
         basicItem(ItemRegistry.MODIFIER_AUGMENTATION_KIT.get());
         basicItem(ItemRegistry.PRECISION_FIRE_MODIFIER.get());
         basicItem(ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER.get());
