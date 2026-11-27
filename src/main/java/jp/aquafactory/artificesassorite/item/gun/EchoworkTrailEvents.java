@@ -1,8 +1,9 @@
 package jp.aquafactory.artificesassorite.item.gun;
 
+import io.redspace.irons_artifice.data.ShotComponents;
 import io.redspace.irons_artifice.entity.Bullet;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
-import net.minecraft.core.particles.ParticleTypes;
+import jp.aquafactory.artificesassorite.particle.EchoworkRingOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
@@ -33,7 +34,6 @@ public final class EchoworkTrailEvents {
                 || bullet.getProfile().gun() != GunProfiles.ECHOWORK_LONG_GUN) {
             return;
         }
-
         // 弾が衝突で破棄される tick でも、座標は衝突地点まで更新されてから Post が呼ばれる。
         Vec3 from = new Vec3(bullet.xOld, bullet.yOld, bullet.zOld);
         Vec3 path = bullet.position().subtract(from);
@@ -41,10 +41,13 @@ public final class EchoworkTrailEvents {
         if (length <= 0 || !Double.isFinite(length)) {
             return;
         }
+        int projectileCount = Math.max(1, (int) Math.round(bullet.getProfile().value(ShotComponents.PROJECTILE_COUNT)));
+        // 弾数が増えても、輪の面積の合計が単発相当になるよう直径を調整する。
+        var particle = new EchoworkRingOptions((float) (1 / Math.sqrt(projectileCount)));
         double distance = bullet.getData(DISTANCE_TO_NEXT_RING);
         for (; distance <= length; distance += TRAIL_SPACING) {
             Vec3 point = from.add(path.scale(distance / length));
-            level.sendParticles(ParticleTypes.SONIC_BOOM, point.x, point.y, point.z, 1, 0, 0, 0, 0);
+            level.sendParticles(particle, point.x, point.y, point.z, 1, 0, 0, 0, 0);
         }
         bullet.setData(DISTANCE_TO_NEXT_RING, distance - length);
     }

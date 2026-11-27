@@ -20,6 +20,7 @@ import jp.aquafactory.artificesassorite.network.Networks;
 import jp.aquafactory.artificesassorite.registry.CreativeTabRegistry;
 import jp.aquafactory.artificesassorite.registry.EntityRegistry;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
+import jp.aquafactory.artificesassorite.registry.ParticleRegistry;
 import jp.aquafactory.artificesassorite.registry.SoundRegistry;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -35,6 +36,7 @@ public class ArtificesAssortie {
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
         ItemRegistry.ITEMS.register(bus);
         EntityRegistry.ENTITIES.register(bus);
+        ParticleRegistry.PARTICLES.register(bus);
         EchoworkTrailEvents.ATTACHMENTS.register(bus);
         GyroscopeCalibrationEvents.ATTACHMENTS.register(bus);
         ShockAbsorberEvents.ATTACHMENTS.register(bus);
