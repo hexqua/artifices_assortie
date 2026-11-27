@@ -35,6 +35,9 @@ public final class ModItemModelProvider extends ModelProvider {
         items.itemModelOutput.accept(ItemRegistry.GEARWORK_REPEATER.get(), new SpecialModelWrapper.Unbaked(
                 Identifier.fromNamespaceAndPath("irons_artifice", "item/gun_display"),
                 Optional.empty(), new GeckolibItemSpecialRenderer.Unbaked<GunItem>()));
+        items.itemModelOutput.accept(ItemRegistry.ECHOWORK_LONG_GUN.get(), new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("irons_artifice", "item/gun_display"),
+                Optional.empty(), new GeckolibItemSpecialRenderer.Unbaked<GunItem>()));
         items.generateFlatItem(ItemRegistry.MODIFIER_AUGMENTATION_KIT.get(), ModelTemplates.FLAT_ITEM);
         items.generateFlatItem(ItemRegistry.PRECISION_FIRE_MODIFIER.get(), ModelTemplates.FLAT_ITEM);
         items.generateFlatItem(ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER.get(), ModelTemplates.FLAT_ITEM);
