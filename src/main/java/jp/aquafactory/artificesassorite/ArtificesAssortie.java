@@ -18,6 +18,7 @@ import jp.aquafactory.artificesassorite.item.modifier.potionimbuement.PotionImbu
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import jp.aquafactory.artificesassorite.datagen.ModItemModelProvider;
+import jp.aquafactory.artificesassorite.datagen.ModParticleDescriptionProvider;
 import jp.aquafactory.artificesassorite.datagen.RecipeDataProviders;
 import jp.aquafactory.artificesassorite.datagen.SoundDataProvider;
 import jp.aquafactory.artificesassorite.datagen.OilDamageProvider;
@@ -26,6 +27,7 @@ import jp.aquafactory.artificesassorite.network.Networks;
 import jp.aquafactory.artificesassorite.registry.CreativeTabRegistry;
 import jp.aquafactory.artificesassorite.registry.EntityRegistry;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
+import jp.aquafactory.artificesassorite.registry.ParticleRegistry;
 import jp.aquafactory.artificesassorite.registry.SoundRegistry;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -41,6 +43,7 @@ public class ArtificesAssortie {
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
         ItemRegistry.ITEMS.register(bus);
         EntityRegistry.ENTITIES.register(bus);
+        ParticleRegistry.PARTICLES.register(bus);
         EchoworkTrailEvents.ATTACHMENTS.register(bus);
         GyroscopeCalibrationEvents.ATTACHMENTS.register(bus);
         ShockAbsorberEvents.ATTACHMENTS.register(bus);
@@ -60,6 +63,7 @@ public class ArtificesAssortie {
         ModifierConfigSync.register(bus);
         bus.addListener(Networks::register);
         bus.addListener(ModItemModelProvider::gatherData);
+        bus.addListener(ModParticleDescriptionProvider::gatherData);
         bus.addListener(ModItemTagsProvider::gatherData);
         bus.addListener(ModEntityTypeTagsProvider::gatherData);
         bus.addListener(SoundDataProvider::gatherData);
