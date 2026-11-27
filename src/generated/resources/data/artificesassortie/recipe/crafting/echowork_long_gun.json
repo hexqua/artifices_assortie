@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": "irons_artifice:clockwork_components",
+    "E": "minecraft:echo_shard",
+    "G": "irons_artifice:antigravity_powder_modifier",
+    "I": "minecraft:iron_ingot",
+    "W": "#minecraft:logs"
+  },
+  "pattern": [
+    "I  ",
+    " EC",
+    " WG"
+  ],
+  "result": {
+    "id": "artificesassortie:echowork_long_gun"
+  }
+}

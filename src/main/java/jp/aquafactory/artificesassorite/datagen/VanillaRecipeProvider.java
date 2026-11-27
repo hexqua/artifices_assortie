@@ -44,6 +44,18 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_clockwork_components", has(IronsArtificeItems.CLOCKWORK_COMPONENTS.get()))
                 .save(output, id("crafting/gearwork_repeater"));
 
+        shaped(RecipeCategory.COMBAT, ECHOWORK_LONG_GUN.get())
+                .pattern("I  ")
+                .pattern(" EC")
+                .pattern(" WG")
+                .define('I', Items.IRON_INGOT)
+                .define('E', Items.ECHO_SHARD)
+                .define('W', ItemTags.LOGS)
+                .define('C', IronsArtificeItems.CLOCKWORK_COMPONENTS.get())
+                .define('G', IronsArtificeItems.ANTIGRAVITY_MODIFIER.get())
+                .unlockedBy("has_echo_shard", has(Items.ECHO_SHARD))
+                .save(output, id("crafting/echowork_long_gun"));
+
         shaped(RecipeCategory.MISC, ENCHANTED_MAGAZINE_MODIFIER.get())
                 .pattern("GQ ")
                 .pattern("EEQ")

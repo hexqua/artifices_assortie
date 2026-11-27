@@ -60,6 +60,7 @@ public final class ModGameTests {
             new Test("smithing_preserves_gun_and_consumes_inputs_once", "augmentation", 100, AugmentationGameTests::smithingPreservesGunAndConsumesInputsOnce),
             new Test("synchronized_material_and_tooltip_limits", "augmentation", 100, AugmentationGameTests::synchronizedMaterialAndTooltipLimits),
             new Test("tag_controls_new_augmentation_only", "augmentation", 100, AugmentationGameTests::tagControlsNewAugmentationOnly),
+            new Test("echowork_long_gun_crafts_with_clockwork_components", "default", 100, ModifierRecipeGameTests::echoworkLongGunCraftsWithClockworkComponents),
             new Test("echowork_long_gun_exposes_six_slots_without_augmentation", "gun", 100, EchoworkLongGunGameTests::exposesSixSlotsWithoutAugmentation),
             new Test("echowork_long_gun_fires_flat_and_cycles_after_fifteen_ticks", "gun", 100, EchoworkLongGunGameTests::firesFlatAndCyclesAfterFifteenTicks),
             new Test("echowork_long_gun_reloads_empty_and_partial_magazines_in_thirty_ticks", "gun", 100, EchoworkLongGunGameTests::reloadsEmptyAndPartialMagazinesInThirtyTicks),
