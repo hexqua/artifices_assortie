@@ -2,6 +2,7 @@
   "itemGroup.artificesassortie": "Artifices Assortie",
 
   "item.artificesassortie.gearwork_repeater": "Gearwork Repeater",
+  "item.artificesassortie.echowork_long_gun": "Echo-work Long Gun",
   "item.artificesassortie.precision_fire_modifier": "Precision Fire Modifier",
   "item.artificesassortie.grip_hold_stabilization_modifier": "Grip-Hold Stabilization Modifier",
   "item.artificesassortie.fortune_medal_modifier": "Medal of Fortune Modifier",
@@ -152,6 +153,7 @@
 
   "subtitle.artificesassortie.sound.precision_fire_headshot": "Bullet hits critically",
   "subtitle.artificesassortie.sound.notify_standing_snipe": "Standing snipe ready",
+  "subtitle.artificesassortie.sound.echo_fire": "Echo is unleashed",
 
   "death.attack.artificesassortie.oil_bullet": "%1$s was shot with potion oil",
   "death.attack.artificesassortie.oil_bullet.player": "%1$s was shot with potion oil by %2$s",

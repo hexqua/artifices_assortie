@@ -25,6 +25,8 @@ public final class ItemRegistry {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ArtificesAssortie.MODID);
     public static final DeferredItem<GunItem> GEARWORK_REPEATER = ITEMS.registerItem("gearwork_repeater",
             properties -> new GunItem(properties, GunProfiles.GEARWORK_REPEATER));
+    public static final DeferredItem<GunItem> ECHOWORK_LONG_GUN = ITEMS.registerItem("echowork_long_gun",
+            properties -> new GunItem(properties, GunProfiles.ECHOWORK_LONG_GUN));
     public static final DeferredItem<Item> MODIFIER_AUGMENTATION_KIT = ITEMS.registerSimpleItem("modifier_augmentation_kit");
     public static final DeferredItem<SpellImbuementItem> SPELL_IMBUEMENT_MODIFIER = ITEMS.registerItem("spell_imbuement_modifier",
             properties -> new SpellImbuementItem(properties.stacksTo(1)));

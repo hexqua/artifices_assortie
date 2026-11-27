@@ -28,6 +28,7 @@ public final class CreativeTabRegistry {
 
     private static void addGuns(CreativeModeTab.Output output) {
         output.accept(ItemRegistry.GEARWORK_REPEATER.get());
+        output.accept(ItemRegistry.ECHOWORK_LONG_GUN.get());
     }
 
     private static void addModifiers(CreativeModeTab.Output output) {

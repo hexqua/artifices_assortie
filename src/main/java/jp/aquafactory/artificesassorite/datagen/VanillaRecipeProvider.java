@@ -215,6 +215,18 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_clockwork_components", has(IronsArtificeItems.CLOCKWORK_COMPONENTS.get()))
                 .save(fallback, id("crafting/gearwork_repeater"));
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ECHOWORK_LONG_GUN.get())
+                .pattern("I  ")
+                .pattern(" EC")
+                .pattern(" WG")
+                .define('I', Items.IRON_INGOT)
+                .define('E', Items.ECHO_SHARD)
+                .define('W', ItemTags.LOGS)
+                .define('C', IronsArtificeItems.CLOCKWORK_COMPONENTS.get())
+                .define('G', IronsArtificeItems.ANTIGRAVITY_MODIFIER.get())
+                .unlockedBy("has_echo_shard", has(Items.ECHO_SHARD))
+                .save(fallback, id("crafting/echowork_long_gun"));
+
         // Create 用でも通常の作業台で作れるよう、バニラ形式として生成する。
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, GRIP_HOLD_STABILIZATION_MODIFIER.get())
                 .pattern(" V ")
@@ -239,6 +251,18 @@ public final class VanillaRecipeProvider extends RecipeProvider {
                 .define('R', IronsArtificeItems.MECHANICAL_REPEATER.get())
                 .unlockedBy("has_precision_mechanism", has(AllItems.PRECISION_MECHANISM.get()))
                 .save(output.withConditions(createLoaded), id("compat/create/gearwork_repeater"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ECHOWORK_LONG_GUN.get())
+                .pattern("I  ")
+                .pattern(" EC")
+                .pattern(" WG")
+                .define('I', Items.IRON_INGOT)
+                .define('E', Items.ECHO_SHARD)
+                .define('W', ItemTags.LOGS)
+                .define('C', AllItems.PRECISION_MECHANISM)
+                .define('G', IronsArtificeItems.ANTIGRAVITY_MODIFIER.get())
+                .unlockedBy("has_echo_shard", has(Items.ECHO_SHARD))
+                .save(output.withConditions(createLoaded), id("compat/create/echowork_long_gun"));
 
         // 入手時期がMODに左右されないようにCreate 導入時でもレシピを変更しない.
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, STANDING_SNIPE_MODIFIER.get())
