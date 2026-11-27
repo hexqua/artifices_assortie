@@ -15,6 +15,7 @@
   "item.artificesassortie.gyroscope_calibration_modifier": "ジャイロスコープ調整モディファイア",
   "item.artificesassortie.shock_absorber_modifier": "ショックアブソーバーモディファイア",
   "item.artificesassortie.enchanted_magazine_modifier": "エンチャント弾倉モディファイア",
+  "item.artificesassortie.juggling_reload_coin": "ジャグリングリロードコイン",
   "item.artificesassortie.spell_imbuement_modifier": "術式注入モディファイア",
   "item.artificesassortie.modifier_augmentation_kit": "モディファイア拡張キット",
 
@@ -27,6 +28,7 @@
   "item.artificesassortie.incomplete_gyroscope_calibration_modifier": "未完成のジャイロスコープ調整モディファイア",
   "item.artificesassortie.incomplete_shock_absorber_modifier": "未完成のショックアブソーバーモディファイア",
   "item.artificesassortie.incomplete_enchanted_magazine_modifier": "未完成のエンチャント弾倉モディファイア",
+  "item.artificesassortie.incomplete_juggling_reload_coin": "未完成のジャグリングリロードコイン",
 
   "item.artificesassortie.common.tooltip.spare_aamo": "予備弾数: %s",
   "item.artificesassortie.common.tooltip.tool_tier": "ツールレベル: %s",
@@ -121,6 +123,11 @@
   "item.artificesassortie.enchanted_magazine_modifier.desc_2": "リロード時、モディファイア1個につき銃の装弾数の%s%%（切り上げ）まで予備弾を補充する",
   "item.artificesassortie.enchanted_magazine_modifier.desc_3": "予備弾の補充にも弾を消費する",
   "item.artificesassortie.enchanted_magazine_modifier.desc_4": "モディファイアは銃の装弾数と同じ個数まで有効",
+  "item.artificesassortie.juggling_reload_coin.desc_1": "最後の弾（予備弾を含む）を敵に当てると、装着数と同じ枚数のコインが飛び出す",
+  "item.artificesassortie.juggling_reload_coin.desc_2": "コインが残っている間、その銃でもう一発だけ撃てる",
+  "item.artificesassortie.juggling_reload_coin.desc_3": "コインを撃ち抜くと、手に持っている銃を予備弾ごと即座にリロードする",
+  "item.artificesassortie.juggling_reload_coin.desc_4": "このリロードは通常のリロードと同じく銃弾を消費する",
+  "item.artificesassortie.juggling_reload_coin.desc_5": "追加の一発を再び得るにはリロードが必要となる",
   "item.artificesassortie.spell_imbuement_modifier.tooltip": "系統のルーンとクラフトすることで系統を変更できる",
   "item.artificesassortie.spell_imbuement_modifier.desc_1": "%1$s%% ダメージ(モディファイア追加分は+%2$s%%)",
   "item.artificesassortie.spell_imbuement_modifier.desc_2": "%s系統として呪文耐性の影響を受ける",
@@ -137,7 +144,11 @@
   "item.artificesassortie.modifier_augmentation_kit.detail.overflow": "他%s種",
   "item.artificesassortie.modifier_augmentation_kit.detail.overflow_jei": "他%s種(レシピはJEIで確認可能)",
 
+  "entity.artificesassortie.juggling_reload_coin": "ジャグリングリロードコイン",
+
   "ui.artificesassortie.insufficient_mana": "発射するのに十分なマナが足りない！",
+  "ui.artificesassortie.juggling_reload_coin.empty": "弾薬を持っていない！",
+  "ui.artificesassortie.juggling_reload_coin.partial": "弾薬が不足している！",
 
   "subtitle.artificesassortie.sound.precision_fire_headshot": "銃弾が鋭く当たる",
   "subtitle.artificesassortie.sound.notify_standing_snipe": "静止狙撃状態の通知音がなる",

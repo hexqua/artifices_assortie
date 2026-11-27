@@ -9,6 +9,7 @@ import jp.aquafactory.artificesassorite.gametest.modifier.FortuneMedalGameTests;
 import jp.aquafactory.artificesassorite.gametest.modifier.GripHoldStabilizationGameTests;
 import jp.aquafactory.artificesassorite.gametest.modifier.GyroscopeCalibrationGameTests;
 import jp.aquafactory.artificesassorite.gametest.modifier.ItemTransferGameTests;
+import jp.aquafactory.artificesassorite.gametest.modifier.JugglingReloadGameTests;
 import jp.aquafactory.artificesassorite.gametest.modifier.ModifierConfigGameTests;
 import jp.aquafactory.artificesassorite.gametest.recipe.ModifierRecipeGameTests;
 import jp.aquafactory.artificesassorite.gametest.modifier.MovementFireGameTests;
@@ -104,6 +105,12 @@ public final class ModGameTests {
             new Test("item_delay_and_orb_state_survive_normal_transfer", "modifier", 100, ItemTransferGameTests::itemDelayAndOrbStateSurviveNormalTransfer),
             new Test("killed_mob_drops_transfer_outside_impact_range_after_switching_hands", "modifier", 100, ItemTransferGameTests::killedMobDropsTransferOutsideImpactRangeAfterSwitchingHands),
             new Test("nonlethal_hits_transfer_but_canceled_impacts_do_not", "modifier", 100, ItemTransferGameTests::nonlethalHitsTransferButCanceledImpactsDoNot),
+            new Test("juggling_reload_last_reserve_round", "juggling_reload", 100, JugglingReloadGameTests::lastReserveRoundCreatesOneCoinPerModifierEvenWithoutDamage),
+            new Test("juggling_reload_extra_shot_expires_with_last_coin", "juggling_reload", 100, JugglingReloadGameTests::extraShotSurvivesUntilTheLastCoinDisappears),
+            new Test("juggling_reload_box_ammo", "juggling_reload", 100, JugglingReloadGameTests::anotherPlayerCanReloadTheirHeldGunWithBoxAmmo),
+            new Test("juggling_reload_partial_and_empty_recovery", "juggling_reload", 100, JugglingReloadGameTests::partialAndEmptyRecoveryConsumeCoinAndSendActionBar),
+            new Test("juggling_reload_rearms_after_reload", "juggling_reload", 100, JugglingReloadGameTests::actualReloadsRearmAndCowboyHatKeepsLastRoundCoin),
+            new Test("juggling_reload_invalidates_in_flight_grants", "juggling_reload", 100, JugglingReloadGameTests::heldChangesAndSessionEndRejectInFlightGrants),
             new Test("gyroscope_tooltip_omits_disabled_effects", "modifier", 100, ModifierConfigGameTests::gyroscopeTooltipOmitsDisabledEffects),
             new Test("synchronized_config_updates_tooltip_and_resets", "modifier", 100, ModifierConfigGameTests::synchronizedConfigUpdatesTooltipAndResets),
             new Test("augmentation_kit_crafting_remains_available_with_create", "default", 100, ModifierRecipeGameTests::augmentationKitCraftingRemainsAvailableWithCreate),
@@ -112,6 +119,7 @@ public final class ModGameTests {
             new Test("fortune_medal_recipe_switches_with_create", "default", 100, ModifierRecipeGameTests::fortuneMedalRecipeSwitchesWithCreate),
             new Test("grip_hold_recipe_switches_with_create", "default", 100, ModifierRecipeGameTests::gripHoldRecipeSwitchesWithCreate),
             new Test("gyroscope_calibration_recipe_switches_with_create", "default", 100, ModifierRecipeGameTests::gyroscopeCalibrationRecipeSwitchesWithCreate),
+            new Test("juggling_reload_coin_crafts_with_both_gun_oils", "default", 100, ModifierRecipeGameTests::jugglingReloadCoinCraftsWithBothGunOils),
             new Test("item_transfer_crafting_remains_available_with_create", "default", 100, ModifierRecipeGameTests::itemTransferCraftingRemainsAvailableWithCreate),
             new Test("precision_fire_recipe_switches_with_create", "default", 100, ModifierRecipeGameTests::precisionFireRecipeSwitchesWithCreate),
             new Test("shock_absorber_recipe_switches_with_create", "default", 100, ModifierRecipeGameTests::shockAbsorberRecipeSwitchesWithCreate),
