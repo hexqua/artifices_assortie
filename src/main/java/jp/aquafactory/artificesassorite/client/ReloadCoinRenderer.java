@@ -17,7 +17,6 @@ import net.minecraft.world.item.ItemStack;
 
 public final class ReloadCoinRenderer extends EntityRenderer<ReloadCoin, ReloadCoinRenderer.CoinRenderState> {
     private final ItemModelResolver itemModelResolver;
-    private final ItemStack appearance = new ItemStack(ItemRegistry.JUGGLING_RELOAD_COIN.get());
 
     public ReloadCoinRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -32,6 +31,8 @@ public final class ReloadCoinRenderer extends EntityRenderer<ReloadCoin, ReloadC
     @Override
     public void extractRenderState(ReloadCoin coin, CoinRenderState state, float partialTick) {
         super.extractRenderState(coin, state, partialTick);
+        // リソース読み込みでレンダラーを生成する時点では、アイテムのコンポーネントが未確定の場合がある。
+        var appearance = new ItemStack(ItemRegistry.JUGGLING_RELOAD_COIN.get());
         itemModelResolver.updateForTopItem(state.item, appearance, ItemDisplayContext.GROUND,
                 coin.level(), null, coin.getId());
     }
