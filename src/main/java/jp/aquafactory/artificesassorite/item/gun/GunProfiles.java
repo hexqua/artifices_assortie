@@ -10,6 +10,7 @@ import io.redspace.irons_artifice.data.ShotComponentTemplate;
 import io.redspace.irons_artifice.gun.ArmPoseKind;
 import io.redspace.irons_artifice.gun.GunProfile;
 import io.redspace.irons_artifice.registry.IronsArtificeSounds;
+import jp.aquafactory.artificesassorite.registry.SoundRegistry;
 import net.minecraft.sounds.SoundEvents;
 
 public final class GunProfiles {
@@ -33,7 +34,7 @@ public final class GunProfiles {
                             .bulletSpeedMultiplier(1.5)
                             .gravity(0)
                             .gunshotSound(
-                                    GunShotSoundSettings.standardShot(IronsArtificeSounds.MUSKET_SHOOT, 1f),
+                                    GunShotSoundSettings.standardShot(SoundRegistry.ECHO_FIRE, 1f),
                                     GunShotSoundSettings.standardEcho(IronsArtificeSounds.BULLET_ECHO_MUZZLELOADER, 1.15f),
                                     PlayableSound.holder(SoundEvents.DISPENSER_FAIL))
                             .build())

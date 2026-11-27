@@ -1,4 +1,10 @@
 {
+  "echo_fire": {
+    "sounds": [
+      "artificesassortie:echo_fire"
+    ],
+    "subtitle": "subtitle.artificesassortie.sound.echo_fire"
+  },
   "notify_standing_snipe": {
     "sounds": [
       {
