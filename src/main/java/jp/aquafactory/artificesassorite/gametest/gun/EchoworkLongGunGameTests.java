@@ -61,11 +61,20 @@ public final class EchoworkLongGunGameTests {
             helper.assertTrue(Math.abs(player.getDeltaMovement().z + 0.75) < 1e-5,
                     "The shot must push the shooter back by 0.75 on the firing axis");
 
-            // 拡散による初速の上下成分を外し、弾の tick が加える重力だけを観測する。
-            bullet.setDeltaMovement(SHOT_DIRECTION);
-            bullet.tick();
-            helper.assertTrue(!bullet.isRemoved() && bullet.getDeltaMovement().y == 0,
-                    "An unobstructed horizontal bullet must acquire no downward velocity");
+            try {
+                // 射手と構造物から離れた空間で、拡散による初速の上下成分を外して重力だけを観測する。
+                var origin = new Vec3(bullet.getX(), helper.getBounds().maxY + 2, bullet.getZ());
+                bullet.setPos(origin);
+                bullet.setDeltaMovement(SHOT_DIRECTION);
+                helper.getLevel().tickNonPassenger(bullet);
+                helper.assertTrue(!bullet.isRemoved() && bullet.getZ() > origin.z,
+                        "The unobstructed bullet must advance and remain alive: position=" + bullet.position()
+                                + ", removed=" + bullet.isRemoved());
+                helper.assertTrue(bullet.getDeltaMovement().y == 0,
+                        "A horizontal bullet must acquire no downward velocity: velocity=" + bullet.getDeltaMovement());
+            } finally {
+                bullet.discard();
+            }
 
             var tick = new EntityTickEvent.Post(player);
             for (int elapsed = 0; elapsed < 14; elapsed++) {
