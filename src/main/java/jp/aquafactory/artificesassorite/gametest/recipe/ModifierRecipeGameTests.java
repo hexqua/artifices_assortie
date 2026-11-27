@@ -1,5 +1,6 @@
 package jp.aquafactory.artificesassorite.gametest.recipe;
 
+import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import io.redspace.irons_artifice.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -15,6 +16,7 @@ import net.minecraft.world.level.ItemLike;
 import java.util.Arrays;
 
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ENCHANTED_MAGAZINE_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GEARWORK_REPEATER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GRIP_HOLD_STABILIZATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.EXCAVATION_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PRECISION_FIRE_MODIFIER;
@@ -25,6 +27,16 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.GYROSCOPE_C
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.SHOCK_ABSORBER_MODIFIER;
 public final class ModifierRecipeGameTests {
     private ModifierRecipeGameTests() {}
+
+    public static void gearworkRepeaterCraftsWithClockworkComponents(GameTestHelper helper) {
+        assertRecipeVariants(helper, "gearwork_repeater", "compat/create/gearwork_repeater");
+        assertCrafts(helper, input(3, 3,
+                Items.NETHERITE_INGOT, Items.AIR, Items.AIR,
+                Items.AIR, IronsArtificeItems.MECHANICAL_REPEATER.get(), IronsArtificeItems.BULLET_BOX.get(),
+                Items.AIR, Items.OAK_LOG, IronsArtificeItems.CLOCKWORK_COMPONENTS.get()), GEARWORK_REPEATER.get());
+        helper.succeed();
+    }
+
     public static void enchantedMagazineRecipeSwitchesWithCreate(GameTestHelper helper) {
         assertRecipeVariants(helper, "enchanted_magazine_modifier",
                 "sequenced_assembly/enchanted_magazine_modifier");

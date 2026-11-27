@@ -1,5 +1,6 @@
 package jp.aquafactory.artificesassorite.datagen;
 
+import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import io.redspace.irons_artifice.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.augmentation.AugmentationRecipe;
@@ -10,6 +11,7 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.Items;
@@ -30,6 +32,17 @@ public final class VanillaRecipeProvider extends RecipeProvider {
     protected void buildRecipes() {
         output.accept(id("smithing/modifier_augmentation"), new AugmentationRecipe(), null);
 
+        shaped(RecipeCategory.COMBAT, GEARWORK_REPEATER.get())
+                .pattern("N  ")
+                .pattern(" RB")
+                .pattern(" WC")
+                .define('N', Items.NETHERITE_INGOT)
+                .define('R', IronsArtificeItems.MECHANICAL_REPEATER.get())
+                .define('B', IronsArtificeItems.BULLET_BOX.get())
+                .define('W', ItemTags.LOGS)
+                .define('C', IronsArtificeItems.CLOCKWORK_COMPONENTS.get())
+                .unlockedBy("has_clockwork_components", has(IronsArtificeItems.CLOCKWORK_COMPONENTS.get()))
+                .save(output, id("crafting/gearwork_repeater"));
 
         shaped(RecipeCategory.MISC, ENCHANTED_MAGAZINE_MODIFIER.get())
                 .pattern("GQ ")

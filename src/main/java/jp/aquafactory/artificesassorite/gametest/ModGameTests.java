@@ -2,6 +2,7 @@ package jp.aquafactory.artificesassorite.gametest;
 
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.gametest.augmentation.AugmentationGameTests;
+import jp.aquafactory.artificesassorite.gametest.gun.GearworkRepeaterGameTests;
 import jp.aquafactory.artificesassorite.gametest.modifier.EnchantedMagazineGameTests;
 import jp.aquafactory.artificesassorite.gametest.modifier.ExcavationGameTests;
 import jp.aquafactory.artificesassorite.gametest.modifier.FortuneMedalGameTests;
@@ -51,11 +52,16 @@ public final class ModGameTests {
 
     private static final List<Test> TESTS = List.of(
             new Test("extra_slot_affects_shots_and_survives_storage", "augmentation", 100, AugmentationGameTests::extraSlotAffectsShotsAndSurvivesStorage),
+            new Test("gearwork_repeater_rejects_augmentation", "augmentation", 100, AugmentationGameTests::gearworkRepeaterRejectsAugmentation),
             new Test("login_recipe_packet_preserves_usable_augmentation_recipe", "augmentation", 100, AugmentationGameTests::loginRecipePacketPreservesUsableAugmentationRecipe),
             new Test("material_changes_reject_and_recover_without_consuming_inputs", "augmentation", 100, AugmentationGameTests::materialChangesRejectAndRecoverWithoutConsumingInputs),
             new Test("smithing_preserves_gun_and_consumes_inputs_once", "augmentation", 100, AugmentationGameTests::smithingPreservesGunAndConsumesInputsOnce),
             new Test("synchronized_material_and_tooltip_limits", "augmentation", 100, AugmentationGameTests::synchronizedMaterialAndTooltipLimits),
             new Test("tag_controls_new_augmentation_only", "augmentation", 100, AugmentationGameTests::tagControlsNewAugmentationOnly),
+            new Test("gearwork_repeater_accepts_modifier_in_sixth_slot", "gun", 100, GearworkRepeaterGameTests::acceptsAModifierInTheSixthSlot),
+            new Test("gearwork_repeater_crafts_with_clockwork_components", "default", 100, ModifierRecipeGameTests::gearworkRepeaterCraftsWithClockworkComponents),
+            new Test("gearwork_repeater_fires_again_after_three_ticks", "gun", 100, GearworkRepeaterGameTests::firesAgainAfterThreeTicks),
+            new Test("gearwork_repeater_reload_duration_is_independent_of_remaining_rounds", "gun", 100, GearworkRepeaterGameTests::reloadDurationIsIndependentOfRemainingRounds),
             new Test("ammo_box_refill_pays_only_for_missing_rounds", "modifier", 100, EnchantedMagazineGameTests::ammoBoxRefillPaysOnlyForMissingRounds),
             new Test("capacity_limit_and_zero_refill_preserve_paid_rounds", "modifier", 100, EnchantedMagazineGameTests::capacityLimitAndZeroRefillPreservePaidRounds),
             new Test("gun_tooltip_shows_only_effective_reserve_ammo", "modifier", 100, EnchantedMagazineGameTests::gunTooltipShowsOnlyEffectiveReserveAmmo),

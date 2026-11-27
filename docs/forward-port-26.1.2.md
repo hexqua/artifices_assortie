@@ -10,6 +10,12 @@
 - Create・Spellbooks・Malumの連携はこの版では無効。通常レシピを生成し、Spell Imbuementのアイテムと保存コンポーネントIDは維持する。新規ワールドを検証基準にする。
 - JEIはクライアントの任意依存。鍛冶のサーバー判定、同期された素材・タグ、JEIの具体例、拡張前後の銃の区別を確認する。
 
+## GeckoLib 5 の銃リソース
+
+- 手管理の銃モデルは `assets/<modid>/geckolib/models/item/<id>.geo.json`、アニメーションは `assets/<modid>/geckolib/animations/item/<id>.animation.json` に置く。テクスチャは `assets/<modid>/textures/item/<id>.png` に置く。パスとアニメーション名は、固定した親 MOD の配布 JAR にある既存銃と照合する。
+- 親 MOD の `GunItem` を使う銃は、`ModItemModelProvider` で `assets/<modid>/items/<id>.json` を生成する。アイテム定義には `minecraft:special`、表示変換の参照先には `irons_artifice:item/gun_display`、特殊レンダラーには `geckolib:geckolib` を指定する。
+- `runData` と `build` 後に、1.21.1 由来の `geo/item/`、`animations/item/`、銃ごとの `models/item/<id>.json` が移植先のソースと配布 JAR に残っていないことを確認する。クライアントではインベントリ、地面、一人称・三人称での表示と、装備・射撃・装填のアニメーションを確認する。
+
 ## 検証
 
 Java 25でCLIの `runData` を実行し、生成物の追加と旧出力の残存を確認する。`build` と `runGameTestServer` を実行する。JEIに触れる場合は `runGameTestServer -PwithoutJei` でも鍛冶を確認する。IDE同期は `neoForgeIdeSync`。ゲームディレクトリは `run/26.1.2` とし、1.21.1の手動ワールド・設定と分ける。ゲーム用の起動構成は `runClient` と `runGameTestServer` を使う。
