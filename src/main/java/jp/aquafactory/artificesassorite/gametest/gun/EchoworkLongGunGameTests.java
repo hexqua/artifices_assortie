@@ -10,24 +10,42 @@ import io.redspace.irons_artifice.item.GunplayManager;
 import io.redspace.irons_artifice.item.MagazineContents;
 import io.redspace.irons_artifice.menu.GunModifierMenu;
 import io.redspace.irons_artifice.registry.IronsArtificeItems;
+import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.augmentation.GunAugmentation;
 import jp.aquafactory.artificesassorite.registry.ItemRegistry;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
+@GameTestHolder(ArtificesAssortie.MODID)
+@PrefixGameTestTemplate(false)
 public final class EchoworkLongGunGameTests {
     private static final Vec3 SHOT_DIRECTION = new Vec3(0, 0, 1);
 
     private EchoworkLongGunGameTests() {}
 
+    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.gun")
     public static void firesFlatAndCyclesAfterFifteenTicks(GameTestHelper helper) {
         var gun = new ItemStack(ItemRegistry.ECHOWORK_LONG_GUN.get());
         var player = playerWithGun(helper, gun);
@@ -70,12 +88,78 @@ public final class EchoworkLongGunGameTests {
         helper.succeed();
     }
 
+    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.gun")
+    @SuppressWarnings("unused")
+    public static void spacesSonicBoomParticlesAcrossTicksAndStopsAtImpact(GameTestHelper helper) {
+        var player = playerWithGun(helper, new ItemStack(ItemRegistry.ECHOWORK_LONG_GUN.get()));
+        var level = helper.getLevel();
+        var shotArea = AABB.ofSize(player.position(), 4, 8, 4);
+        var particles = new ArrayList<ClientboundLevelParticlesPacket>();
+        var previousConnection = player.connection;
+        try {
+            helper.assertTrue(level.addFreshEntity(player), "The shooter must receive particle packets");
+            new ServerGamePacketListenerImpl(player.server, new Connection(PacketFlow.SERVERBOUND), player,
+                    CommonListenerCookie.createInitial(player.getGameProfile(), false)) {
+                @Override
+                public void send(@NotNull Packet<?> packet) {
+                    if (packet instanceof ClientboundLevelParticlesPacket particle
+                            && particle.getParticle() == ParticleTypes.SONIC_BOOM) {
+                        particles.add(particle);
+                    }
+                }
+            };
+            helper.assertTrue(GunplayManager.tryFire(player, SHOT_DIRECTION).fired(), "The gun must fire");
+            var bullets = level.getEntitiesOfClass(Bullet.class, shotArea, bullet -> bullet.getOwner() == player);
+            helper.assertTrue(bullets.size() == 1, "The gun must spawn one bullet");
+            var bullet = bullets.getFirst();
+            try {
+                // 天井より上を使い、長い弾道が隣のテスト用構造物を横切らないようにする。
+                Vec3 origin = new Vec3(bullet.getX(), helper.getBounds().maxY + 2, bullet.getZ());
+                bullet.setPos(origin);
+                player.setPos(origin.add(2, 0, 0));
+                bullet.setDeltaMovement(0, 18, 0);
+                BlockPos obstacle = BlockPos.containing(origin.add(0, 27, 0));
+                var previousBlock = level.getBlockState(obstacle);
+                level.setBlockAndUpdate(obstacle, Blocks.STONE.defaultBlockState());
+                try {
+                    level.tickNonPassenger(bullet);
+                    helper.assertTrue(particles.size() == 4
+                                    && Math.abs(particles.get(0).getY() - origin.y - 4) < 0.001
+                                    && Math.abs(particles.get(1).getY() - origin.y - 8) < 0.001
+                                    && Math.abs(particles.get(2).getY() - origin.y - 12) < 0.001
+                                    && Math.abs(particles.get(3).getY() - origin.y - 16) < 0.001,
+                            "The first tick must send rings at 4, 8 , 12 and 16 blocks: origin=" + origin
+                                    + ", end=" + bullet.position() + ", removed=" + bullet.isRemoved()
+                                    + ", recipient=" + level.players().contains(player)
+                                    + ", heights=" + particles.stream().map(ClientboundLevelParticlesPacket::getY).toList());
+                    level.tickNonPassenger(bullet);
+                    helper.assertTrue(bullet.isRemoved() && particles.size() == 6
+                                    && Math.abs(particles.get(4).getY() - origin.y - 20) < 0.001
+                                    && Math.abs(particles.get(5).getY() - origin.y - 24) < 0.001,
+                            "The second tick must send the 24-block ring and stop before the wall: end="
+                                    + bullet.position() + ", removed=" + bullet.isRemoved()
+                                    + ", heights=" + particles.stream().map(ClientboundLevelParticlesPacket::getY).toList());
+                } finally {
+                    level.setBlockAndUpdate(obstacle, previousBlock);
+                }
+            } finally {
+                bullet.discard();
+            }
+        } finally {
+            player.connection = previousConnection;
+            player.discard();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.gun")
     public static void reloadsEmptyAndPartialMagazinesInThirtyTicks(GameTestHelper helper) {
         assertFixedReload(helper, 0);
         assertFixedReload(helper, 1);
         helper.succeed();
     }
 
+    @GameTest(template = "gametest/basic_floor", batch = "artificesassortie.gun")
     public static void exposesSixSlotsWithoutAugmentation(GameTestHelper helper) {
         var gun = new ItemStack(ItemRegistry.ECHOWORK_LONG_GUN.get());
         var player = playerWithGun(helper, gun);

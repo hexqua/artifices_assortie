@@ -4,6 +4,7 @@ import jp.aquafactory.artificesassorite.config.ServerConfig;
 import jp.aquafactory.artificesassorite.config.ClientConfig;
 import jp.aquafactory.artificesassorite.item.augmentation.GunAugmentation;
 import jp.aquafactory.artificesassorite.item.augmentation.AugmentationRecipe;
+import jp.aquafactory.artificesassorite.item.gun.EchoworkTrailEvents;
 import jp.aquafactory.artificesassorite.item.modifier.enchantedmagazine.EnchantedMagazine;
 import jp.aquafactory.artificesassorite.item.modifier.gyroscope.GyroscopeCalibrationEvents;
 import jp.aquafactory.artificesassorite.item.modifier.shockabsorber.ShockAbsorberEvents;
@@ -34,6 +35,7 @@ public class ArtificesAssortie {
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
         ItemRegistry.ITEMS.register(bus);
         EntityRegistry.ENTITIES.register(bus);
+        EchoworkTrailEvents.ATTACHMENTS.register(bus);
         GyroscopeCalibrationEvents.ATTACHMENTS.register(bus);
         ShockAbsorberEvents.ATTACHMENTS.register(bus);
         GunAugmentation.COMPONENTS.register(bus);
