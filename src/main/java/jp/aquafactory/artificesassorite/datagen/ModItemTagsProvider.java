@@ -1,6 +1,6 @@
 package jp.aquafactory.artificesassorite.datagen;
 
-import io.redspace.irons_artifice.registry.ItemRegistry;
+import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.item.augmentation.GunAugmentation;
 import net.minecraft.core.HolderLookup;
@@ -25,7 +25,7 @@ public final class ModItemTagsProvider extends IntrinsicHolderTagsProvider<Item>
 
     @Override
     protected void addTags(HolderLookup.@NotNull Provider registries) {
-        tag(GunAugmentation.AUGMENTABLE_GUNS).add(ItemRegistry.FLINTLOCK_PISTOL.get(), ItemRegistry.MUSKET.get(),
-                ItemRegistry.BLUNDERBUSS.get(), ItemRegistry.BLACKPOWDER_REVOLVER.get(), ItemRegistry.SIX_SHOOTER.get());
+        tag(GunAugmentation.AUGMENTABLE_GUNS).add(IronsArtificeItems.FLINTLOCK_PISTOL.get(), IronsArtificeItems.MUSKET.get(),
+                IronsArtificeItems.BLUNDERBUSS.get(), IronsArtificeItems.BLACKPOWDER_REVOLVER.get(), IronsArtificeItems.SIX_SHOOTER.get());
     }
 }
