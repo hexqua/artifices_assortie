@@ -122,9 +122,9 @@ public final class GripHoldStabilizationEvents {
         int count = event.getShotProfile().peek(GripHoldStabilizationModifier.COUNT);
         var values = shooter.level().isClientSide() ? ServerConfig.clientValues().gripHoldStabilization() : ServerConfig.serverValues().gripHoldStabilization();
         event.getShotProfile().modifyValue(ShotComponents.CAMERA_RECOIL_MULTIPLIER,
-                new ValueModifier(Math.pow(values.adsRecoilMultiplier(), count) - 1, ValueModifier.Operation.MULTIPLY_TOTAL, ValueModifier.Type.HARMFUL));
+                new ValueModifier(Math.pow(values.adsRecoilMultiplier(), count) - 1, ValueModifier.Operation.MULTIPLY_TOTAL));
         event.getShotProfile().modifyValue(ShotComponents.SPREAD,
-                new ValueModifier(values.adsSpreadBonus() * count, ValueModifier.Operation.ADD, ValueModifier.Type.HARMFUL));
+                new ValueModifier(values.adsSpreadBonus() * count, ValueModifier.Operation.ADD));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

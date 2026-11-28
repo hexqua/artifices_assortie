@@ -43,10 +43,10 @@ public final class OilModifier implements GunModifier {
         var values = event.getEntity().level().isClientSide() ? ServerConfig.clientValues() : ServerConfig.serverValues();
         if (profile.peek(HEALING) > 0) profile.modifyValue(ShotComponents.DAMAGE, new ValueModifier(
                 Math.pow(values.healingOil().damageMultiplier(), profile.peek(HEALING)) - 1,
-                ValueModifier.Operation.MULTIPLY_TOTAL, ValueModifier.Type.BENEFICIAL));
+                ValueModifier.Operation.MULTIPLY_TOTAL));
         if (profile.peek(HARMING) > 0) profile.modifyValue(ShotComponents.DAMAGE, new ValueModifier(
                 Math.pow(values.harmingOil().damageMultiplier(), profile.peek(HARMING)) - 1,
-                ValueModifier.Operation.MULTIPLY_TOTAL, ValueModifier.Type.BENEFICIAL));
+                ValueModifier.Operation.MULTIPLY_TOTAL));
     }
 
     @Override

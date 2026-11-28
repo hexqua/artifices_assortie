@@ -97,8 +97,7 @@ public final class MovementFireEvents {
         int count = shot.peek(modifier.count());
         for (int i = 0; i < count; i++) {
             shot.modifyValue(ShotComponents.DAMAGE, new ValueModifier(multiplier - 1,
-                    ValueModifier.Operation.MULTIPLY_TOTAL,
-                    multiplier < 1 ? ValueModifier.Type.HARMFUL : ValueModifier.Type.BENEFICIAL));
+                    ValueModifier.Operation.MULTIPLY_TOTAL));
         }
     }
 

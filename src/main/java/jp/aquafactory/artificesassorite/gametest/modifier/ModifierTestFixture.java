@@ -9,7 +9,7 @@ import io.redspace.irons_artifice.item.GunItem;
 import io.redspace.irons_artifice.item.GunplayManager;
 import io.redspace.irons_artifice.item.MagazineContents;
 import io.redspace.irons_artifice.menu.GunContainer;
-import io.redspace.irons_artifice.registry.EntityRegistry;
+import io.redspace.irons_artifice.registry.IronsArtificeEntities;
 import jp.aquafactory.artificesassorite.item.modifier.gripholdstabilization.GripHoldStabilizationEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -112,7 +112,7 @@ final class ModifierTestFixture implements AutoCloseable {
     // 保護メソッドへの入口だけを公開し、上流のイベントと本体 damage 処理を通す。
     static final class TestBullet extends Bullet {
         TestBullet(ServerLevel level) {
-            super(EntityRegistry.BULLET.get(), level);
+            super(IronsArtificeEntities.BULLET.get(), level);
         }
 
         void hit(HitResult result) { super.onHit(result); }

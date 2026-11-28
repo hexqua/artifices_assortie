@@ -57,8 +57,8 @@ public final class PrecisionFireGameTests {
                 fixture.equip("flintlock", ItemRegistry.PRECISION_FIRE_MODIFIER.get(), count);
                 var profile = fixture.compose();
                 profile.components().set(ShotComponents.DAMAGE, Value.of(10));
-                profile.modifyValue(ShotComponents.DAMAGE, new ValueModifier(5, ValueModifier.Operation.ADD, ValueModifier.Type.BENEFICIAL));
-                profile.modifyValue(ShotComponents.DAMAGE, new ValueModifier(0.5, ValueModifier.Operation.MULTIPLY_TOTAL, ValueModifier.Type.BENEFICIAL));
+                profile.modifyValue(ShotComponents.DAMAGE, new ValueModifier(5, ValueModifier.Operation.ADD));
+                profile.modifyValue(ShotComponents.DAMAGE, new ValueModifier(0.5, ValueModifier.Operation.MULTIPLY_TOTAL));
                 profile.components().set(ShotComponents.PROJECTILE_COUNT, Value.of(3));
                 fixture.assertDamage(profile.copy(), true, head[count]);
                 fixture.assertDamage(profile.copy(), false, body[count]);

@@ -1,7 +1,6 @@
 package jp.aquafactory.artificesassorite.gametest.recipe;
 
 import io.redspace.irons_artifice.registry.IronsArtificeItems;
-import io.redspace.irons_artifice.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.Identifier;
@@ -59,7 +58,7 @@ public final class ModifierRecipeGameTests {
     }
 
     private static CraftingInput enchantedMagazineInput(ItemLike secondBottle) {
-        var bullet = ItemRegistry.ENCHANTED_BULLET_MODIFIER.get();
+        var bullet = IronsArtificeItems.ENCHANTED_BULLET_MODIFIER.get();
         return input(3, 3,
                 Items.GOLD_INGOT, Items.QUARTZ_BLOCK, Items.AIR,
                 bullet, bullet, Items.QUARTZ_BLOCK,
@@ -94,8 +93,8 @@ public final class ModifierRecipeGameTests {
     static CraftingInput excavationInput(ItemLike top, ItemLike side, ItemLike flint) {
         return input(3, 3,
                 Items.AIR, top, Items.AIR,
-                side, ItemRegistry.BREACHING_SHELL.get(), side,
-                flint, ItemRegistry.CLOCKWORK_COMPONENTS.get(), flint);
+                side, IronsArtificeItems.BREACHING_SHELL.get(), side,
+                flint, IronsArtificeItems.CLOCKWORK_COMPONENTS.get(), flint);
     }
 
     // GameTest がアノテーションから探索して呼び出す。
@@ -110,7 +109,7 @@ public final class ModifierRecipeGameTests {
     }
 
     private static CraftingInput augmentationKitInput(ItemLike pickaxe) {
-        var components = ItemRegistry.CLOCKWORK_COMPONENTS.get();
+        var components = IronsArtificeItems.CLOCKWORK_COMPONENTS.get();
         return input(3, 3,
                 Items.LEATHER, pickaxe, Items.LEATHER,
                 components, components, components,
@@ -128,12 +127,12 @@ public final class ModifierRecipeGameTests {
         assertRecipeVariants(helper, "precision_fire_modifier", "sequenced_assembly/precision_fire_modifier");
         var fallback = input(3, 3,
                 Items.AIR, Items.REDSTONE, Items.SPYGLASS,
-                Items.SPECTRAL_ARROW, ItemRegistry.MECHANICAL_COMPONENTS.get(), Items.REDSTONE,
+                Items.SPECTRAL_ARROW, IronsArtificeItems.MECHANICAL_COMPONENTS.get(), Items.REDSTONE,
                 Items.SPECTRAL_ARROW, Items.SPECTRAL_ARROW, Items.AIR);
         assertCrafts(helper, fallback, PRECISION_FIRE_MODIFIER.get());
         var incomplete = input(3, 3,
                 Items.AIR, Items.REDSTONE, Items.SPYGLASS,
-                Items.SPECTRAL_ARROW, ItemRegistry.MECHANICAL_COMPONENTS.get(), Items.REDSTONE,
+                Items.SPECTRAL_ARROW, IronsArtificeItems.MECHANICAL_COMPONENTS.get(), Items.REDSTONE,
                 Items.SPECTRAL_ARROW, Items.AIR, Items.AIR);
         assertNoCraftingRecipe(helper, incomplete, "Precision fire must require all three spectral arrows");
         helper.succeed();
@@ -151,7 +150,7 @@ public final class ModifierRecipeGameTests {
         return input(3, 3,
                 Items.AIR, quartz, Items.AIR,
                 Items.COPPER_INGOT, Items.COMPASS, Items.COPPER_INGOT,
-                Items.AIR, ItemRegistry.CLOCKWORK_COMPONENTS.get(), Items.AIR);
+                Items.AIR, IronsArtificeItems.CLOCKWORK_COMPONENTS.get(), Items.AIR);
     }
     public static void shockAbsorberRecipeSwitchesWithCreate(GameTestHelper helper) {
         assertRecipeVariants(helper, "shock_absorber_modifier", "sequenced_assembly/shock_absorber_modifier");
@@ -164,8 +163,8 @@ public final class ModifierRecipeGameTests {
     private static CraftingInput shockAbsorberInput(ItemLike scrap) {
         return input(3, 3,
                 Items.AIR, scrap, Items.AIR,
-                Items.SLIME_BALL, ItemRegistry.BUFFER_SPRING.get(), Items.AIR,
-                Items.AIR, ItemRegistry.CLOCKWORK_COMPONENTS.get(), Items.AIR);
+                Items.SLIME_BALL, IronsArtificeItems.BUFFER_SPRING.get(), Items.AIR,
+                Items.AIR, IronsArtificeItems.CLOCKWORK_COMPONENTS.get(), Items.AIR);
     }
     public static void gripHoldRecipeSwitchesWithCreate(GameTestHelper helper) {
         assertRecipeVariants(helper, "grip_hold_stabilization_modifier", "compat/create/grip_hold_stabilization_modifier");
@@ -183,13 +182,13 @@ public final class ModifierRecipeGameTests {
     }
     public static void itemTransferCraftingRemainsAvailableWithCreate(GameTestHelper helper) {
         assertCrafts(helper, input(3, 3,
-                ItemRegistry.MECHANICAL_COMPONENTS.get(), Items.IRON_INGOT, Items.AIR,
-                Items.ENDER_PEARL, ItemRegistry.CLOCKWORK_COMPONENTS.get(), Items.ENDER_PEARL,
-                Items.AIR, Items.GOLD_INGOT, ItemRegistry.MECHANICAL_COMPONENTS.get()), ITEM_TRANSFER_MODIFIER.get());
+                IronsArtificeItems.MECHANICAL_COMPONENTS.get(), Items.IRON_INGOT, Items.AIR,
+                Items.ENDER_PEARL, IronsArtificeItems.CLOCKWORK_COMPONENTS.get(), Items.ENDER_PEARL,
+                Items.AIR, Items.GOLD_INGOT, IronsArtificeItems.MECHANICAL_COMPONENTS.get()), ITEM_TRANSFER_MODIFIER.get());
         assertNoCraftingRecipe(helper, input(3, 3,
-                ItemRegistry.MECHANICAL_COMPONENTS.get(), Items.IRON_INGOT, Items.AIR,
-                Items.ENDER_PEARL, ItemRegistry.CLOCKWORK_COMPONENTS.get(), Items.AIR,
-                Items.AIR, Items.GOLD_INGOT, ItemRegistry.MECHANICAL_COMPONENTS.get()),
+                IronsArtificeItems.MECHANICAL_COMPONENTS.get(), Items.IRON_INGOT, Items.AIR,
+                Items.ENDER_PEARL, IronsArtificeItems.CLOCKWORK_COMPONENTS.get(), Items.AIR,
+                Items.AIR, Items.GOLD_INGOT, IronsArtificeItems.MECHANICAL_COMPONENTS.get()),
                 "Crafting table item transfer recipe must require two ender pearls");
         helper.assertTrue(helper.getLevel().recipeAccess().byKey(id("compat/create/item_transfer_modifier"))
                 .isEmpty(), "Mechanical item transfer recipe must require Create");
@@ -199,7 +198,7 @@ public final class ModifierRecipeGameTests {
     private static CraftingInput fortuneInput(ItemLike dye) {
         return input(3, 3,
                 Items.AIR, dye, Items.AIR,
-                Items.GOLD_INGOT, ItemRegistry.MECHANICAL_COMPONENTS.get(), Items.GOLD_INGOT,
+                Items.GOLD_INGOT, IronsArtificeItems.MECHANICAL_COMPONENTS.get(), Items.GOLD_INGOT,
                 Items.AIR, Items.RABBIT_FOOT, Items.AIR);
     }
 
@@ -213,8 +212,8 @@ public final class ModifierRecipeGameTests {
 
     static CraftingInput gripInput(ItemLike corner) {
         return input(3, 3,
-                Items.AIR, ItemRegistry.GAS_VENT.get(), Items.AIR,
-                ItemRegistry.HAIR_TRIGGER.get(), ItemRegistry.MECHANICAL_COMPONENTS.get(), ItemRegistry.HAIR_TRIGGER.get(),
+                Items.AIR, IronsArtificeItems.GAS_VENT.get(), Items.AIR,
+                IronsArtificeItems.HAIR_TRIGGER.get(), IronsArtificeItems.MECHANICAL_COMPONENTS.get(), IronsArtificeItems.HAIR_TRIGGER.get(),
                 corner, Items.IRON_BLOCK, corner);
     }
 
