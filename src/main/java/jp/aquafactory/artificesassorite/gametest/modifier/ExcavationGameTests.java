@@ -5,6 +5,7 @@ import io.redspace.irons_artifice.data.ShotComponents;
 import io.redspace.irons_artifice.data.Value;
 import io.redspace.irons_artifice.gun.ShotProfile;
 import io.redspace.irons_artifice.menu.GunContainer;
+import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.api.event.ExcavationBreakEvent;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
@@ -83,8 +84,8 @@ public final class ExcavationGameTests {
     private static final Item MINING = ItemRegistry.EXCAVATION_MODIFIER.get();
     private static final Item MEDAL = ItemRegistry.FORTUNE_MEDAL_MODIFIER.get();
     private static final Item TRANSFER = ItemRegistry.ITEM_TRANSFER_MODIFIER.get();
-    private static final Item BREACH = io.redspace.irons_artifice.registry.ItemRegistry.BREACHING_SHELL.get();
-    private static final Item POWDER = io.redspace.irons_artifice.registry.ItemRegistry.BLACKPOWDER_CHARGE.get();
+    private static final Item BREACH = IronsArtificeItems.BREACHING_SHELL.get();
+    private static final Item POWDER = IronsArtificeItems.BLACKPOWDER_CHARGE.get();
 
     private ExcavationGameTests() {}
 

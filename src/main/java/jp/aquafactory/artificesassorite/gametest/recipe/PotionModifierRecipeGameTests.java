@@ -1,6 +1,6 @@
 package jp.aquafactory.artificesassorite.gametest.recipe;
 
-import io.redspace.irons_artifice.registry.ItemRegistry;
+import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.core.Holder;
 import net.minecraft.gametest.framework.GameTest;
@@ -76,8 +76,8 @@ public final class PotionModifierRecipeGameTests {
         assertVariants(helper, "potion_imbuement_modifier", createLoaded);
         var input = ModifierRecipeGameTests.input(3, 3,
                 Items.AIR, Items.NETHER_WART, Items.AIR,
-                HEALING_OIL_MODIFIER.get(), ItemRegistry.VENOM_CAPSULE.get(), HARMING_OIL_MODIFIER.get(),
-                ItemRegistry.CLOCKWORK_COMPONENTS.get(), Items.GLASS_BOTTLE, Items.AIR);
+                HEALING_OIL_MODIFIER.get(), IronsArtificeItems.VENOM_CAPSULE.get(), HARMING_OIL_MODIFIER.get(),
+                IronsArtificeItems.CLOCKWORK_COMPONENTS.get(), Items.GLASS_BOTTLE, Items.AIR);
         if (createLoaded) {
             ModifierRecipeGameTests.assertNoCraftingRecipe(helper, input,
                     "Create must disable potion imbuement crafting");
@@ -94,7 +94,7 @@ public final class PotionModifierRecipeGameTests {
         var stacks = new ArrayList<>(ModifierRecipeGameTests.input(3, 3,
                 Items.AIR, side, Items.AIR,
                 side, Items.AIR, side,
-                ItemRegistry.CLOCKWORK_COMPONENTS.get(), ItemRegistry.GUN_OIL.get(), Items.AIR).items());
+                IronsArtificeItems.CLOCKWORK_COMPONENTS.get(), IronsArtificeItems.GUN_OIL.get(), Items.AIR).items());
         stacks.set(4, potion);
         return CraftingInput.of(3, 3, stacks);
     }

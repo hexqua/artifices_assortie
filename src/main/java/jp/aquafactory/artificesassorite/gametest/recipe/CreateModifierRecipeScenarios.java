@@ -14,7 +14,6 @@ import com.simibubi.create.content.processing.basin.BasinRecipe;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import com.simibubi.create.content.kinetics.crafter.RecipeGridHandler;
 import io.redspace.irons_artifice.registry.IronsArtificeItems;
-import io.redspace.irons_artifice.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -146,20 +145,20 @@ final class CreateModifierRecipeScenarios {
 
     static void potionOil(GameTestHelper helper, boolean healing) {
         var strong = healing ? Potions.STRONG_HEALING : Potions.STRONG_HARMING;
-        var current = fill(helper, new ItemStack(ItemRegistry.GUN_OIL.get()), strong,
+        var current = fill(helper, new ItemStack(IronsArtificeItems.GUN_OIL.get()), strong,
                 healing ? Potions.HEALING : Potions.HARMING);
         assertIntermediate(helper, current,
                 healing ? INCOMPLETE_HEALING_OIL_MODIFIER.get() : INCOMPLETE_HARMING_OIL_MODIFIER.get(), 1);
         // 最初の注入で選ばれた系統を、別のポーションで変更できないことも確認する。
         assertFillingRejected(helper, current, healing ? Potions.STRONG_HARMING : Potions.STRONG_HEALING, 250);
-        current = deploy(helper, current, ItemRegistry.CLOCKWORK_COMPONENTS.get());
+        current = deploy(helper, current, IronsArtificeItems.CLOCKWORK_COMPONENTS.get());
         ModifierRecipeGameTests.assertResult(helper, current,
                 healing ? HEALING_OIL_MODIFIER.get() : HARMING_OIL_MODIFIER.get(), "Oil assembly");
     }
 
     static void potionImbuement(GameTestHelper helper) {
         var incomplete = INCOMPLETE_POTION_IMBUEMENT_MODIFIER.get();
-        var current = deploy(helper, new ItemStack(ItemRegistry.VENOM_CAPSULE.get()), ItemRegistry.CLOCKWORK_COMPONENTS.get());
+        var current = deploy(helper, new ItemStack(IronsArtificeItems.VENOM_CAPSULE.get()), IronsArtificeItems.CLOCKWORK_COMPONENTS.get());
         assertIntermediate(helper, current, incomplete, 1);
         current = fill(helper, current, Potions.STRONG_HARMING, Potions.HARMING);
         assertIntermediate(helper, current, incomplete, 2);
@@ -174,7 +173,7 @@ final class CreateModifierRecipeScenarios {
         assertFillingRejected(helper, current, Potions.STRONG_POISON, 250);
         assertFillingRejected(helper, current, potion, 249);
         // ガンオイルの初回だけは治癒・負傷の両方が正しい入口となる。
-        if (!current.is(ItemRegistry.GUN_OIL.get())) {
+        if (!current.is(IronsArtificeItems.GUN_OIL.get())) {
             assertFillingRejected(helper, current,
                     potion.equals(Potions.STRONG_HEALING) ? Potions.STRONG_HARMING : Potions.STRONG_HEALING, 250);
         }
@@ -223,9 +222,9 @@ final class CreateModifierRecipeScenarios {
         assertIntermediate(helper, current, incomplete, 2);
         current = press(helper, current);
         assertIntermediate(helper, current, incomplete, 3);
-        current = deploy(helper, current, ItemRegistry.CLOCKWORK_COMPONENTS.get());
+        current = deploy(helper, current, IronsArtificeItems.CLOCKWORK_COMPONENTS.get());
         assertIntermediate(helper, current, incomplete, 4);
-        current = deploy(helper, current, ItemRegistry.CLOCKWORK_COMPONENTS.get());
+        current = deploy(helper, current, IronsArtificeItems.CLOCKWORK_COMPONENTS.get());
         assertIntermediate(helper, current, incomplete, 5);
         current = deploy(helper, current, AllItems.EXTENDO_GRIP.get());
         ModifierRecipeGameTests.assertResult(helper, current, MODIFIER_AUGMENTATION_KIT.get(), "Sequenced assembly");
@@ -245,13 +244,13 @@ final class CreateModifierRecipeScenarios {
     static void gyroscopeCalibration(GameTestHelper helper) {
         assertAssemblyWithFinalPress(helper, AllItems.BRASS_SHEET.get(),
                 INCOMPLETE_GYROSCOPE_CALIBRATION_MODIFIER.get(), GYROSCOPE_CALIBRATION_MODIFIER.get(),
-                ItemRegistry.CLOCKWORK_COMPONENTS.get(), Items.COMPASS, Items.QUARTZ);
+                IronsArtificeItems.CLOCKWORK_COMPONENTS.get(), Items.COMPASS, Items.QUARTZ);
     }
 
     static void shockAbsorber(GameTestHelper helper) {
-        assertAssemblyWithFinalPress(helper, ItemRegistry.CLOCKWORK_COMPONENTS.get(),
+        assertAssemblyWithFinalPress(helper, IronsArtificeItems.CLOCKWORK_COMPONENTS.get(),
                 INCOMPLETE_SHOCK_ABSORBER_MODIFIER.get(), SHOCK_ABSORBER_MODIFIER.get(),
-                ItemRegistry.BUFFER_SPRING.get(), Items.SLIME_BALL, Items.NETHERITE_SCRAP);
+                IronsArtificeItems.BUFFER_SPRING.get(), Items.SLIME_BALL, Items.NETHERITE_SCRAP);
     }
 
     private static void assertAssemblyWithFinalPress(GameTestHelper helper, ItemLike base,
@@ -267,7 +266,7 @@ final class CreateModifierRecipeScenarios {
 
     static void enchantedMagazine(GameTestHelper helper) {
         var incomplete = INCOMPLETE_ENCHANTED_MAGAZINE_MODIFIER.get();
-        var bullet = ItemRegistry.ENCHANTED_BULLET_MODIFIER.get();
+        var bullet = IronsArtificeItems.ENCHANTED_BULLET_MODIFIER.get();
         var current = deploy(helper, new ItemStack(AllItems.BRASS_SHEET.get()), bullet);
         assertIntermediate(helper, current, incomplete, 1);
         current = deploy(helper, current, bullet);
@@ -304,7 +303,7 @@ final class CreateModifierRecipeScenarios {
     }
 
     static void fortuneMedal(GameTestHelper helper) {
-        var current = deploy(helper, new ItemStack(AllItems.GOLDEN_SHEET.get()), ItemRegistry.MECHANICAL_COMPONENTS.get());
+        var current = deploy(helper, new ItemStack(AllItems.GOLDEN_SHEET.get()), IronsArtificeItems.MECHANICAL_COMPONENTS.get());
         assertIntermediate(helper, current, INCOMPLETE_FORTUNE_MEDAL_MODIFIER.get(), 1);
         current = deploy(helper, current, Items.RABBIT_FOOT);
         assertIntermediate(helper, current, INCOMPLETE_FORTUNE_MEDAL_MODIFIER.get(), 2);
@@ -351,8 +350,8 @@ final class CreateModifierRecipeScenarios {
 
     static void itemTransfer(GameTestHelper helper) {
         var input = ModifierRecipeGameTests.input(1, 4,
-                Items.ENDER_PEARL, ItemRegistry.MECHANICAL_COMPONENTS.get(),
-                AllItems.PRECISION_MECHANISM.get(), ItemRegistry.CLOCKWORK_COMPONENTS.get());
+                Items.ENDER_PEARL, IronsArtificeItems.MECHANICAL_COMPONENTS.get(),
+                AllItems.PRECISION_MECHANISM.get(), IronsArtificeItems.CLOCKWORK_COMPONENTS.get());
         var result = RecipeGridHandler.tryToApplyRecipe(helper.getLevel(), groupedItems(helper, input));
         ModifierRecipeGameTests.assertResult(helper, result, ITEM_TRANSFER_MODIFIER.get(), "Mechanical crafter");
         ModifierRecipeGameTests.assertNoCraftingRecipe(helper, input,

@@ -7,6 +7,7 @@ import io.redspace.irons_artifice.item.GunplayManager;
 import io.redspace.irons_artifice.item.MagazineContents;
 import io.redspace.irons_artifice.menu.GunContainer;
 import io.redspace.irons_artifice.utils.RecoilHelper;
+import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
 import jp.aquafactory.artificesassorite.config.ServerConfig;
@@ -84,7 +85,7 @@ public final class ShockAbsorberGameTests {
             checkShot(fixture, 2.5, 1.0);
             checkShot(fixture, 2.5, 1.0);
             var slots = new GunContainer(sixShooter);
-            slots.setItem(2, new ItemStack(io.redspace.irons_artifice.registry.ItemRegistry.MECHANICAL_REPEATER.get()));
+            slots.setItem(2, new ItemStack(IronsArtificeItems.MECHANICAL_REPEATER.get()));
             slots.setChanged();
             checkShot(fixture, 2.5, 1.0);
             checkShot(fixture, 2.5, 0.0);
