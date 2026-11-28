@@ -9,24 +9,32 @@ import com.simibubi.create.content.fluids.potion.PotionFluidHandler;
 import com.simibubi.create.content.fluids.spout.FillingBySpout;
 import com.simibubi.create.content.kinetics.deployer.DeployerApplicationRecipe;
 import com.simibubi.create.content.kinetics.press.PressingRecipe;
+import com.simibubi.create.content.processing.basin.BasinBlockEntity;
+import com.simibubi.create.content.processing.basin.BasinRecipe;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import com.simibubi.create.content.kinetics.crafter.RecipeGridHandler;
 import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import io.redspace.irons_artifice.registry.ItemRegistry;
+import jp.aquafactory.artificesassorite.ArtificesAssortie;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.RecipeWrapper;
 
@@ -55,9 +63,86 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.POTION_IMBU
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_HEALING_OIL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_HARMING_OIL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_POTION_IMBUEMENT_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.BULLET_HEAD;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.BULLET_HEAD_MOLD;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.EMPTY_CASING;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_BULLET;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PINCH_OF_GUNPOWDER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ROUND_CASING_MOLD;
 
 final class CreateModifierRecipeScenarios {
     private CreateModifierRecipeScenarios() {}
+
+    static void bulletProduction(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var brassSheet = new SingleRecipeInput(new ItemStack(AllItems.BRASS_SHEET.get()));
+        var stonecutting = level.getRecipeManager().getRecipesFor(RecipeType.STONECUTTING, brassSheet, level);
+        for (var mold : new ItemLike[]{BULLET_HEAD_MOLD.get(), ROUND_CASING_MOLD.get()}) {
+            helper.assertTrue(stonecutting.stream().anyMatch(recipe ->
+                            recipe.value().getResultItem(level.registryAccess()).is(mold.asItem())),
+                    "Stonecutting brass must offer " + mold);
+        }
+
+        var bulletHead = formBulletPart(helper, AllItems.ANDESITE_ALLOY.get(),
+                BULLET_HEAD_MOLD.get(), BULLET_HEAD.get(), 8);
+        var casing = formBulletPart(helper, AllItems.IRON_SHEET.get(),
+                ROUND_CASING_MOLD.get(), EMPTY_CASING.get(), 32);
+        var powder = mixBulletPowder(helper);
+
+        var incomplete = INCOMPLETE_BULLET.get();
+        var current = deploy(helper, casing.copyWithCount(1), bulletHead.getItem());
+        assertIntermediate(helper, current, incomplete, 1);
+        current = deploy(helper, current, powder.getItem());
+        assertIntermediate(helper, current, incomplete, 2);
+        ModifierRecipeGameTests.assertResult(helper, press(helper, current), IronsArtificeItems.BULLET.get(),
+                "Bullet assembly");
+    }
+
+    private static ItemStack formBulletPart(GameTestHelper helper, ItemLike material, ItemLike mold,
+                                           ItemLike part, int expectedCount) {
+        var handler = new ItemStackHandler(2);
+        handler.setStackInSlot(0, new ItemStack(material));
+        handler.setStackInSlot(1, new ItemStack(mold));
+        var level = helper.getLevel();
+        var recipe = level.getRecipeManager().getRecipeFor(AllRecipeTypes.DEPLOYING.getType(),
+                new RecipeWrapper(handler), level).orElseThrow(() -> new AssertionError("Expected a recipe for " + part));
+        var deploying = (DeployerApplicationRecipe) recipe.value();
+        helper.assertTrue(deploying.shouldKeepHeldItem(), "Forming bullet parts must keep the mold");
+        var result = deploying.rollResults(level.random).getFirst();
+        helper.assertTrue(result.is(part.asItem()) && result.getCount() == expectedCount,
+                "Expected " + expectedCount + " of " + part);
+        return result;
+    }
+
+    private static ItemStack mixBulletPowder(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var recipe = level.getRecipeManager().byKey(ResourceLocation.fromNamespaceAndPath(
+                ArtificesAssortie.MODID, "mixing/pinch_of_gunpowder"))
+                .orElseThrow(() -> new AssertionError("Expected the bullet powder mixing recipe")).value();
+        var pos = new BlockPos(1, 2, 1);
+        helper.setBlock(pos, AllBlocks.BASIN.getDefaultState());
+        var basinPos = helper.absolutePos(pos);
+        var basin = (BasinBlockEntity) level.getBlockEntity(basinPos);
+        var inventory = level.getCapability(Capabilities.ItemHandler.BLOCK, basinPos, null);
+        helper.assertTrue(inventory != null, "Basin must expose its item inventory");
+        helper.assertTrue(ItemHandlerHelper.insertItem(inventory,
+                new ItemStack(IronsArtificeItems.BLACKPOWDER.get()), false).isEmpty(), "Basin must accept blackpowder");
+        helper.assertTrue(!BasinRecipe.match(basin, recipe), "Mixing must require cinder flour");
+        helper.assertTrue(ItemHandlerHelper.insertItem(inventory,
+                new ItemStack(AllItems.CINDER_FLOUR.get()), false).isEmpty(), "Basin must accept cinder flour");
+        helper.assertTrue(BasinRecipe.match(basin, recipe) && BasinRecipe.apply(basin, recipe),
+                "An unheated basin must mix blackpowder and cinder flour");
+        var outputs = new ArrayList<ItemStack>();
+        for (int slot = 0; slot < inventory.getSlots(); slot++) {
+            var stack = inventory.getStackInSlot(slot);
+            if (!stack.isEmpty()) outputs.add(stack);
+        }
+        helper.assertTrue(outputs.size() == 1, "Mixing must consume both inputs and leave one output stack");
+        var result = outputs.getFirst();
+        helper.assertTrue(result.is(PINCH_OF_GUNPOWDER.get()) && result.getCount() == 32,
+                "Mixing must produce 32 pinches of gunpowder");
+        return result;
+    }
 
     static void potionOil(GameTestHelper helper, boolean healing) {
         var strong = healing ? Potions.STRONG_HEALING : Potions.STRONG_HARMING;

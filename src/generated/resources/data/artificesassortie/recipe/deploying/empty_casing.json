@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:deploying",
+  "ingredients": [
+    {
+      "item": "create:iron_sheet"
+    },
+    {
+      "item": "artificesassortie:round_casing_mold"
+    }
+  ],
+  "keep_held_item": true,
+  "results": [
+    {
+      "count": 32,
+      "id": "artificesassortie:empty_casing"
+    }
+  ]
+}

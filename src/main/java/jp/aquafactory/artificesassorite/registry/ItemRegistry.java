@@ -69,6 +69,12 @@ public final class ItemRegistry {
     public static final DeferredItem<Item> INCOMPLETE_HEALING_OIL_MODIFIER = ITEMS.registerSimpleItem("incomplete_healing_oil_modifier");
     public static final DeferredItem<Item> INCOMPLETE_HARMING_OIL_MODIFIER = ITEMS.registerSimpleItem("incomplete_harming_oil_modifier");
     public static final DeferredItem<Item> INCOMPLETE_POTION_IMBUEMENT_MODIFIER = ITEMS.registerSimpleItem("incomplete_potion_imbuement_modifier");
+    public static final DeferredItem<Item> BULLET_HEAD_MOLD = ITEMS.registerSimpleItem("bullet_head_mold");
+    public static final DeferredItem<Item> ROUND_CASING_MOLD = ITEMS.registerSimpleItem("round_casing_mold");
+    public static final DeferredItem<Item> BULLET_HEAD = ITEMS.registerSimpleItem("bullet_head");
+    public static final DeferredItem<Item> EMPTY_CASING = ITEMS.registerSimpleItem("empty_casing");
+    public static final DeferredItem<Item> PINCH_OF_GUNPOWDER = ITEMS.registerSimpleItem("pinch_of_gunpowder");
+    public static final DeferredItem<Item> INCOMPLETE_BULLET = ITEMS.registerSimpleItem("incomplete_bullet");
 
     private ItemRegistry() {}
 }

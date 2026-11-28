@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:deploying",
+  "ingredients": [
+    {
+      "item": "create:andesite_alloy"
+    },
+    {
+      "item": "artificesassortie:bullet_head_mold"
+    }
+  ],
+  "keep_held_item": true,
+  "results": [
+    {
+      "count": 8,
+      "id": "artificesassortie:bullet_head"
+    }
+  ]
+}

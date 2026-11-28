@@ -4,9 +4,12 @@ import com.simibubi.create.AllFluids;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.api.data.recipe.MechanicalCraftingRecipeBuilder;
 import com.simibubi.create.content.kinetics.deployer.DeployerApplicationRecipe;
+import com.simibubi.create.content.kinetics.deployer.ItemApplicationRecipe;
+import com.simibubi.create.content.kinetics.mixer.MixingRecipe;
 import com.simibubi.create.content.kinetics.press.PressingRecipe;
 import com.simibubi.create.content.fluids.potion.PotionFluidHandler;
 import com.simibubi.create.content.fluids.transfer.FillingRecipe;
+import com.simibubi.create.content.processing.recipe.StandardProcessingRecipe;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipeBuilder;
 import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import io.redspace.irons_artifice.registry.ItemRegistry;
@@ -39,12 +42,19 @@ import static jp.aquafactory.artificesassorite.registry.ItemRegistry.POTION_IMBU
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_HEALING_OIL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_HARMING_OIL_MODIFIER;
 import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_POTION_IMBUEMENT_MODIFIER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.BULLET_HEAD;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.BULLET_HEAD_MOLD;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.EMPTY_CASING;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.INCOMPLETE_BULLET;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.PINCH_OF_GUNPOWDER;
+import static jp.aquafactory.artificesassorite.registry.ItemRegistry.ROUND_CASING_MOLD;
 
 final class CreateRecipes {
     private CreateRecipes() {}
 
     static void buildRecipes(RecipeOutput output) {
         var createOutput = output.withConditions(new ModLoadedCondition("create"));
+        buildBulletRecipes(createOutput);
         new SequencedAssemblyRecipeBuilder(id("enchanted_magazine_modifier"))
                 .require(AllItems.BRASS_SHEET.get())
                 .transitionTo(INCOMPLETE_ENCHANTED_MAGAZINE_MODIFIER.get())
@@ -167,6 +177,38 @@ final class CreateRecipes {
                 .whenModLoaded("create")
                 .build(output, ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID,
                         "compat/create/item_transfer_modifier"));
+    }
+
+    private static void buildBulletRecipes(RecipeOutput output) {
+        new ItemApplicationRecipe.Builder<>(DeployerApplicationRecipe::new, id("bullet_head"))
+                .require(AllItems.ANDESITE_ALLOY.get())
+                .require(BULLET_HEAD_MOLD.get())
+                .toolNotConsumed()
+                .output(BULLET_HEAD.get(), 8)
+                .build(output);
+
+        new ItemApplicationRecipe.Builder<>(DeployerApplicationRecipe::new, id("empty_casing"))
+                .require(AllItems.IRON_SHEET.get())
+                .require(ROUND_CASING_MOLD.get())
+                .toolNotConsumed()
+                .output(EMPTY_CASING.get(), 32)
+                .build(output);
+
+        new StandardProcessingRecipe.Builder<>(MixingRecipe::new, id("pinch_of_gunpowder"))
+                .require(IronsArtificeItems.BLACKPOWDER.get())
+                .require(AllItems.CINDER_FLOUR.get())
+                .output(PINCH_OF_GUNPOWDER.get(), 32)
+                .build(output);
+
+        new SequencedAssemblyRecipeBuilder(id("bullet"))
+                .require(EMPTY_CASING.get())
+                .transitionTo(INCOMPLETE_BULLET.get())
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(BULLET_HEAD.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(PINCH_OF_GUNPOWDER.get()))
+                .addStep(PressingRecipe::new, step -> step)
+                .loops(1)
+                .addOutput(IronsArtificeItems.BULLET.get(), 1)
+                .build(output);
     }
 
     private static ResourceLocation id(String path) {
