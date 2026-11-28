@@ -39,7 +39,7 @@ public final class SpellImbuementEvents {
             ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "spell_imbuement_power"), () -> new Power(1, null));
     public static final ComponentType<ValueModifier> DAMAGE_BOOST = new ComponentType<>(
             ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "spell_imbuement_damage_boost"),
-            () -> new ValueModifier(0, ValueModifier.Operation.MULTIPLY_TOTAL, ValueModifier.Type.BENEFICIAL));
+            () -> new ValueModifier(0, ValueModifier.Operation.MULTIPLY_TOTAL));
     public static final ComponentType<Integer> MANA_COST = new ComponentType<>(
             ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "spell_imbuement_mana_cost"), () -> 0);
 
@@ -87,7 +87,7 @@ public final class SpellImbuementEvents {
         var power = select(event.getEntity(), profile.itemStack());
         profile.components().set(POWER, power);
         var boost = new ValueModifier(values.damageMultiplier(power.multiplier(), count) - 1,
-                ValueModifier.Operation.MULTIPLY_TOTAL, ValueModifier.Type.BENEFICIAL);
+                ValueModifier.Operation.MULTIPLY_TOTAL);
         profile.components().set(DAMAGE_BOOST, boost);
         profile.modifyValue(ShotComponents.DAMAGE, boost);
         profile.modify(ShotComponents.ON_SHOT, effects -> effects.getOrCreate(ManaCost.class, ManaCost::new));

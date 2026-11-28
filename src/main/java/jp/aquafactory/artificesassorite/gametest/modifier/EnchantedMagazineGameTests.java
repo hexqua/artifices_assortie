@@ -14,7 +14,7 @@ import io.redspace.irons_artifice.item.GunplayManager;
 import io.redspace.irons_artifice.item.MagazineContents;
 import io.redspace.irons_artifice.menu.GunContainer;
 import io.redspace.irons_artifice.menu.GunModifierMenu;
-import io.redspace.irons_artifice.registry.ItemRegistry;
+import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import jp.aquafactory.artificesassorite.client.EnchantedMagazineClientTooltips;
 import jp.aquafactory.artificesassorite.config.ModifierValues;
@@ -57,7 +57,7 @@ public final class EnchantedMagazineGameTests {
         try (var f = new ModifierTestFixture(h)) {
             var gun = equip(f, "clockwork_rifle", 2, 9);
             var inventory = f.player.getInventory();
-            var box = new ItemStack(ItemRegistry.BULLET_BOX.get());
+            var box = new ItemStack(IronsArtificeItems.BULLET_BOX.get());
             inventory.setItem(5, box);
             putInBox(f, 4);
             var menu = new GunModifierMenu(2, inventory);
@@ -93,7 +93,7 @@ public final class EnchantedMagazineGameTests {
             h.assertTrue(fire(f) == FireOutcome.EMPTY_MAGAZINE, "An uncharged modifier must not allow firing");
             f.player.getInventory().setItem(5, bullets(2));
             reload(f, gun);
-            f.player.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ItemRegistry.TRICORNE_HAT.get()));
+            f.player.setItemSlot(EquipmentSlot.HEAD, new ItemStack(IronsArtificeItems.TRICORNE_HAT.get()));
             List<Double> damage = new ArrayList<>();
             List<Integer> consume = new ArrayList<>();
             Consumer<GunShootEvent.Post> record = event -> {
@@ -287,7 +287,7 @@ public final class EnchantedMagazineGameTests {
     }
 
     private static ItemStack bullets(int count) {
-        return new ItemStack(ItemRegistry.BULLET.get(), count);
+        return new ItemStack(IronsArtificeItems.BULLET.get(), count);
     }
 
     private static void putInBox(ModifierTestFixture f, int count) {

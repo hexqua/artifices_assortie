@@ -1,6 +1,6 @@
 package jp.aquafactory.artificesassorite.datagen;
 
-import io.redspace.irons_artifice.registry.ItemRegistry;
+import io.redspace.irons_artifice.registry.IronsArtificeItems;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -21,11 +21,11 @@ final class SpellbooksRecipes {
                 .pattern(" BA")
                 .pattern("ECE")
                 .pattern("AB ")
-                .define('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
-                .define('B', ItemRegistry.BULLET.get())
+                .define('C', IronsArtificeItems.CLOCKWORK_COMPONENTS.get())
+                .define('B', IronsArtificeItems.BULLET.get())
                 .define('E', CINDER_ESSENCE.get())
                 .define('A', ARCANE_INGOT.get())
-                .unlockedBy("has_clockwork_components", InventoryChangeTrigger.TriggerInstance.hasItems(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .unlockedBy("has_clockwork_components", InventoryChangeTrigger.TriggerInstance.hasItems(IronsArtificeItems.CLOCKWORK_COMPONENTS.get()))
                 .save(output.withConditions(new ModLoadedCondition("irons_spellbooks")),
                         ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID, "crafting/spell_imbuement_modifier"));
     }

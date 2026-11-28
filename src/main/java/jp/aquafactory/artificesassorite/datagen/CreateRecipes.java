@@ -12,7 +12,6 @@ import com.simibubi.create.content.fluids.transfer.FillingRecipe;
 import com.simibubi.create.content.processing.recipe.StandardProcessingRecipe;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipeBuilder;
 import io.redspace.irons_artifice.registry.IronsArtificeItems;
-import io.redspace.irons_artifice.registry.ItemRegistry;
 import jp.aquafactory.artificesassorite.ArtificesAssortie;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -58,8 +57,8 @@ final class CreateRecipes {
         new SequencedAssemblyRecipeBuilder(id("enchanted_magazine_modifier"))
                 .require(AllItems.BRASS_SHEET.get())
                 .transitionTo(INCOMPLETE_ENCHANTED_MAGAZINE_MODIFIER.get())
-                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.ENCHANTED_BULLET_MODIFIER.get()))
-                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.ENCHANTED_BULLET_MODIFIER.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(IronsArtificeItems.ENCHANTED_BULLET_MODIFIER.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(IronsArtificeItems.ENCHANTED_BULLET_MODIFIER.get()))
                 .addStep(PressingRecipe::new, step -> step)
                 .addStep(DeployerApplicationRecipe::new, step -> step.require(AllItems.EXP_NUGGET.get()))
                 .addStep(PressingRecipe::new, step -> step)
@@ -79,27 +78,27 @@ final class CreateRecipes {
                 .build(createOutput);
 
         new SequencedAssemblyRecipeBuilder(id("healing_oil_modifier"))
-                .require(ItemRegistry.GUN_OIL.get())
+                .require(IronsArtificeItems.GUN_OIL.get())
                 .transitionTo(INCOMPLETE_HEALING_OIL_MODIFIER.get())
                 .addStep(FillingRecipe::new, step -> step.require(PotionFluidHandler.potionIngredient(Potions.STRONG_HEALING, 250)))
-                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(IronsArtificeItems.CLOCKWORK_COMPONENTS.get()))
                 .loops(1)
                 .addOutput(HEALING_OIL_MODIFIER.get(), 1)
                 .build(createOutput);
 
         new SequencedAssemblyRecipeBuilder(id("harming_oil_modifier"))
-                .require(ItemRegistry.GUN_OIL.get())
+                .require(IronsArtificeItems.GUN_OIL.get())
                 .transitionTo(INCOMPLETE_HARMING_OIL_MODIFIER.get())
                 .addStep(FillingRecipe::new, step -> step.require(PotionFluidHandler.potionIngredient(Potions.STRONG_HARMING, 250)))
-                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(IronsArtificeItems.CLOCKWORK_COMPONENTS.get()))
                 .loops(1)
                 .addOutput(HARMING_OIL_MODIFIER.get(), 1)
                 .build(createOutput);
 
         new SequencedAssemblyRecipeBuilder(id("potion_imbuement_modifier"))
-                .require(ItemRegistry.VENOM_CAPSULE.get())
+                .require(IronsArtificeItems.VENOM_CAPSULE.get())
                 .transitionTo(INCOMPLETE_POTION_IMBUEMENT_MODIFIER.get())
-                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(IronsArtificeItems.CLOCKWORK_COMPONENTS.get()))
                 .addStep(FillingRecipe::new, step -> step.require(PotionFluidHandler.potionIngredient(Potions.STRONG_HARMING, 250)))
                 .addStep(FillingRecipe::new, step -> step.require(PotionFluidHandler.potionIngredient(Potions.STRONG_HEALING, 250)))
                 .addStep(PressingRecipe::new, step -> step)
@@ -113,8 +112,8 @@ final class CreateRecipes {
                 .addStep(DeployerApplicationRecipe::new, step -> step.require(Items.NETHERITE_INGOT))
                 .addStep(DeployerApplicationRecipe::new, step -> step.require(AllItems.STURDY_SHEET.get()))
                 .addStep(PressingRecipe::new, step -> step)
-                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
-                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(IronsArtificeItems.CLOCKWORK_COMPONENTS.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(IronsArtificeItems.CLOCKWORK_COMPONENTS.get()))
                 .addStep(DeployerApplicationRecipe::new, step -> step.require(AllItems.EXTENDO_GRIP.get()))
                 .loops(1)
                 .addOutput(MODIFIER_AUGMENTATION_KIT.get(), 1)
@@ -134,7 +133,7 @@ final class CreateRecipes {
         new SequencedAssemblyRecipeBuilder(id("gyroscope_calibration_modifier"))
                 .require(AllItems.BRASS_SHEET.get())
                 .transitionTo(INCOMPLETE_GYROSCOPE_CALIBRATION_MODIFIER.get())
-                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.CLOCKWORK_COMPONENTS.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(IronsArtificeItems.CLOCKWORK_COMPONENTS.get()))
                 .addStep(DeployerApplicationRecipe::new, step -> step.require(Items.COMPASS))
                 .addStep(DeployerApplicationRecipe::new, step -> step.require(Items.QUARTZ))
                 .addStep(PressingRecipe::new, step -> step)
@@ -143,9 +142,9 @@ final class CreateRecipes {
                 .build(createOutput);
 
         new SequencedAssemblyRecipeBuilder(id("shock_absorber_modifier"))
-                .require(ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .require(IronsArtificeItems.CLOCKWORK_COMPONENTS.get())
                 .transitionTo(INCOMPLETE_SHOCK_ABSORBER_MODIFIER.get())
-                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.BUFFER_SPRING.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(IronsArtificeItems.BUFFER_SPRING.get()))
                 .addStep(DeployerApplicationRecipe::new, step -> step.require(Items.SLIME_BALL))
                 .addStep(DeployerApplicationRecipe::new, step -> step.require(Items.NETHERITE_SCRAP))
                 .addStep(PressingRecipe::new, step -> step)
@@ -156,7 +155,7 @@ final class CreateRecipes {
         new SequencedAssemblyRecipeBuilder(id("fortune_medal_modifier"))
                 .require(AllItems.GOLDEN_SHEET.get())
                 .transitionTo(INCOMPLETE_FORTUNE_MEDAL_MODIFIER.get())
-                .addStep(DeployerApplicationRecipe::new, step -> step.require(ItemRegistry.MECHANICAL_COMPONENTS.get()))
+                .addStep(DeployerApplicationRecipe::new, step -> step.require(IronsArtificeItems.MECHANICAL_COMPONENTS.get()))
                 .addStep(DeployerApplicationRecipe::new, step -> step.require(Items.RABBIT_FOOT))
                 .addStep(PressingRecipe::new, step -> step)
                 .addStep(PressingRecipe::new, step -> step)
@@ -171,9 +170,9 @@ final class CreateRecipes {
                 .patternLine("P")
                 .patternLine("C")
                 .key('E', Items.ENDER_PEARL)
-                .key('M', ItemRegistry.MECHANICAL_COMPONENTS.get())
+                .key('M', IronsArtificeItems.MECHANICAL_COMPONENTS.get())
                 .key('P', AllItems.PRECISION_MECHANISM.get())
-                .key('C', ItemRegistry.CLOCKWORK_COMPONENTS.get())
+                .key('C', IronsArtificeItems.CLOCKWORK_COMPONENTS.get())
                 .whenModLoaded("create")
                 .build(output, ResourceLocation.fromNamespaceAndPath(ArtificesAssortie.MODID,
                         "compat/create/item_transfer_modifier"));

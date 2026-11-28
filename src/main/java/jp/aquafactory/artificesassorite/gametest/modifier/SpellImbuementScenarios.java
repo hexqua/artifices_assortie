@@ -175,10 +175,10 @@ final class SpellImbuementScenarios {
             int cost = (int) Math.ceil(normal * 0.1001 + normal * 1.5 * 0.65 * 0.25);
             h.assertTrue(SpellImbuementEvents.cost(profile, false) == cost, "Mana must include other modifiers and round up once per firing");
             int projectiles = Math.max(1, (int) Math.round(profile.value(ShotComponents.PROJECTILE_COUNT)));
-            profile.modifyValue(ShotComponents.PROJECTILE_COUNT, new ValueModifier(10, ValueModifier.Operation.ADD, ValueModifier.Type.BENEFICIAL));
+            profile.modifyValue(ShotComponents.PROJECTILE_COUNT, new ValueModifier(10, ValueModifier.Operation.ADD));
             h.assertTrue(SpellImbuementEvents.cost(profile, false) == cost, "Pellet count must not multiply mana");
             var boost = profile.peek(SpellImbuementEvents.DAMAGE_BOOST);
-            profile.modifyValue(ShotComponents.DAMAGE, new ValueModifier(boost.amount(), boost.operation(), boost.type()));
+            profile.modifyValue(ShotComponents.DAMAGE, new ValueModifier(boost.amount(), boost.operation()));
             h.assertTrue(SpellImbuementEvents.cost(profile, false) == (int) Math.ceil((normal * 0.1001 + normal * 1.5 * 0.65 * 0.25) * (1 + boost.amount())),
                     "Equal-valued modifiers must remain in the normal mana portion");
             var data = MagicData.getPlayerMagicData(f.player);
