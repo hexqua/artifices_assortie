@@ -50,5 +50,11 @@ public final class ModItemModelProvider extends ItemModelProvider {
         basicItem(ItemRegistry.INCOMPLETE_HEALING_OIL_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_HARMING_OIL_MODIFIER.get());
         basicItem(ItemRegistry.INCOMPLETE_POTION_IMBUEMENT_MODIFIER.get());
+        basicItem(ItemRegistry.BULLET_HEAD_MOLD.get());
+        basicItem(ItemRegistry.ROUND_CASING_MOLD.get());
+        basicItem(ItemRegistry.BULLET_HEAD.get());
+        basicItem(ItemRegistry.EMPTY_CASING.get());
+        basicItem(ItemRegistry.PINCH_OF_GUNPOWDER.get());
+        basicItem(ItemRegistry.INCOMPLETE_BULLET.get());
     }
 }

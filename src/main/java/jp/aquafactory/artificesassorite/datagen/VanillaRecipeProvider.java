@@ -14,12 +14,14 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.SingleItemRecipeBuilder;
 import net.minecraft.data.recipes.SpecialRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import net.neoforged.neoforge.common.conditions.NotCondition;
@@ -40,7 +42,16 @@ public final class VanillaRecipeProvider extends RecipeProvider {
         SpecialRecipeBuilder.special(SpellImbuementRecipe::new)
                 .save(output.withConditions(new ModLoadedCondition("irons_spellbooks")), id("crafting/spell_imbuement_school"));
         var createLoaded = new ModLoadedCondition("create");
+        var createOutput = output.withConditions(createLoaded);
         var fallback = output.withConditions(new NotCondition(createLoaded));
+
+        var brassSheet = AllItems.BRASS_SHEET.get();
+        SingleItemRecipeBuilder.stonecutting(Ingredient.of(brassSheet), RecipeCategory.MISC, BULLET_HEAD_MOLD.get())
+                .unlockedBy("has_brass_sheet", has(brassSheet))
+                .save(createOutput, id("stonecutting/bullet_head_mold"));
+        SingleItemRecipeBuilder.stonecutting(Ingredient.of(brassSheet), RecipeCategory.MISC, ROUND_CASING_MOLD.get())
+                .unlockedBy("has_brass_sheet", has(brassSheet))
+                .save(createOutput, id("stonecutting/round_casing_mold"));
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ENCHANTED_MAGAZINE_MODIFIER.get())
                 .pattern("GQ ")

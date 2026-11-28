@@ -34,6 +34,23 @@ public final class ModifierRecipeGameTests {
     private ModifierRecipeGameTests() {}
 
     @GameTest(template = "gametest/basic_floor")
+    public static void bulletProductionPreservesHandCrafting(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var ironRecipe = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING,
+                input(1, 2, Items.IRON_INGOT, IronsArtificeItems.BLACKPOWDER.get()), level)
+                .orElseThrow(() -> new AssertionError("Expected the original iron bullet recipe"));
+        var result = ironRecipe.value().getResultItem(level.registryAccess());
+        helper.assertTrue(result.is(IronsArtificeItems.BULLET.get()) && result.getCount() == 16,
+                "Iron and blackpowder must still produce sixteen bullets by hand");
+
+        boolean createLoaded = ModList.get().isLoaded("create");
+        helper.assertTrue(level.getRecipeManager().byKey(id("sequenced_assembly/bullet")).isPresent() == createLoaded,
+                "Bullet assembly must only load with Create");
+        if (createLoaded) CreateModifierRecipeScenarios.bulletProduction(helper);
+        helper.succeed();
+    }
+
+    @GameTest(template = "gametest/basic_floor")
     public static void enchantedMagazineRecipeSwitchesWithCreate(GameTestHelper helper) {
         boolean createLoaded = ModList.get().isLoaded("create");
         assertRecipeVariants(helper, "enchanted_magazine_modifier",

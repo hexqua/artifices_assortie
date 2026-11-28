@@ -5,6 +5,7 @@ import jp.aquafactory.artificesassorite.item.modifier.spellimbuement.SpellImbuem
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class CreativeTabRegistry {
@@ -24,6 +25,7 @@ public final class CreativeTabRegistry {
         addGuns(output);
         addModifiers(output);
         addSpecialItem(output);
+        addCreateRecipes(output);
     }
 
     private static void addGuns(CreativeModeTab.Output output) {
@@ -54,5 +56,17 @@ public final class CreativeTabRegistry {
 
     private static void addSpecialItem(CreativeModeTab.Output output) {
         output.accept(ItemRegistry.MODIFIER_AUGMENTATION_KIT.get());
+    }
+
+    private static void addCreateRecipes(CreativeModeTab.Output output) {
+        if(!ModList.get().isLoaded("create")){
+            return;
+        }
+
+        output.accept(ItemRegistry.BULLET_HEAD_MOLD.get());
+        output.accept(ItemRegistry.ROUND_CASING_MOLD.get());
+        output.accept(ItemRegistry.BULLET_HEAD.get());
+        output.accept(ItemRegistry.EMPTY_CASING.get());
+        output.accept(ItemRegistry.PINCH_OF_GUNPOWDER.get());
     }
 }

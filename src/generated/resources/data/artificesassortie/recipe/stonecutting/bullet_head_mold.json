@@ -1,0 +1,16 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "create:brass_sheet"
+  },
+  "result": {
+    "count": 1,
+    "id": "artificesassortie:bullet_head_mold"
+  }
+}

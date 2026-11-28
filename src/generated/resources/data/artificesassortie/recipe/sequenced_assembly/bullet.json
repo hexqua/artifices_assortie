@@ -1,0 +1,67 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "artificesassortie:empty_casing"
+  },
+  "results": [
+    {
+      "id": "irons_artifice:bullet"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_bullet"
+        },
+        {
+          "item": "artificesassortie:bullet_head"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_bullet"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_bullet"
+        },
+        {
+          "item": "artificesassortie:pinch_of_gunpowder"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_bullet"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "artificesassortie:incomplete_bullet"
+        }
+      ],
+      "results": [
+        {
+          "id": "artificesassortie:incomplete_bullet"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "artificesassortie:incomplete_bullet"
+  }
+}
